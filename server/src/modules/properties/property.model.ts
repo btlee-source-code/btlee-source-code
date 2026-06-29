@@ -35,6 +35,12 @@ const locationSchema = new Schema(
 
 const propertySchema = new Schema(
   {
+    // Human-friendly sequential listing number (1, 2, 3, …) shown to users
+    // instead of the opaque ObjectId. Assigned on creation from an atomic
+    // counter; see shared/models/counter.model.ts. Sparse so legacy docs
+    // without it don't collide on the unique index before backfill runs.
+    seq: { type: Number, unique: true, sparse: true, index: true },
+
     // Owner
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
 

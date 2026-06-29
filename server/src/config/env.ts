@@ -12,6 +12,7 @@ dotenv.config();
 // production. Real generated secrets won't contain these markers.
 const PLACEHOLDER = /replace[-_ ]?with|change[-_ ]?this|your[-_ ]?(secret|api|key)|example|xxxx|placeholder/i;
 
+
 const strongSecret = (label: string) =>
   z
     .string()
@@ -55,6 +56,7 @@ const envSchema = z.object({
   // The exact redirect URI registered in the Google Cloud console, e.g.
   // https://api.btlee.com/api/auth/google/callback
   GOOGLE_CALLBACK_URL: optionalConfig(z.string().url()),
+
 
   CLOUDINARY_CLOUD_NAME: z.string().min(1).refine((v) => !PLACEHOLDER.test(v), 'CLOUDINARY_CLOUD_NAME is still a placeholder'),
   CLOUDINARY_API_KEY: z.string().min(1),
@@ -105,7 +107,7 @@ if (env.JWT_ACCESS_SECRET === env.JWT_REFRESH_SECRET) {
 if (env.NODE_ENV === 'production' && env.COOKIE_SAMESITE === 'lax') {
   console.warn(
     '⚠️  COOKIE_SAMESITE=lax in production. If the frontend and API are on ' +
-      'different sites (e.g. *.vercel.app + *.railway.app), set COOKIE_SAMESITE=none ' +
-      'or auth cookies will NOT be sent and login will fail.'
+    'different sites (e.g. *.vercel.app + *.railway.app), set COOKIE_SAMESITE=none ' +
+    'or auth cookies will NOT be sent and login will fail.'
   );
 }

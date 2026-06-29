@@ -158,7 +158,10 @@ export function PropertyDetailView({ property }: { property: Property }) {
               <KeyValue label={t('finishingLabel')} value={t(`finishing.${property.finishing}`)} />
               <KeyValue label={t('categoryLabel')} value={t(`categories.${property.category}`)} />
               <KeyValue label={t('publishedOn')} value={formatDate(property.createdAt)} />
-              <KeyValue label={t('listingNumber')} value={`#${property._id.slice(-6)}`} />
+              <KeyValue
+                label={t('listingNumber')}
+                value={property.seq != null ? `#${property.seq}` : `#${property._id.slice(-6)}`}
+              />
             </div>
           </Card>
 

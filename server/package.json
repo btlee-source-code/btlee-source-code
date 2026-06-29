@@ -11,7 +11,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "type-check": "tsc --noEmit",
-    "seed": "tsx src/seeds/index.ts"
+    "seed": "tsx src/seeds/index.ts",
+    "backfill:seq": "tsx src/scripts/backfillListingSeq.ts"
   },
   "keywords": [
     "real-estate",

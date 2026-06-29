@@ -292,7 +292,11 @@ export function PropertyDetailsDialog({
             <Meta icon={Calendar} label="تاريخ النشر" value={formatDate(property.createdAt)} />
             <Meta icon={Clock} label="مدة الإعلان" value={`${property.durationDays} يوم`} />
             <Meta icon={Eye} label={tProp('views')} value={String(property.viewCount)} />
-            <Meta icon={Hash} label={tProp('listingNumber')} value={`#${property._id.slice(-6)}`} />
+            <Meta
+              icon={Hash}
+              label={tProp('listingNumber')}
+              value={property.seq != null ? `#${property.seq}` : `#${property._id.slice(-6)}`}
+            />
           </div>
 
           {/* Rejection reason (shown only while rejecting) */}

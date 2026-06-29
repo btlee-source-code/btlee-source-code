@@ -6,6 +6,7 @@
  */
 import { Types } from 'mongoose';
 import { Property } from './property.model.js';
+import { getNextSequence } from '../../shared/models/counter.model.js';
 import { User } from '../users/user.model.js';
 import { cloudinary } from '../../config/cloudinary.js';
 import { sendEmail } from '../../shared/utils/email.js';
@@ -294,8 +295,10 @@ export async function getPropertiesByOwner(ownerId: string, limit = 12) {
  */
 export async function createProperty(ownerId: string, input: CreatePropertyInput) {
   const expiresAt = new Date(Date.now() + input.durationDays * 24 * 60 * 60 * 1000);
+  const seq = await getNextSequence('property');
 
   const property = await Property.create({
+    seq,
     owner: new Types.ObjectId(ownerId),
     type: input.type,
     listingType: input.listingType,

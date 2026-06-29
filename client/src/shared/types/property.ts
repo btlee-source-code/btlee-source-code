@@ -25,6 +25,9 @@ export interface PropertyOwner {
 
 export interface Property {
   _id: string;
+  // Human-friendly sequential listing number (1, 2, 3, …) shown to users.
+  // Optional for legacy listings created before the field existed / backfill.
+  seq?: number;
   // Null when the owner's account has been deleted (orphaned listing).
   owner: PropertyOwner | null;
   type: PropertyType;
