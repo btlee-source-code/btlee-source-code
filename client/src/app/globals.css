@@ -1,0 +1,257 @@
+/**
+ * Global styles + Tailwind v4 theme configuration.
+ * In v4, all theme tokens are defined here via @theme — no tailwind.config file.
+ */
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Cairo (Arabic + Latin) — self-hosted from /public/fonts/cairo (variable font,
+   weight 400–800). Replaces the old Google Fonts @import so the font ships with
+   the project and is never fetched from a third party at runtime. */
+@font-face {
+  font-family: 'Cairo';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/cairo/cairo-arabic.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC, U+102E0-102FB, U+10E60-10E7E, U+10EC2-10EC4, U+10EFC-10EFF, U+1EE00-1EE03, U+1EE05-1EE1F, U+1EE21-1EE22, U+1EE24, U+1EE27, U+1EE29-1EE32, U+1EE34-1EE37, U+1EE39, U+1EE3B, U+1EE42, U+1EE47, U+1EE49, U+1EE4B, U+1EE4D-1EE4F, U+1EE51-1EE52, U+1EE54, U+1EE57, U+1EE59, U+1EE5B, U+1EE5D, U+1EE5F, U+1EE61-1EE62, U+1EE64, U+1EE67-1EE6A, U+1EE6C-1EE72, U+1EE74-1EE77, U+1EE79-1EE7C, U+1EE7E, U+1EE80-1EE89, U+1EE8B-1EE9B, U+1EEA1-1EEA3, U+1EEA5-1EEA9, U+1EEAB-1EEBB, U+1EEF0-1EEF1;
+}
+@font-face {
+  font-family: 'Cairo';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/cairo/cairo-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Cairo';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/cairo/cairo-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================
+   Bt Lee — Brand Color Tokens (HSL for shadcn compatibility)
+   Light mode = main site (warm, dark-green)
+   Dark mode  = admin panel only
+   ============================================================ */
+:root {
+  /* Force light rendering for native controls (inputs, scrollbars, date
+     pickers) so the site stays light even when the OS/browser is in dark
+     mode. The admin panel re-enables dark via `.dark` below. */
+  color-scheme: light;
+
+  /* shadcn semantic tokens — pure white + neutral grays (Airbnb-style).
+     Brand identity (forest green + warm gold) is preserved below. */
+  --background: 0 0% 100%;           /* #FFFFFF — pure white */
+  --foreground: 0 0% 11%;            /* #1C1C1C */
+
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 11%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 11%;
+
+  --primary: 169 38% 17%;            /* #1A3C34 — Dark Forest Green */
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 0 0% 97%;             /* #F7F7F7 — neutral light gray (section stripes) */
+  --secondary-foreground: 169 38% 17%;
+
+  --muted: 0 0% 97%;                 /* #F7F7F7 — neutral light gray */
+  --muted-foreground: 0 0% 45%;      /* #737373 — secondary text */
+
+  --accent: 39 65% 47%;              /* #C4922A — Warm Gold */
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 73% 51%;          /* #DC2626 */
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 0 0% 90%;                /* #E5E5E5 — neutral gray border */
+  --input: 0 0% 90%;
+  --ring: 169 38% 17%;
+
+  --radius: 0.75rem;
+
+  /* Status tokens (used in listing badges) */
+  --status-approved: 142 71% 45%;    /* #16A34A */
+  --status-pending: 32 95% 44%;      /* #D97706 */
+  --status-rejected: 0 73% 51%;      /* #DC2626 */
+  --status-sold: 262 83% 58%;        /* #7C3AED */
+}
+
+.dark {
+  /* Dark mode — warm, deep, near-pure-black & chic.
+     Used by both the public site (manual toggle) and the admin panel.
+     Hue ~30 (warm/brown) at very low saturation keeps the black warm
+     rather than a cold neutral grey; the gold accent carries the "chic". */
+  color-scheme: dark;
+  --background: 30 11% 4%;           /* #0C0A08 — warm near-black */
+  --foreground: 40 22% 92%;          /* #F2EDE3 — warm ivory */
+
+  --card: 30 9% 7%;                  /* #141210 — raised warm panel */
+  --card-foreground: 40 22% 92%;
+
+  --popover: 30 10% 6%;              /* #110F0D */
+  --popover-foreground: 40 22% 92%;
+
+  --primary: 168 30% 52%;            /* softened forest green (brand) */
+  --primary-foreground: 30 14% 6%;
+
+  --secondary: 30 7% 11%;            /* #1E1B18 — warm dark surface */
+  --secondary-foreground: 40 22% 92%;
+
+  --muted: 30 7% 11%;
+  --muted-foreground: 38 12% 60%;    /* warm grey secondary text */
+
+  --accent: 39 62% 55%;              /* #D1A23E — warm gold */
+  --accent-foreground: 30 14% 6%;
+
+  --destructive: 0 62% 55%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 34 9% 14%;               /* warm, subtle hairline border */
+  --input: 34 9% 14%;
+  --ring: 39 62% 55%;
+}
+
+/* ============================================================
+   @theme — maps the CSS vars above into Tailwind utility classes
+   ============================================================ */
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-status-approved: hsl(var(--status-approved));
+  --color-status-pending: hsl(var(--status-pending));
+  --color-status-rejected: hsl(var(--status-rejected));
+  --color-status-sold: hsl(var(--status-sold));
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-cairo: 'Cairo', system-ui, sans-serif;
+}
+
+/* ============================================================
+   Base layer
+   ============================================================ */
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: 'Cairo', system-ui, sans-serif;
+  }
+
+  /* RTL specific tweaks */
+  [dir='rtl'] {
+    text-align: right;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--secondary));
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.4);
+    border-radius: 6px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.6);
+  }
+}
+
+/* ============================================================
+   Utility helpers
+   ============================================================ */
+@utility no-scrollbar {
+  &::-webkit-scrollbar { display: none; }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ============================================================
+   Leaflet map + GeoSearch — branded to match the design system
+   (forest-green primary, gold accent, Cairo font, rounded radii)
+   ============================================================ */
+.leaflet-container {
+  font-family: 'Cairo', system-ui, sans-serif;
+  background: hsl(var(--secondary));
+}
+
+/* Zoom controls */
+.leaflet-bar {
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 4px 14px hsl(0 0% 0% / 0.10);
+}
+.leaflet-bar a,
+.leaflet-bar a:hover {
+  width: 34px;
+  height: 34px;
+  line-height: 34px;
+  color: hsl(var(--foreground));
+  background: hsl(var(--background));
+  border-bottom: 1px solid hsl(var(--border));
+  font-size: 18px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.leaflet-bar a:hover {
+  background: hsl(var(--secondary));
+  color: hsl(var(--primary));
+}
+.leaflet-bar a:last-child { border-bottom: none; }
+.leaflet-bar a.leaflet-disabled {
+  background: hsl(var(--secondary));
+  color: hsl(var(--muted-foreground) / 0.45);
+}
+
+/* Attribution pill */
+.leaflet-control-attribution {
+  background: hsl(var(--background) / 0.82) !important;
+  backdrop-filter: blur(4px);
+  color: hsl(var(--muted-foreground)) !important;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm) 0 0 0;
+}
+.leaflet-control-attribution a { color: hsl(var(--primary)) !important; }

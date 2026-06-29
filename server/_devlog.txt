@@ -1,0 +1,14 @@
+﻿
+> btlee-server@1.0.0 dev
+> tsx watch src/server.ts
+
+Γùç injected env (21) from .env // tip: Γîÿ override existing { override: true }
+[EMAIL] SMTP transport ready ΓÇö emails can be sent
+Γ£à MongoDB connected
+≡ƒöä Background jobs started
+≡ƒÜÇ Server running on http://localhost:5000
+≡ƒôª Environment: development
+[0mGET /api/properties/featured [32m200[0m 298.311 ms - -[0m
+[0mGET /api/properties/latest [32m200[0m 415.652 ms - -[0m
+[0mGET /api/properties/featured [36m304[0m 272.540 ms - -[0m
+[0mGET /api/properties/latest [36m304[0m 291.441 ms - -[0m
