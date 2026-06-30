@@ -128,7 +128,9 @@
     "follow": "Follow Us",
     "rights": "All rights reserved",
     "disclaimer": "Disclaimer",
-    "privacy": "Privacy Policy"
+    "privacy": "Privacy Policy",
+    "developedBy": "Designed & developed by",
+    "developerName": "Mohamed Hany Hassan"
   },
   "disclaimer": {
     "title": "Disclaimer",

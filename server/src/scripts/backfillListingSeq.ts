@@ -22,6 +22,7 @@ async function main(): Promise<void> {
     .sort({ seq: -1 })
     .select('seq')
     .lean();
+
   let next = (highest?.seq ?? 0) + 1;
 
   // Only docs missing a number, oldest first.

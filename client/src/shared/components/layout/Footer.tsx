@@ -2,7 +2,7 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/config/navigation';
 import { Logo } from './Logo';
-import { Facebook, Instagram, Twitter, MessageCircle } from 'lucide-react';
+import { Facebook, Instagram, Twitter, MessageCircle, Code2 } from 'lucide-react';
 
 export function Footer() {
   const t = useTranslations();
@@ -93,9 +93,15 @@ export function Footer() {
         </div>
 
         {/* Developer credit */}
-        <div className="mt-4 flex flex-col sm:flex-row items-center justify-center gap-x-3 gap-y-1 text-center text-xs text-muted-foreground">
-          <span>من صنع وتطوير محمد هاني حسن</span>
-          <span className="flex items-center gap-3">
+        <div className="mt-6 border-t border-border pt-5 flex flex-col items-center gap-2.5 text-center text-xs text-muted-foreground">
+          <p className="inline-flex items-center gap-1.5">
+            <Code2 className="size-3.5 text-primary" />
+            <span>
+              {t('footer.developedBy')}{' '}
+              <span className="font-semibold text-foreground">{t('footer.developerName')}</span>
+            </span>
+          </p>
+          <div className="flex items-center gap-4">
             <a
               href="https://wa.me/201070010209"
               target="_blank"
@@ -116,7 +122,7 @@ export function Footer() {
               <MessageCircle className="size-3.5" />
               01010060446
             </a>
-          </span>
+          </div>
         </div>
       </div>
     </footer>

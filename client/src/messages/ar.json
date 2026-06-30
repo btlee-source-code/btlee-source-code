@@ -127,7 +127,9 @@
     "follow": "تابعنا",
     "rights": "جميع الحقوق محفوظة",
     "disclaimer": "إخلاء المسؤولية",
-    "privacy": "سياسة الخصوصية"
+    "privacy": "سياسة الخصوصية",
+    "developedBy": "تصميم وتطوير",
+    "developerName": "محمد هاني حسن"
   },
   "disclaimer": {
     "title": "إخلاء المسؤولية",
