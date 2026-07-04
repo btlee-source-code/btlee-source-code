@@ -50,7 +50,6 @@ export function GoogleButton({ label }: GoogleButtonProps) {
     <Button
       type="button"
       variant="outline"
-      size="lg"
       className="w-full gap-2"
       onClick={start}
     >

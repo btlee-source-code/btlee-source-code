@@ -104,39 +104,40 @@ export default function RegisterPage() {
         transition={{ duration: 0.4 }}
       >
         <Card className="border-border shadow-lg">
-          <CardHeader className="text-center pb-3">
-            <div className="flex justify-center mb-4">
+          <CardHeader className="text-center pt-4 pb-2">
+            <div className="flex justify-center mb-2">
               <Logo size="md" />
             </div>
-            <CardTitle className="text-2xl">{t('registerTitle')}</CardTitle>
-            <CardDescription>{t('registerSubtitle')}</CardDescription>
+            <CardTitle className="text-lg">{t('registerTitle')}</CardTitle>
+            <CardDescription className="text-xs">{t('registerSubtitle')}</CardDescription>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="name">{t('name')}</Label>
-                <Input id="name" {...register('name')} />
+          <CardContent className="pb-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-2.5">
+              <div className="space-y-1">
+                <Label htmlFor="name" className="text-xs">{t('name')}</Label>
+                <Input id="name" className="h-9" {...register('name')} />
                 {errors.name && (
                   <p className="text-xs text-destructive">{errors.name.message}</p>
                 )}
               </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="email">{t('email')}</Label>
-                <Input id="email" type="email" autoComplete="email" {...register('email')} />
+              <div className="space-y-1">
+                <Label htmlFor="email" className="text-xs">{t('email')}</Label>
+                <Input id="email" type="email" autoComplete="email" className="h-9" {...register('email')} />
                 {errors.email && (
                   <p className="text-xs text-destructive">{errors.email.message}</p>
                 )}
               </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="phone">{t('phone')}</Label>
+              <div className="space-y-1">
+                <Label htmlFor="phone" className="text-xs">{t('phone')}</Label>
                 <Input
                   id="phone"
                   type="tel"
                   inputMode="numeric"
                   autoComplete="tel"
                   placeholder="01012345678"
+                  className="h-9"
                   {...register('phone')}
                 />
                 {errors.phone && (
@@ -144,12 +145,13 @@ export default function RegisterPage() {
                 )}
               </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="password">{t('password')}</Label>
+              <div className="space-y-1">
+                <Label htmlFor="password" className="text-xs">{t('password')}</Label>
                 <Input
                   id="password"
                   type="password"
                   autoComplete="new-password"
+                  className="h-9"
                   {...register('password')}
                 />
                 {errors.password && (
@@ -157,12 +159,13 @@ export default function RegisterPage() {
                 )}
               </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label>
+              <div className="space-y-1">
+                <Label htmlFor="confirmPassword" className="text-xs">{t('confirmPassword')}</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
                   autoComplete="new-password"
+                  className="h-9"
                   {...register('confirmPassword')}
                 />
                 {errors.confirmPassword && (
@@ -170,13 +173,13 @@ export default function RegisterPage() {
                 )}
               </div>
 
-              <Button type="submit" disabled={submitting} className="w-full" size="lg">
+              <Button type="submit" disabled={submitting} className="w-full">
                 {submitting && <Loader2 className="size-4 animate-spin" />}
                 {t('createAccount')}
               </Button>
             </form>
 
-            <div className="my-5 flex items-center gap-3">
+            <div className="my-3 flex items-center gap-3">
               <span className="h-px flex-1 bg-border" />
               <span className="text-xs text-muted-foreground">{t('orDivider')}</span>
               <span className="h-px flex-1 bg-border" />
@@ -186,7 +189,7 @@ export default function RegisterPage() {
               <GoogleButton />
             </div>
 
-            <p className="mt-6 text-center text-sm text-muted-foreground">
+            <p className="mt-4 text-center text-xs text-muted-foreground">
               {t('hasAccount')}{' '}
               <Link href="/login" className="font-semibold text-primary hover:underline">
                 {t('signIn')}

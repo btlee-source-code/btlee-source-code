@@ -65,18 +65,18 @@ export default function LoginPage() {
       transition={{ duration: 0.4 }}
     >
       <Card className="border-border shadow-lg">
-        <CardHeader className="text-center pb-3">
-          <div className="flex justify-center mb-4">
+        <CardHeader className="text-center pt-4 pb-2">
+          <div className="flex justify-center mb-2">
             <Logo size="md" />
           </div>
-          <CardTitle className="text-2xl">{t('loginTitle')}</CardTitle>
-          <CardDescription>{t('loginSubtitle')}</CardDescription>
+          <CardTitle className="text-lg">{t('loginTitle')}</CardTitle>
+          <CardDescription className="text-xs">{t('loginSubtitle')}</CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <CardContent className="pb-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
             <div className="space-y-1.5">
-              <Label htmlFor="identifier">{t('emailOrPhone')}</Label>
-              <Input id="identifier" type="text" autoComplete="username" {...register('identifier')} />
+              <Label htmlFor="identifier" className="text-xs">{t('emailOrPhone')}</Label>
+              <Input id="identifier" type="text" autoComplete="username" className="h-9" {...register('identifier')} />
               {errors.identifier && (
                 <p className="text-xs text-destructive">{errors.identifier.message}</p>
               )}
@@ -84,7 +84,7 @@ export default function LoginPage() {
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">{t('password')}</Label>
+                <Label htmlFor="password" className="text-xs">{t('password')}</Label>
                 <Link
                   href="/forgot-password"
                   className="text-xs text-primary hover:underline"
@@ -96,6 +96,7 @@ export default function LoginPage() {
                 id="password"
                 type="password"
                 autoComplete="current-password"
+                className="h-9"
                 {...register('password')}
               />
               {errors.password && (
@@ -103,13 +104,13 @@ export default function LoginPage() {
               )}
             </div>
 
-            <Button type="submit" disabled={submitting} className="w-full" size="lg">
+            <Button type="submit" disabled={submitting} className="w-full">
               {submitting && <Loader2 className="size-4 animate-spin" />}
               {t('signIn')}
             </Button>
           </form>
 
-          <div className="my-5 flex items-center gap-3">
+          <div className="my-3 flex items-center gap-3">
             <span className="h-px flex-1 bg-border" />
             <span className="text-xs text-muted-foreground">{t('orDivider')}</span>
             <span className="h-px flex-1 bg-border" />
@@ -119,7 +120,7 @@ export default function LoginPage() {
             <GoogleButton />
           </div>
 
-          <p className="mt-6 text-center text-sm text-muted-foreground">
+          <p className="mt-4 text-center text-xs text-muted-foreground">
             {t('noAccount')}{' '}
             <Link href="/register" className="font-semibold text-primary hover:underline">
               {t('createAccount')}

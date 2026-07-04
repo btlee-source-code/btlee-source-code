@@ -9,7 +9,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
-      <main className="flex-1 flex items-center justify-center bg-secondary/30 px-4 py-12 md:py-16">
+      <main className="flex-1 flex items-center justify-center bg-secondary/30 px-4 py-6 md:py-8">
         <div className="w-full max-w-md">{children}</div>
       </main>
       <Footer />
