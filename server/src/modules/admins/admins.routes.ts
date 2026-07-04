@@ -21,6 +21,12 @@ const idParams = z.object({ id: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid i
 
 const blockSchema = z.object({ isBlocked: z.boolean() });
 const featuredSchema = z.object({ isFeatured: z.boolean() });
+const bulkDeleteSchema = z.object({
+  ids: z
+    .array(z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid id'))
+    .min(1, 'Select at least one property')
+    .max(100, 'Cannot delete more than 100 at once'),
+});
 const reportUpdateSchema = z.object({ status: z.enum(['reviewed', 'dismissed']) });
 
 export const adminsRouter = Router();
@@ -45,6 +51,12 @@ adminsRouter.post(
   adminProtect,
   validate({ params: propertyIdParamsSchema, body: featuredSchema }),
   asyncHandler(controller.setFeatured)
+);
+adminsRouter.post(
+  '/properties/bulk-delete',
+  adminProtect,
+  validate({ body: bulkDeleteSchema }),
+  asyncHandler(controller.bulkDeleteProperties)
 );
 adminsRouter.delete(
   '/properties/:id',

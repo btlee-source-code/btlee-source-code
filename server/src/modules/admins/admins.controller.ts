@@ -37,6 +37,11 @@ export async function deleteProperty(req: Request, res: Response): Promise<void>
   res.json(ok({ message: 'Property deleted' }));
 }
 
+export async function bulkDeleteProperties(req: Request, res: Response): Promise<void> {
+  const result = await propertiesService.adminBulkDeleteProperties(req.body.ids);
+  res.json(ok({ deletedCount: result.deletedCount }));
+}
+
 export async function listUsers(req: Request, res: Response): Promise<void> {
   const page = Number(req.query.page ?? 1);
   const limit = Number(req.query.limit ?? 20);

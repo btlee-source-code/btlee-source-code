@@ -56,6 +56,14 @@ adminAxios.interceptors.response.use(
 interface Envelope<T> {
   status: 'success';
   data: T;
+  meta?: { pagination?: PaginationMeta };
+}
+
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
 }
 
 async function unwrap<T>(p: Promise<{ data: Envelope<T> }>): Promise<T> {
@@ -80,6 +88,13 @@ export const adminApi = {
   listProperties: (params: Record<string, string | number | undefined>) =>
     unwrap<unknown[]>(adminAxios.get('/admin/properties', { params })),
 
+  // Paginated variant — returns the page's items plus pagination meta so the
+  // admin panel can offer a "load more" button.
+  listPropertiesPaged: async (params: Record<string, string | number | undefined>) => {
+    const res = await adminAxios.get<Envelope<unknown[]>>('/admin/properties', { params });
+    return { items: res.data.data, meta: res.data.meta?.pagination };
+  },
+
   reviewProperty: (id: string, status: 'approved' | 'rejected', rejectionReason?: string) =>
     unwrap<unknown>(
       adminAxios.post(`/admin/properties/${id}/review`, { status, rejectionReason })
@@ -92,6 +107,11 @@ export const adminApi = {
 
   deleteProperty: (id: string) =>
     unwrap<{ message: string }>(adminAxios.delete(`/admin/properties/${id}`)),
+
+  bulkDeleteProperties: (ids: string[]) =>
+    unwrap<{ deletedCount: number }>(
+      adminAxios.post('/admin/properties/bulk-delete', { ids })
+    ),
 
   listUsers: () => unwrap<UserAdmin[]>(adminAxios.get('/admin/users')),
 

@@ -442,6 +442,30 @@ export async function adminDeleteProperty(id: string) {
 }
 
 /**
+ * Admin removes many listings at once (no owner check) and cleans up their
+ * Cloudinary images. Used by the admin panel's bulk-delete action.
+ * Returns how many listings were actually deleted.
+ */
+export async function adminBulkDeleteProperties(ids: string[]): Promise<{ deletedCount: number }> {
+  const properties = await Property.find({ _id: { $in: ids } });
+  if (properties.length === 0) return { deletedCount: 0 };
+
+  // Best-effort cleanup of every selected listing's Cloudinary images.
+  await Promise.all(
+    properties.flatMap((property) =>
+      property.images.map((img) =>
+        cloudinary.uploader.destroy(img.publicId).catch((err) => {
+          console.error('[cloudinary] failed to delete', img.publicId, err);
+        })
+      )
+    )
+  );
+
+  const result = await Property.deleteMany({ _id: { $in: properties.map((p) => p._id) } });
+  return { deletedCount: result.deletedCount ?? 0 };
+}
+
+/**
  * Owner marks their listing as sold or rented — it disappears from search.
  */
 export async function markAsSoldOrRented(
