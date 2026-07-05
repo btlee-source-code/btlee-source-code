@@ -65,7 +65,7 @@ export default function LoginPage() {
       transition={{ duration: 0.4 }}
     >
       <Card className="border-border shadow-lg">
-        <CardHeader className="text-center pt-4 pb-2">
+        <CardHeader className="text-center pt-4 pb-3">
           <div className="flex justify-center mb-2">
             <Logo size="md" />
           </div>
@@ -73,6 +73,14 @@ export default function LoginPage() {
           <CardDescription className="text-xs">{t('loginSubtitle')}</CardDescription>
         </CardHeader>
         <CardContent className="pb-4">
+          <GoogleButton />
+
+          <div className="my-3 flex items-center gap-3">
+            <span className="h-px flex-1 bg-border" />
+            <span className="text-xs text-muted-foreground">{t('orDivider')}</span>
+            <span className="h-px flex-1 bg-border" />
+          </div>
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
             <div className="space-y-1.5">
               <Label htmlFor="identifier" className="text-xs">{t('emailOrPhone')}</Label>
@@ -109,16 +117,6 @@ export default function LoginPage() {
               {t('signIn')}
             </Button>
           </form>
-
-          <div className="my-3 flex items-center gap-3">
-            <span className="h-px flex-1 bg-border" />
-            <span className="text-xs text-muted-foreground">{t('orDivider')}</span>
-            <span className="h-px flex-1 bg-border" />
-          </div>
-
-          <div className="space-y-2">
-            <GoogleButton />
-          </div>
 
           <p className="mt-4 text-center text-xs text-muted-foreground">
             {t('noAccount')}{' '}
