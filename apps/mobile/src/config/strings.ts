@@ -28,6 +28,9 @@ export const S = {
   heroSubtitle: 'آلاف العقارات للبيع والإيجار في مكان واحد',
   startSearch: 'ابدأ البحث',
   exploreByType: 'استكشف حسب النوع',
+  featuredTitle: 'عقارات مميزة',
+  latestTitle: 'أحدث العقارات',
+  viewAll: 'عرض الكل',
 
   // Properties list
   searchPlaceholder: 'ابحث عن مدينة، منطقة، أو نوع عقار...',

@@ -4,7 +4,9 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
-import { Logo } from '@/shared/components/Logo';
+import { PropertySection } from '@/features/home/components/PropertySection';
+import { propertiesApi } from '@/features/properties/api/properties.api';
+import { Logo } from '@/shared/components/layout/Logo';
 import { PROPERTY_TYPES, TYPE_LABELS } from '@/shared/lib/constants';
 
 export default function HomeScreen() {
@@ -47,6 +49,10 @@ export default function HomeScreen() {
             ))}
           </View>
         </View>
+
+        {/* Featured + latest carousels (public endpoints) */}
+        <PropertySection title={S.featuredTitle} fetcher={propertiesApi.featured} cacheKey="home-featured" />
+        <PropertySection title={S.latestTitle} fetcher={propertiesApi.latest} cacheKey="home-latest" />
       </ScrollView>
     </SafeAreaView>
   );

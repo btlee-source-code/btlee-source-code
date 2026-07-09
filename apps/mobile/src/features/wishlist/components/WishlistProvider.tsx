@@ -1,7 +1,7 @@
 import { useEffect, type ReactNode } from 'react';
 
 import { useAppDispatch, useAppSelector } from '@/shared/store/hooks';
-import { wishlistActions } from '@/shared/store/wishlistSlice';
+import { wishlistActions } from '@/features/wishlist/store/wishlist.slice';
 import { wishlistApi } from '../api/wishlist.api';
 
 /**

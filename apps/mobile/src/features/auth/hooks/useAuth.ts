@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 import { clearTokens, getRefreshToken, setTokens } from '@/shared/api/authStorage';
-import { authActions } from '@/shared/store/authSlice';
+import { authActions } from '@/features/auth/store/auth.slice';
 import { useAppDispatch, useAppSelector } from '@/shared/store/hooks';
 import type { User } from '@/shared/types/user';
 import { authApi, type RegisterInput } from '../api/auth.api';

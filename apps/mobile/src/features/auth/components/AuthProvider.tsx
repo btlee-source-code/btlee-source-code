@@ -1,7 +1,7 @@
 import { useEffect, type ReactNode } from 'react';
 
 import { clearTokens, getAccessToken } from '@/shared/api/authStorage';
-import { authActions } from '@/shared/store/authSlice';
+import { authActions } from '@/features/auth/store/auth.slice';
 import { useAppDispatch } from '@/shared/store/hooks';
 import { authApi } from '../api/auth.api';
 

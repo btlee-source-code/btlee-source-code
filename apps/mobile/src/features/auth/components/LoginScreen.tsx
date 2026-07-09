@@ -15,8 +15,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { HttpError } from '@/shared/api/httpClient';
-import { Logo } from '@/shared/components/Logo';
-import { TextField } from '@/shared/components/TextField';
+import { Logo } from '@/shared/components/layout/Logo';
+import { TextField } from '@/shared/components/ui/TextField';
 import { useAuth } from '../hooks/useAuth';
 
 export function LoginScreen() {
