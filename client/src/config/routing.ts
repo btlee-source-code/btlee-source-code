@@ -11,6 +11,11 @@ export const routing = defineRouting({
   // Users can still switch via the language toggle, and that choice sticks
   // through the NEXT_LOCALE cookie next-intl sets on navigation.
   localeDetection: false,
+  // Don't emit the middleware's `Link` hreflang header: it points x-default at
+  // the redirecting root (/), contradicting the metadata hreflang (x-default →
+  // /ar) and confusing Google's canonical selection. The per-page metadata in
+  // the locale layout is the single source of hreflang/canonical signals.
+  alternateLinks: false,
 });
 
 export type Locale = (typeof routing.locales)[number];

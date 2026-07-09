@@ -4,8 +4,9 @@ import { SITE_URL, serverApiBase } from '@/config/site';
 const LOCALES = ['ar', 'en'] as const;
 
 // Public static routes (per locale). Account/admin pages are intentionally left
-// out — they're disallowed in robots.ts.
-const STATIC_PATHS = ['', '/properties', '/disclaimer', '/login', '/register'];
+// out — they're disallowed in robots.ts. Auth pages (login/register) are also
+// excluded: they carry no SEO value and Google flags them as thin duplicates.
+const STATIC_PATHS = ['', '/properties', '/disclaimer'];
 
 function altLanguages(path: string) {
   return {
@@ -38,8 +39,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
     if (res.ok) {
       const json: { data?: Array<{ _id: string; updatedAt?: string }> } = await res.json();
+
       for (const p of json.data ?? []) {
         const path = `/properties/${p._id}`;
+
         for (const locale of LOCALES) {
           entries.push({
             url: `${SITE_URL}/${locale}${path}`,
