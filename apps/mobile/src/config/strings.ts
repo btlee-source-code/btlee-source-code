@@ -56,6 +56,28 @@ export const S = {
   listingNumber: 'رقم الإعلان',
   views: 'مشاهدة',
 
+  // Auth
+  signInTitle: 'تسجيل الدخول',
+  signInSubtitle: 'أهلاً بعودتك إلى بيت لي',
+  registerTitle: 'إنشاء حساب جديد',
+  registerSubtitle: 'انضم إلى بيت لي وابدأ رحلتك العقارية',
+  nameLabel: 'الاسم',
+  emailOrPhoneLabel: 'البريد الإلكتروني أو رقم الهاتف',
+  emailLabel: 'البريد الإلكتروني',
+  phoneLabel: 'رقم الهاتف',
+  passwordLabel: 'كلمة المرور',
+  signInBtn: 'دخول',
+  createAccountBtn: 'إنشاء حساب',
+  noAccount: 'ليس لديك حساب؟',
+  hasAccount: 'لديك حساب؟',
+  logout: 'تسجيل الخروج',
+  // Validation
+  required: 'هذا الحقل مطلوب',
+  invalidEmail: 'البريد الإلكتروني غير صحيح',
+  invalidPhone: 'أدخل رقم هاتف مصري صحيح (مثال: 01012345678)',
+  passwordMin: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
+  loginFailed: 'بيانات الدخول غير صحيحة',
+
   // Placeholders (features coming next)
   wishlistEmptyTitle: 'مفيش عقارات محفوظة',
   wishlistEmptyDesc: 'احفظ العقارات اللي عجباك وهتلاقيها هنا',

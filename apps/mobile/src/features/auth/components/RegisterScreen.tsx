@@ -1,0 +1,132 @@
+import { useRouter } from 'expo-router';
+import { ArrowRight } from 'lucide-react-native';
+import { useState } from 'react';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { S } from '@/config/strings';
+import { HttpError } from '@/shared/api/httpClient';
+import { Logo } from '@/shared/components/Logo';
+import { TextField } from '@/shared/components/TextField';
+import { useAuth } from '../hooks/useAuth';
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EG_PHONE_RE = /^01[0125][0-9]{8}$/;
+
+type Errors = Partial<Record<'name' | 'email' | 'phone' | 'password' | 'form', string>>;
+
+export function RegisterScreen() {
+  const router = useRouter();
+  const { register } = useAuth();
+
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState<Errors>({});
+  const [submitting, setSubmitting] = useState(false);
+
+  const validate = (): boolean => {
+    const e: Errors = {};
+    if (name.trim().length < 2) e.name = S.required;
+    if (!EMAIL_RE.test(email.trim())) e.email = S.invalidEmail;
+    if (!EG_PHONE_RE.test(phone.trim())) e.phone = S.invalidPhone;
+    if (password.length < 8) e.password = S.passwordMin;
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const onSubmit = async () => {
+    if (!validate()) return;
+    setSubmitting(true);
+    setErrors({});
+    try {
+      await register({ name: name.trim(), email: email.trim(), phone: phone.trim(), password });
+      router.back();
+    } catch (err) {
+      const e = err as HttpError;
+      setErrors({ form: e.message || S.genericError });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
+      <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView contentContainerClassName="px-6 pt-2 pb-8 flex-grow" keyboardShouldPersistTaps="handled">
+          <Pressable onPress={() => router.back()} hitSlop={8} className="h-10 w-10 items-start justify-center">
+            <ArrowRight size={24} color="#1A3C34" />
+          </Pressable>
+
+          <View className="items-center mt-2 mb-6">
+            <Logo height={36} />
+          </View>
+
+          <Text className="text-2xl font-cairo-bold text-foreground text-right">{S.registerTitle}</Text>
+          <Text className="text-sm text-muted-foreground font-cairo text-right mb-6">{S.registerSubtitle}</Text>
+
+          <View className="gap-4">
+            <TextField label={S.nameLabel} value={name} onChangeText={setName} error={errors.name} />
+            <TextField
+              label={S.emailLabel}
+              value={email}
+              onChangeText={setEmail}
+              error={errors.email}
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
+            <TextField
+              label={S.phoneLabel}
+              value={phone}
+              onChangeText={setPhone}
+              error={errors.phone}
+              keyboardType="phone-pad"
+              placeholder="01xxxxxxxxx"
+            />
+            <TextField
+              label={S.passwordLabel}
+              value={password}
+              onChangeText={setPassword}
+              error={errors.password}
+              secureTextEntry
+              autoCapitalize="none"
+            />
+
+            {errors.form ? (
+              <View className="bg-destructive/10 rounded-lg px-3 py-2">
+                <Text className="text-destructive text-sm font-cairo text-right">{errors.form}</Text>
+              </View>
+            ) : null}
+
+            <Pressable
+              onPress={onSubmit}
+              disabled={submitting}
+              className="bg-primary rounded-xl h-12 items-center justify-center active:opacity-90 mt-1">
+              {submitting ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text className="text-primary-foreground font-cairo-bold text-base">{S.createAccountBtn}</Text>
+              )}
+            </Pressable>
+
+            <View className="flex-row items-center justify-center gap-1 mt-2">
+              <Pressable onPress={() => router.replace('/login')} hitSlop={8}>
+                <Text className="text-primary font-cairo-semibold text-sm">{S.signInBtn}</Text>
+              </Pressable>
+              <Text className="text-muted-foreground font-cairo text-sm">{S.hasAccount}</Text>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+}

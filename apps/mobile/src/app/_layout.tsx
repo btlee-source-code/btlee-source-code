@@ -11,7 +11,12 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { Provider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+import { AuthProvider } from '@/features/auth/components/AuthProvider';
+import { WishlistProvider } from '@/features/wishlist/components/WishlistProvider';
+import { store } from '@/shared/store';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -31,15 +36,23 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <SafeAreaProvider>
-      <StatusBar style="dark" />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#FFFFFF' } }}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen
-          name="properties/[id]"
-          options={{ headerShown: true, headerTitle: '', headerBackTitle: 'رجوع', headerTintColor: '#1A3C34' }}
-        />
-      </Stack>
-    </SafeAreaProvider>
+    <Provider store={store}>
+      <AuthProvider>
+        <WishlistProvider>
+        <SafeAreaProvider>
+          <StatusBar style="dark" />
+          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#FFFFFF' } }}>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen
+              name="properties/[id]"
+              options={{ headerShown: true, headerTitle: '', headerBackTitle: 'رجوع', headerTintColor: '#1A3C34' }}
+            />
+            <Stack.Screen name="login" options={{ animation: 'slide_from_bottom' }} />
+            <Stack.Screen name="register" options={{ animation: 'slide_from_bottom' }} />
+          </Stack>
+        </SafeAreaProvider>
+        </WishlistProvider>
+      </AuthProvider>
+    </Provider>
   );
 }

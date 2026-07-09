@@ -41,3 +41,6 @@ Thumbs.db
 # Dev screenshots (verification artifacts)
 .expo-screenshot.png
 **/.expo-screenshot.png
+
+# one-off dev DB copy helper
+apps/server/_copy_db_to_local.mjs

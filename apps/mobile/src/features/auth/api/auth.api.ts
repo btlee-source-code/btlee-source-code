@@ -1,0 +1,31 @@
+import { get, post } from '@/shared/api/httpClient';
+import type { User } from '@/shared/types/user';
+
+/** Auth responses carry the tokens in the body (backend sends them for X-Client: mobile). */
+interface AuthResponse {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface RegisterInput {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+}
+
+export const authApi = {
+  register: (body: RegisterInput) =>
+    post<AuthResponse>('/auth/register', body, { skipAuth: true }),
+
+  login: (identifier: string, password: string) =>
+    post<AuthResponse>('/auth/login', { identifier, password }, { skipAuth: true }),
+
+  logout: (refreshToken: string) => post<{ message: string }>('/auth/logout', { refreshToken }),
+
+  me: () => get<User>('/users/me'),
+
+  forgotPassword: (email: string) =>
+    post<{ message: string }>('/auth/forgot-password', { email }, { skipAuth: true }),
+};

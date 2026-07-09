@@ -4,13 +4,16 @@ import { Bath, BedDouble, Heart, Home, Maximize2, MapPin, Star } from 'lucide-re
 import { Pressable, Text, View } from 'react-native';
 
 import { S } from '@/config/strings';
+import { useWishlist } from '@/features/wishlist/hooks/useWishlist';
 import { LISTING_TYPE_LABELS, TYPE_LABELS } from '@/shared/lib/constants';
 import { formatPrice } from '@/shared/lib/format';
+import { useAppSelector } from '@/shared/store/hooks';
 import type { Property } from '@/shared/types/property';
 
 const MUTED = '#737373';
 const GOLD = '#C4922A';
 const FOREGROUND = '#1C1C1C';
+const RED = '#DC2626';
 
 /**
  * Property card — mobile parity with the web `PropertyCard.tsx`:
@@ -22,6 +25,8 @@ export function PropertyCard({ property }: { property: Property }) {
   const router = useRouter();
   const cover = property.images?.[0]?.url;
   const hasRating = property.ratingCount > 0;
+  const saved = useAppSelector((s) => s.wishlist.ids.includes(property._id));
+  const { toggle } = useWishlist();
 
   return (
     <Pressable
@@ -55,11 +60,13 @@ export function PropertyCard({ property }: { property: Property }) {
         </View>
 
         {/* Wishlist heart (top-left to match RTL web) */}
-        <View
+        <Pressable
+          onPress={() => toggle(property._id, saved)}
+          hitSlop={6}
           className="absolute top-3 left-3 h-9 w-9 rounded-full items-center justify-center"
           style={{ backgroundColor: 'rgba(255,255,255,0.9)' }}>
-          <Heart size={16} color={FOREGROUND} />
-        </View>
+          <Heart size={16} color={saved ? RED : FOREGROUND} fill={saved ? RED : 'transparent'} />
+        </Pressable>
       </View>
 
       {/* Content */}
