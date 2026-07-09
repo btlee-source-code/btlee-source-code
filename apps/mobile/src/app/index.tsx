@@ -1,98 +1,60 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+import { View, Text, Pressable, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
-
+/**
+ * Home screen — first Bt Lee-branded screen, styled with NativeWind using the
+ * same design tokens as the web (primary forest green, gold accent, Cairo).
+ * Real feature screens (search, listings, detail) come next.
+ */
 export default function HomeScreen() {
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            أهلاً بيك في{'\n'}Bt Lee 🏠
-          </ThemedText>
-        </ThemedView>
+    <SafeAreaView className="flex-1 bg-background" edges={['top']}>
+      <ScrollView contentContainerClassName="px-5 pt-4 pb-8 gap-6">
+        {/* Header */}
+        <View className="flex-row items-center justify-between">
+          <Text className="text-2xl font-bold text-primary">Bt Lee</Text>
+          <View className="h-10 w-10 rounded-full bg-secondary items-center justify-center">
+            <Text className="text-base">🔔</Text>
+          </View>
+        </View>
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+        {/* Hero */}
+        <View className="bg-primary rounded-xl p-6 gap-2">
+          <Text className="text-primary-foreground text-xl font-bold">لاقي بيتك الجديد 🏠</Text>
+          <Text className="text-primary-foreground text-sm opacity-80">
+            آلاف العقارات للبيع والإيجار في مكان واحد
+          </Text>
+          <Pressable className="mt-3 self-start bg-accent rounded-lg px-5 py-2.5 active:opacity-90">
+            <Text className="text-accent-foreground font-semibold">ابدأ البحث</Text>
+          </Pressable>
+        </View>
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
+        {/* Sections */}
+        <Text className="text-lg font-bold text-foreground">الأقسام</Text>
+        <View className="flex-row gap-3">
+          <View className="flex-1 bg-card border border-border rounded-lg p-4 gap-1">
+            <Text className="text-2xl">🏠</Text>
+            <Text className="text-foreground font-semibold">عقارات</Text>
+            <Text className="text-muted-foreground text-xs">شقق · فيلات · محلات</Text>
+          </View>
+          <View className="flex-1 bg-card border border-border rounded-lg p-4 gap-1 opacity-60">
+            <Text className="text-2xl">🚗</Text>
+            <Text className="text-foreground font-semibold">عربيات</Text>
+            <Text className="text-muted-foreground text-xs">قريباً</Text>
+          </View>
+        </View>
 
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+        {/* Brand-parity proof strip */}
+        <View className="bg-secondary rounded-lg p-4 gap-2">
+          <Text className="text-secondary-foreground font-semibold">هوية الموقع على الموبايل ✅</Text>
+          <View className="flex-row gap-2">
+            <View className="h-8 flex-1 rounded-md bg-primary" />
+            <View className="h-8 flex-1 rounded-md bg-accent" />
+            <View className="h-8 flex-1 rounded-md bg-status-approved" />
+            <View className="h-8 flex-1 rounded-md bg-muted-foreground" />
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
-  },
-});
