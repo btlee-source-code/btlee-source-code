@@ -37,3 +37,7 @@ npm-debug.log*
 # OS / editor
 .DS_Store
 Thumbs.db
+
+# Dev screenshots (verification artifacts)
+.expo-screenshot.png
+**/.expo-screenshot.png
