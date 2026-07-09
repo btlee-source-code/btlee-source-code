@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Env / secrets
+.env
+.env.local
+**/.env
+!**/.env.example
+!**/.env.production.example
+
+# Build output
+dist/
+build/
+.next/
+**/.next/
+**/dist/
+**/build/
+
+# Expo / React Native
+.expo/
+**/.expo/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+**/android/app/build/
+**/ios/build/
+
+# Logs & caches
+*.log
+npm-debug.log*
+.turbo/
+*.tsbuildinfo
+
+# OS / editor
+.DS_Store
+Thumbs.db
