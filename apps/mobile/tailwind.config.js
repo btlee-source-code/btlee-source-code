@@ -37,8 +37,15 @@ module.exports = {
         lg: '12px', // --radius 0.75rem
         xl: '16px',
       },
+      // Cairo — the site's brand font. Each weight is its own family because RN
+      // doesn't synthesize weights from a single custom font; use `font-cairo`,
+      // `font-cairo-medium`, `font-cairo-semibold`, `font-cairo-bold` (NOT
+      // `font-bold`, which only sets fontWeight and won't pick the Cairo glyphs).
       fontFamily: {
-        cairo: ['Cairo', 'System'],
+        cairo: ['Cairo_400Regular'],
+        'cairo-medium': ['Cairo_500Medium'],
+        'cairo-semibold': ['Cairo_600SemiBold'],
+        'cairo-bold': ['Cairo_700Bold'],
       },
     },
   },
