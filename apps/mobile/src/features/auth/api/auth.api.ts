@@ -28,4 +28,7 @@ export const authApi = {
 
   forgotPassword: (email: string) =>
     post<{ message: string }>('/auth/forgot-password', { email }, { skipAuth: true }),
+
+  resetPassword: (token: string, password: string) =>
+    post<{ message: string }>('/auth/reset-password', { token, password }, { skipAuth: true }),
 };

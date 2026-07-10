@@ -1,9 +1,12 @@
 /**
- * Arabic UI strings for the mobile app. The web uses next-intl (`ar.json`),
- * which doesn't port to RN; these mirror the relevant keys plus the strings the
- * web hardcodes inline. Default language is Arabic (matches the web).
+ * UI strings. Arabic is the source dictionary; English is a partial overlay that
+ * falls back to Arabic for any missing key, so the UI is never broken — only
+ * partially translated. Call sites use `S.x` unchanged; `S` reads the active
+ * locale (see config/locale.ts) at access time.
  */
-export const S = {
+import { getLocale } from './locale';
+
+const ar = {
   appName: 'Bt Lee',
 
   // Currency / units (from property.* keys)
@@ -12,6 +15,9 @@ export const S = {
   priceOnRequest: 'السعر عند التواصل',
   areaUnit: 'م²',
   in: 'في',
+
+  // Common
+  back: 'رجوع',
 
   // Card badges
   featured: 'مميز',
@@ -35,6 +41,31 @@ export const S = {
   // Properties list
   searchPlaceholder: 'ابحث عن مدينة، منطقة، أو نوع عقار...',
   resultsCount: (n: number) => `${n} نتيجة`,
+  searchNoMatches: 'لا نتائج مطابقة',
+
+  // Filters & sort
+  filterBtn: 'تصفية',
+  sortBtn: 'الترتيب',
+  filterTitle: 'تصفية النتائج',
+  sortTitle: 'الترتيب',
+  apply: 'تطبيق',
+  reset: 'إعادة تعيين',
+  clearAll: 'مسح الكل',
+  all: 'الكل',
+  fListingType: 'نوع الصفقة',
+  fType: 'نوع العقار',
+  fCategory: 'التصنيف',
+  fGovernorate: 'المحافظة',
+  fPrice: 'السعر (ج.م)',
+  fMinPrice: 'من',
+  fMaxPrice: 'إلى',
+  fMinBedrooms: 'غرف النوم (على الأقل)',
+  fMinArea: 'المساحة على الأقل (م²)',
+  fFinishing: 'حالة التشطيب',
+  chipMinPrice: (n: string) => `السعر من: ${n}`,
+  chipMaxPrice: (n: string) => `السعر إلى: ${n}`,
+  chipMinBedrooms: (n: number) => `غرف: ${n}+`,
+  chipMinArea: (n: number) => `مساحة: ${n}+ م²`,
   loading: 'جارٍ التحميل',
   noResultsTitle: 'لا نتائج',
   noResultsDesc: 'جرّب تعديل كلمة البحث',
@@ -81,7 +112,147 @@ export const S = {
   passwordMin: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
   loginFailed: 'بيانات الدخول غير صحيحة',
 
-  // Placeholders (features coming next)
+  // Add / edit property
+  addPropertyTitle: 'أضف إعلانك',
+  editPropertyTitle: 'تعديل الإعلان',
+  fImages: 'صور العقار',
+  addImages: 'أضف صور',
+  fBedrooms: 'غرف النوم',
+  fBathrooms: 'الحمامات',
+  fFloor: 'الدور',
+  fAreaM: 'المساحة (م²)',
+  fPriceOne: 'السعر (ج.م)',
+  fServices: 'الخدمات المتوفرة',
+  fElevator: 'أسانسير',
+  fGarage: 'جراج',
+  fDeposit: 'التأمين المطلوب',
+  fAreaName: 'المنطقة / الحي',
+  fDescription: 'وصف العقار',
+  fWhatsapp: 'رقم واتساب للتواصل',
+  fDuration: 'مدة عرض الإعلان',
+  days: 'يوم',
+  optional: '(اختياري)',
+  submitAdd: 'نشر الإعلان',
+  submitEdit: 'حفظ التعديلات',
+  uploadingImages: 'جاري رفع الصور...',
+  publishing: 'جاري النشر...',
+  addSuccessTitle: 'تم إرسال إعلانك ✅',
+  addSuccessDesc: 'هيظهر بعد مراجعة الفريق',
+  fillRequired: 'اكمل الحقول المطلوبة',
+  imagesRequired: 'أضف صورة واحدة على الأقل',
+  whatsappHint: 'مثال: 01012345678',
+  descriptionHint: 'اكتب تفاصيل العقار (10 أحرف على الأقل)',
+
+  // My properties
+  myPropertiesTitle: 'إعلاناتي',
+  addNew: 'أضف إعلان',
+  noListingsTitle: 'مفيش إعلانات',
+  noListingsDesc: 'ابدأ بإضافة أول إعلان ليك',
+  editListing: 'تعديل',
+  deleteListing: 'حذف',
+  markSold: 'تم البيع',
+  markRented: 'تم التأجير',
+  confirmDeleteTitle: 'حذف الإعلان؟',
+  confirmDeleteDesc: 'مش هتقدر ترجعه تاني',
+  cancel: 'إلغاء',
+  rejectionReason: 'سبب الرفض',
+  viewsCount: (n: number) => `${n} مشاهدة`,
+
+  // Notifications
+  notificationsTitle: 'الإشعارات',
+  notificationsEmpty: 'مفيش إشعارات',
+  markAllRead: 'قراءة الكل',
+
+  // Ratings
+  ratingsTitle: 'التقييم',
+  ratingsCount: (n: number) => `${n} تقييم`,
+  noRatings: 'لا توجد تقييمات بعد',
+  rateThis: 'قيّم هذا العقار',
+  yourRating: 'تقييمك',
+  loginToRate: 'سجّل دخولك أولاً لتقييم العقار',
+
+  // Report
+  reportListing: 'الإبلاغ عن الإعلان',
+  reportTitle: 'الإبلاغ عن هذا الإعلان',
+  reportDetailsPlaceholder: 'تفاصيل إضافية (اختياري)',
+  reportChooseReason: 'اختر سبب الإبلاغ',
+  reportSubmit: 'إرسال البلاغ',
+  reportSuccess: 'تم إرسال البلاغ، شكراً لك',
+
+  // Similar + location
+  similarProperties: 'عقارات مشابهة',
+  locationLabel: 'الموقع',
+
+  // Owner profile
+  ownerProfile: 'صفحة المعلن',
+  memberSince: 'عضو منذ',
+  listingsCount: (n: number) => `${n} عقار منشور`,
+  allListingsByOwner: 'كل إعلانات هذا المعلن',
+  noOwnerListings: 'لا توجد إعلانات منشورة',
+
+  // Saved searches
+  savedSearchesTitle: 'عمليات البحث المحفوظة',
+  savedSearchesEmpty: 'لا توجد عمليات بحث محفوظة',
+  savedSearchesEmptyDesc: 'احفظ بحثك عشان يوصلك إشعار بأول عقار جديد يطابقه',
+  saveSearch: 'حفظ البحث',
+  savedSearchName: 'اسم البحث',
+  savedSearchNamePlaceholder: 'مثال: شقق للإيجار في المعادي',
+  savedSearchNameRequired: 'اكتب اسم للبحث',
+  savedSearchSaved: 'تم حفظ البحث ✅',
+  savedSearchDeleteTitle: 'حذف البحث؟',
+  applySearch: 'تطبيق البحث',
+
+  // Account
+  editProfileTitle: 'تعديل الملف الشخصي',
+  changePasswordTitle: 'تغيير كلمة المرور',
+  currentPasswordLabel: 'كلمة المرور الحالية',
+  newPasswordLabel: 'كلمة المرور الجديدة',
+  saveChanges: 'حفظ التغييرات',
+  saveSuccess: 'تم حفظ التغييرات',
+  nameInvalid: 'الاسم لازم يكون بين حرفين و60 حرف',
+  passwordLetter: 'كلمة المرور لازم تحتوي على حرف واحد على الأقل',
+  passwordDigit: 'كلمة المرور لازم تحتوي على رقم واحد على الأقل',
+  currentPasswordWrong: 'كلمة المرور الحالية غير صحيحة',
+  passwordChangedTitle: 'تم تغيير كلمة المرور',
+  passwordChangedReLogin: 'سجّل دخولك من جديد بكلمة المرور الجديدة',
+
+  // Forgot / reset password
+  forgotPassword: 'نسيت كلمة المرور؟',
+  resetPasswordTitle: 'إعادة تعيين كلمة المرور',
+  resetPasswordDesc: 'أدخل بريدك الإلكتروني وهنبعتلك رابط إعادة التعيين',
+  sendResetLink: 'إرسال الرابط',
+  resetLinkSent: 'تم إرسال الرابط',
+  resetLinkSentDesc: 'لو الإيميل ده مسجّل عندنا، هيوصلك رابط لإعادة التعيين',
+  backToLogin: 'العودة لتسجيل الدخول',
+  newPasswordTitle: 'تعيين كلمة مرور جديدة',
+  newPasswordSubtitle: 'اختر كلمة مرور قوية لحسابك',
+  confirmPasswordLabel: 'تأكيد كلمة المرور',
+  setNewPassword: 'تعيين كلمة المرور',
+  passwordNoMatch: 'كلمة المرور غير متطابقة',
+  resetSuccess: 'تم تغيير كلمة المرور بنجاح، تقدر تسجّل دخولك دلوقتي',
+  resetInvalidToken: 'رابط إعادة التعيين غير صالح أو منتهي الصلاحية',
+  tooManyAttempts: 'تجاوزت عدد المحاولات المسموح بها. استنى 15 دقيقة وحاول تاني.',
+
+  // Onboarding
+  onboardingTitle: 'أهلاً بيك في Bt Lee 🏡',
+  onboardingSubtitle: 'إيه اللي بتدوّر عليه؟',
+  goalBuy: 'شراء عقار',
+  goalRent: 'استئجار عقار',
+  goalSell: 'بيع أو تأجير',
+  goalBrowse: 'تصفّح فقط',
+  skip: 'تخطّي',
+  continue: 'متابعة',
+
+  // Legal / about
+  aboutApp: 'عن التطبيق',
+  privacyTitle: 'سياسة الخصوصية',
+  disclaimerTitle: 'إخلاء المسؤولية',
+  dataDeletionTitle: 'حذف البيانات',
+
+  // Language
+  language: 'اللغة',
+
+  // Placeholders
   wishlistEmptyTitle: 'مفيش عقارات محفوظة',
   wishlistEmptyDesc: 'احفظ العقارات اللي عجباك وهتلاقيها هنا',
   profileGuestTitle: 'أهلاً بيك في Bt Lee',
@@ -90,3 +261,246 @@ export const S = {
   loginToSave: 'سجل دخولك أولاً لحفظ العقارات',
   genericError: 'حدث خطأ، حاول مرة أخرى',
 };
+
+type Strings = typeof ar;
+
+const en: Partial<Strings> = {
+  back: 'Back',
+
+  currency: 'EGP',
+  perMonth: '/ month',
+  priceOnRequest: 'Price on request',
+  areaUnit: 'm²',
+  in: 'in',
+
+  featured: 'Featured',
+  new: 'New',
+
+  tabHome: 'Home',
+  tabProperties: 'Properties',
+  tabWishlist: 'Saved',
+  tabProfile: 'Account',
+
+  heroTitle: 'Find your new home',
+  heroSubtitle: 'Thousands of properties for sale and rent in one place',
+  startSearch: 'Start searching',
+  exploreByType: 'Explore by type',
+  featuredTitle: 'Featured properties',
+  latestTitle: 'Latest properties',
+  viewAll: 'View all',
+
+  searchPlaceholder: 'Search by city, area, or property type...',
+  resultsCount: (n: number) => `${n} result${n === 1 ? '' : 's'}`,
+  searchNoMatches: 'No matches',
+
+  filterBtn: 'Filter',
+  sortBtn: 'Sort',
+  filterTitle: 'Filter results',
+  sortTitle: 'Sort',
+  apply: 'Apply',
+  reset: 'Reset',
+  clearAll: 'Clear all',
+  all: 'All',
+  fListingType: 'Listing type',
+  fType: 'Property type',
+  fCategory: 'Category',
+  fGovernorate: 'Governorate',
+  fPrice: 'Price (EGP)',
+  fMinPrice: 'From',
+  fMaxPrice: 'To',
+  fMinBedrooms: 'Bedrooms (minimum)',
+  fMinArea: 'Minimum area (m²)',
+  fFinishing: 'Finishing',
+  chipMinPrice: (n: string) => `From: ${n}`,
+  chipMaxPrice: (n: string) => `To: ${n}`,
+  chipMinBedrooms: (n: number) => `Beds: ${n}+`,
+  chipMinArea: (n: number) => `Area: ${n}+ m²`,
+  loading: 'Loading',
+  noResultsTitle: 'No results',
+  noResultsDesc: 'Try adjusting your search',
+  errorTitle: 'Something went wrong',
+  errorDesc: 'Could not load properties, please try again',
+  retry: 'Try again',
+
+  contactOwner: 'Contact the owner',
+  viewOnMap: 'View on map',
+  descriptionLabel: 'Description',
+  detailsLabel: 'Details',
+  bedrooms: 'Bedrooms',
+  bathrooms: 'Bathrooms',
+  floor: 'Floor',
+  area: 'Area',
+  finishingLabel: 'Finishing',
+  elevator: 'Elevator',
+  garage: 'Garage',
+  servicesLabel: 'Available services',
+  depositLabel: 'Required deposit',
+  listingNumber: 'Listing no.',
+  views: 'views',
+
+  signInTitle: 'Sign in',
+  signInSubtitle: 'Welcome back to Bt Lee',
+  registerTitle: 'Create a new account',
+  registerSubtitle: 'Join Bt Lee and start your property journey',
+  nameLabel: 'Name',
+  emailOrPhoneLabel: 'Email or phone number',
+  emailLabel: 'Email',
+  phoneLabel: 'Phone number',
+  passwordLabel: 'Password',
+  signInBtn: 'Sign in',
+  createAccountBtn: 'Create account',
+  noAccount: "Don't have an account?",
+  hasAccount: 'Already have an account?',
+  logout: 'Sign out',
+  required: 'This field is required',
+  invalidEmail: 'Invalid email address',
+  invalidPhone: 'Enter a valid Egyptian phone number (e.g. 01012345678)',
+  passwordMin: 'Password must be at least 8 characters',
+  loginFailed: 'Invalid login credentials',
+
+  addPropertyTitle: 'Add your listing',
+  editPropertyTitle: 'Edit listing',
+  fImages: 'Property photos',
+  addImages: 'Add photos',
+  fBedrooms: 'Bedrooms',
+  fBathrooms: 'Bathrooms',
+  fFloor: 'Floor',
+  fAreaM: 'Area (m²)',
+  fPriceOne: 'Price (EGP)',
+  fServices: 'Available services',
+  fElevator: 'Elevator',
+  fGarage: 'Garage',
+  fDeposit: 'Required deposit',
+  fAreaName: 'Area / neighborhood',
+  fDescription: 'Property description',
+  fWhatsapp: 'WhatsApp contact number',
+  fDuration: 'Listing duration',
+  days: 'days',
+  optional: '(optional)',
+  submitAdd: 'Publish listing',
+  submitEdit: 'Save changes',
+  uploadingImages: 'Uploading photos...',
+  publishing: 'Publishing...',
+  addSuccessTitle: 'Your listing was submitted ✅',
+  addSuccessDesc: 'It will appear after the team reviews it',
+  fillRequired: 'Please complete the required fields',
+  imagesRequired: 'Add at least one photo',
+  whatsappHint: 'e.g. 01012345678',
+  descriptionHint: 'Write the property details (at least 10 characters)',
+
+  myPropertiesTitle: 'My listings',
+  addNew: 'Add listing',
+  noListingsTitle: 'No listings yet',
+  noListingsDesc: 'Start by adding your first listing',
+  editListing: 'Edit',
+  deleteListing: 'Delete',
+  markSold: 'Sold',
+  markRented: 'Rented',
+  confirmDeleteTitle: 'Delete listing?',
+  confirmDeleteDesc: 'This cannot be undone',
+  cancel: 'Cancel',
+  rejectionReason: 'Rejection reason',
+  viewsCount: (n: number) => `${n} views`,
+
+  notificationsTitle: 'Notifications',
+  notificationsEmpty: 'No notifications',
+  markAllRead: 'Mark all read',
+
+  ratingsTitle: 'Rating',
+  ratingsCount: (n: number) => `${n} rating${n === 1 ? '' : 's'}`,
+  noRatings: 'No ratings yet',
+  rateThis: 'Rate this property',
+  yourRating: 'Your rating',
+  loginToRate: 'Sign in first to rate this property',
+
+  reportListing: 'Report listing',
+  reportTitle: 'Report this listing',
+  reportDetailsPlaceholder: 'Additional details (optional)',
+  reportChooseReason: 'Choose a reason',
+  reportSubmit: 'Submit report',
+  reportSuccess: 'Report submitted, thank you',
+
+  similarProperties: 'Similar properties',
+  locationLabel: 'Location',
+
+  ownerProfile: 'Owner profile',
+  memberSince: 'Member since',
+  listingsCount: (n: number) => `${n} published listing${n === 1 ? '' : 's'}`,
+  allListingsByOwner: "All of this owner's listings",
+  noOwnerListings: 'No published listings',
+
+  savedSearchesTitle: 'Saved searches',
+  savedSearchesEmpty: 'No saved searches',
+  savedSearchesEmptyDesc: 'Save a search to get notified about the first new property that matches it',
+  saveSearch: 'Save search',
+  savedSearchName: 'Search name',
+  savedSearchNamePlaceholder: 'e.g. Apartments for rent in Maadi',
+  savedSearchNameRequired: 'Enter a name for the search',
+  savedSearchSaved: 'Search saved ✅',
+  savedSearchDeleteTitle: 'Delete search?',
+  applySearch: 'Apply search',
+
+  editProfileTitle: 'Edit profile',
+  changePasswordTitle: 'Change password',
+  currentPasswordLabel: 'Current password',
+  newPasswordLabel: 'New password',
+  saveChanges: 'Save changes',
+  saveSuccess: 'Changes saved',
+  nameInvalid: 'Name must be between 2 and 60 characters',
+  passwordLetter: 'Password must contain at least one letter',
+  passwordDigit: 'Password must contain at least one number',
+  currentPasswordWrong: 'Current password is incorrect',
+  passwordChangedTitle: 'Password changed',
+  passwordChangedReLogin: 'Sign in again with your new password',
+
+  forgotPassword: 'Forgot password?',
+  resetPasswordTitle: 'Reset password',
+  resetPasswordDesc: "Enter your email and we'll send you a reset link",
+  sendResetLink: 'Send link',
+  resetLinkSent: 'Link sent',
+  resetLinkSentDesc: "If that email is registered with us, you'll receive a reset link",
+  backToLogin: 'Back to sign in',
+  newPasswordTitle: 'Set a new password',
+  newPasswordSubtitle: 'Choose a strong password for your account',
+  confirmPasswordLabel: 'Confirm password',
+  setNewPassword: 'Set password',
+  passwordNoMatch: 'Passwords do not match',
+  resetSuccess: 'Password changed successfully, you can sign in now',
+  resetInvalidToken: 'The reset link is invalid or has expired',
+  tooManyAttempts: 'Too many attempts. Please wait 15 minutes and try again.',
+
+  onboardingTitle: 'Welcome to Bt Lee 🏡',
+  onboardingSubtitle: 'What are you looking for?',
+  goalBuy: 'Buy a property',
+  goalRent: 'Rent a property',
+  goalSell: 'Sell or rent out',
+  goalBrowse: 'Just browsing',
+  skip: 'Skip',
+  continue: 'Continue',
+
+  aboutApp: 'About the app',
+  privacyTitle: 'Privacy Policy',
+  disclaimerTitle: 'Disclaimer',
+  dataDeletionTitle: 'Data deletion',
+
+  language: 'Language',
+
+  wishlistEmptyTitle: 'No saved properties',
+  wishlistEmptyDesc: 'Save the properties you like and find them here',
+  profileGuestTitle: 'Welcome to Bt Lee',
+  profileGuestDesc: 'Sign in to save properties and post your listing',
+  comingSoon: 'Coming soon',
+  loginToSave: 'Sign in first to save properties',
+  genericError: 'Something went wrong, please try again',
+};
+
+/** Locale-aware strings — `S.x` returns the English value when active, else Arabic. */
+export const S: Strings = new Proxy(ar, {
+  get(target, prop: string) {
+    if (getLocale() === 'en') {
+      const v = (en as Record<string, unknown>)[prop];
+      if (v !== undefined) return v;
+    }
+    return (target as Record<string, unknown>)[prop];
+  },
+}) as Strings;

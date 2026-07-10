@@ -1,10 +1,11 @@
 import { useRouter } from 'expo-router';
-import { Bell, Search } from 'lucide-react-native';
+import { Search } from 'lucide-react-native';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { PropertySection } from '@/features/home/components/PropertySection';
+import { NotificationsBell } from '@/features/notifications/components/NotificationsBell';
 import { propertiesApi } from '@/features/properties/api/properties.api';
 import { Logo } from '@/shared/components/layout/Logo';
 import { PROPERTY_TYPES, TYPE_LABELS } from '@/shared/lib/constants';
@@ -18,9 +19,7 @@ export default function HomeScreen() {
         {/* Header: logo + notifications */}
         <View className="flex-row items-center justify-between">
           <Logo height={30} />
-          <View className="h-10 w-10 rounded-full bg-secondary items-center justify-center">
-            <Bell size={20} color="#1A3C34" />
-          </View>
+          <NotificationsBell />
         </View>
 
         {/* Hero */}

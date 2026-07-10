@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
+import { OnboardingSheet } from '@/features/account/components/OnboardingSheet';
 import { HttpError } from '@/shared/api/httpClient';
 import { Logo } from '@/shared/components/layout/Logo';
 import { TextField } from '@/shared/components/ui/TextField';
@@ -33,6 +34,7 @@ export function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const validate = (): boolean => {
     const e: Errors = {};
@@ -50,7 +52,7 @@ export function RegisterScreen() {
     setErrors({});
     try {
       await register({ name: name.trim(), email: email.trim(), phone: phone.trim(), password });
-      router.back();
+      setShowOnboarding(true);
     } catch (err) {
       const e = err as HttpError;
       setErrors({ form: e.message || S.genericError });
@@ -127,6 +129,8 @@ export function RegisterScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <OnboardingSheet visible={showOnboarding} onComplete={() => router.replace('/')} />
     </SafeAreaView>
   );
 }

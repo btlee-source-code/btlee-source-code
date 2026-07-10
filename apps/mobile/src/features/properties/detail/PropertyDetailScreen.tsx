@@ -1,10 +1,12 @@
 import { Image } from 'expo-image';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
   ArrowUpDown,
   Bath,
   BedDouble,
   Building2,
+  ChevronLeft,
+  Flag,
   Layers,
   MapPin,
   Maximize2,
@@ -25,6 +27,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { ReportSheet } from '@/features/reports/components/ReportSheet';
 import { useFetch } from '@/shared/hooks/useFetch';
 import {
   DEPOSIT_LABELS,
@@ -35,6 +39,10 @@ import {
 } from '@/shared/lib/constants';
 import { formatPrice, whatsappLink } from '@/shared/lib/format';
 import { propertiesApi } from '../api/properties.api';
+import { PropertyMap } from './components/PropertyMap';
+import { PropertyRating } from './components/PropertyRating';
+import { ShareButton } from './components/ShareButton';
+import { SimilarProperties } from './components/SimilarProperties';
 
 const PRIMARY = '#1A3C34';
 const MUTED = '#737373';
@@ -43,11 +51,14 @@ const { width } = Dimensions.get('window');
 
 export function PropertyDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const { data: property, isLoading, error, refetch } = useFetch(
     useCallback(() => propertiesApi.detail(id), [id]),
     id
   );
   const [imgIndex, setImgIndex] = useState(0);
+  const [reportOpen, setReportOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -116,6 +127,11 @@ export function PropertyDetailScreen() {
             <Text className="text-primary text-xs font-cairo-semibold">
               {LISTING_TYPE_LABELS[property.listingType]}
             </Text>
+          </View>
+
+          {/* Share (top-left, RTL) */}
+          <View className="absolute top-3 left-3">
+            <ShareButton property={property} />
           </View>
         </View>
 
@@ -201,8 +217,28 @@ export function PropertyDetailScreen() {
             <Text className="text-sm text-foreground font-cairo leading-6 text-right">{property.description}</Text>
           </View>
 
-          {/* Owner + meta */}
-          <View className="flex-row items-center gap-3 pt-3 border-t border-border">
+          {/* Location map (only when a pin was set) */}
+          {property.location?.coordinates && (
+            <PropertyMap lng={property.location.coordinates[0]} lat={property.location.coordinates[1]} />
+          )}
+
+          {/* Ratings */}
+          <PropertyRating property={property} />
+
+          {/* Owner + meta — tappable → owner profile (when the owner still exists) */}
+          <Pressable
+            onPress={() => property.owner?._id && router.push(`/owners/${property.owner._id}`)}
+            disabled={!property.owner?._id}
+            className="flex-row items-center gap-3 pt-3 border-t border-border active:opacity-70">
+            {property.owner?._id ? <ChevronLeft size={18} color={MUTED} /> : null}
+            <View className="flex-1">
+              <Text className="font-cairo-semibold text-foreground text-right">{property.owner?.name ?? 'صاحب العقار'}</Text>
+              <Text className="text-xs text-muted-foreground font-cairo text-right">
+                {property.owner?._id ? `${S.ownerProfile} · ` : ''}
+                {property.seq ? `${S.listingNumber} #${property.seq} · ` : ''}
+                {property.viewCount} {S.views}
+              </Text>
+            </View>
             {property.owner?.avatar ? (
               <Image source={{ uri: property.owner.avatar }} style={{ width: 40, height: 40, borderRadius: 20 }} contentFit="cover" />
             ) : (
@@ -210,14 +246,20 @@ export function PropertyDetailScreen() {
                 <Text className="text-primary font-cairo-bold">{property.owner?.name?.charAt(0) ?? '؟'}</Text>
               </View>
             )}
-            <View className="flex-1">
-              <Text className="font-cairo-semibold text-foreground text-right">{property.owner?.name ?? 'صاحب العقار'}</Text>
-              <Text className="text-xs text-muted-foreground font-cairo text-right">
-                {property.seq ? `${S.listingNumber} #${property.seq} · ` : ''}
-                {property.viewCount} {S.views}
-              </Text>
-            </View>
-          </View>
+          </Pressable>
+
+          {/* Similar properties */}
+          <SimilarProperties id={property._id} />
+
+          {/* Report this listing (authenticated only) */}
+          {isAuthenticated && (
+            <Pressable
+              onPress={() => setReportOpen(true)}
+              className="flex-row items-center justify-center gap-2 pt-2 active:opacity-70">
+              <Flag size={15} color={MUTED} />
+              <Text className="text-sm text-muted-foreground font-cairo">{S.reportListing}</Text>
+            </Pressable>
+          )}
         </View>
       </ScrollView>
 
@@ -230,6 +272,8 @@ export function PropertyDetailScreen() {
           <Text className="text-primary-foreground font-cairo-bold text-base">{S.contactOwner}</Text>
         </Pressable>
       </View>
+
+      <ReportSheet visible={reportOpen} onClose={() => setReportOpen(false)} propertyId={property._id} />
     </SafeAreaView>
   );
 }

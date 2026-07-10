@@ -15,10 +15,31 @@ import { Provider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AuthProvider } from '@/features/auth/components/AuthProvider';
+import { I18nProvider } from '@/features/i18n/components/I18nProvider';
+import { NotificationsProvider } from '@/features/notifications/components/NotificationsProvider';
 import { WishlistProvider } from '@/features/wishlist/components/WishlistProvider';
 import { store } from '@/shared/store';
+import { useAppSelector } from '@/shared/store/hooks';
 
 SplashScreen.preventAutoHideAsync();
+
+/**
+ * Root navigator — registers the three route groups ((tabs), (auth), (main)),
+ * mirroring the web's group-based `app/` layout. Each group owns its own
+ * screen options in its `_layout.tsx`. Keyed by locale so a language switch
+ * remounts the tree and every screen re-reads the localized strings.
+ */
+function RootNavigator() {
+  const locale = useAppSelector((s) => s.locale.locale);
+
+  return (
+    <Stack key={locale} screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#FFFFFF' } }}>
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="(auth)" options={{ animation: 'slide_from_bottom' }} />
+      <Stack.Screen name="(main)" />
+    </Stack>
+  );
+}
 
 export default function RootLayout() {
   // Load the brand font (Cairo) in the weights the UI uses.
@@ -39,18 +60,14 @@ export default function RootLayout() {
     <Provider store={store}>
       <AuthProvider>
         <WishlistProvider>
-        <SafeAreaProvider>
-          <StatusBar style="dark" />
-          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#FFFFFF' } }}>
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen
-              name="properties/[id]"
-              options={{ headerShown: true, headerTitle: '', headerBackTitle: 'رجوع', headerTintColor: '#1A3C34' }}
-            />
-            <Stack.Screen name="login" options={{ animation: 'slide_from_bottom' }} />
-            <Stack.Screen name="register" options={{ animation: 'slide_from_bottom' }} />
-          </Stack>
-        </SafeAreaProvider>
+          <NotificationsProvider>
+            <I18nProvider>
+              <SafeAreaProvider>
+                <StatusBar style="dark" />
+                <RootNavigator />
+              </SafeAreaProvider>
+            </I18nProvider>
+          </NotificationsProvider>
         </WishlistProvider>
       </AuthProvider>
     </Provider>

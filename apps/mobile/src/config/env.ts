@@ -21,4 +21,12 @@ const DEV_FALLBACK =
 
 export const API_URL = process.env.EXPO_PUBLIC_API_URL ?? DEV_FALLBACK;
 
+/**
+ * Public web-site base URL — used to build canonical share links
+ * (`${WEB_URL}/properties/{id}`), since the app itself has no public URL. The
+ * web uses next-intl `localePrefix: 'always'`, so a bare `/properties/{id}`
+ * redirects to `/ar/properties/{id}` server-side.
+ */
+export const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? 'https://www.btlee-eg.com';
+
 export const IS_DEV = __DEV__;

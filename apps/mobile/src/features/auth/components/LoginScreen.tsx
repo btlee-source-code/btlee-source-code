@@ -90,6 +90,9 @@ export function LoginScreen() {
                   className="flex-1 ml-2 text-foreground font-cairo text-right"
                 />
               </View>
+              <Pressable onPress={() => router.push('/forgot-password')} hitSlop={8} className="self-start">
+                <Text className="text-primary font-cairo-medium text-xs">{S.forgotPassword}</Text>
+              </Pressable>
             </View>
 
             {error ? (
