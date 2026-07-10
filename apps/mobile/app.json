@@ -7,6 +7,12 @@
     "icon": "./assets/images/icon.png",
     "scheme": "btlee",
     "userInterfaceStyle": "automatic",
+    "runtimeVersion": {
+      "policy": "fingerprint"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/661190eb-8852-4169-bf85-7f3aa9eb1ebc"
+    },
     "ios": {
       "icon": "./assets/expo.icon"
     },
