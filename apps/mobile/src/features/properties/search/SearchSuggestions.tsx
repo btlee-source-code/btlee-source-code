@@ -3,12 +3,9 @@ import { Home, MapPin } from 'lucide-react-native';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { S } from '@/config/strings';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { formatPrice } from '@/shared/lib/format';
 import type { SuggestionsResponse } from '../api/properties.api';
-
-const PRIMARY = '#1A3C34';
-const GOLD = '#C4922A';
-const MUTED = '#737373';
 
 /**
  * Suggestions dropdown card. Uses a bounded ScrollView (not a FlatList) so it
@@ -26,6 +23,7 @@ export function SearchSuggestions({
   onSelectGovernorate: (label: string) => void;
   onSelectProperty: (id: string) => void;
 }) {
+  const c = useThemeColors();
   const empty = data.items.length === 0 && data.properties.length === 0;
 
   return (
@@ -46,7 +44,7 @@ export function SearchSuggestions({
                 onPress={() => (item.kind === 'area' ? onSelectArea(item.label) : onSelectGovernorate(item.label))}
                 className="flex-row items-center gap-3 px-4 py-2.5 active:bg-secondary">
                 <View className={`h-8 w-8 rounded-lg items-center justify-center ${item.kind === 'area' ? 'bg-primary/10' : 'bg-accent/10'}`}>
-                  <MapPin size={16} color={item.kind === 'area' ? PRIMARY : GOLD} />
+                  <MapPin size={16} color={item.kind === 'area' ? c.primary : c.accent} />
                 </View>
                 <View className="flex-1">
                   <Text className="text-sm font-cairo-semibold text-foreground text-right">{item.label}</Text>
@@ -69,7 +67,7 @@ export function SearchSuggestions({
                   {p.image ? (
                     <Image source={{ uri: p.image }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
                   ) : (
-                    <Home size={16} color={MUTED} />
+                    <Home size={16} color={c.muted} />
                   )}
                 </View>
                 <View className="flex-1">

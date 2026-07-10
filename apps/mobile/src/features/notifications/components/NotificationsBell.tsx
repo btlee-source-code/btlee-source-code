@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { Bell } from 'lucide-react-native';
 import { Pressable, Text, View } from 'react-native';
 
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { useAppSelector } from '@/shared/store/hooks';
 
 /**
@@ -12,13 +13,14 @@ import { useAppSelector } from '@/shared/store/hooks';
 export function NotificationsBell() {
   const router = useRouter();
   const unreadCount = useAppSelector((s) => s.notifications.unreadCount);
+  const c = useThemeColors();
 
   return (
     <Pressable
       onPress={() => router.push('/notifications')}
       hitSlop={6}
       className="h-10 w-10 rounded-full bg-secondary items-center justify-center active:opacity-80">
-      <Bell size={20} color="#1A3C34" />
+      <Bell size={20} color={c.primary} />
       {unreadCount > 0 ? (
         <View
           className="absolute -top-1 -right-1 h-4 rounded-full bg-accent items-center justify-center px-1"

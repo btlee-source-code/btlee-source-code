@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { HttpError } from '@/shared/api/httpClient';
 import { Logo } from '@/shared/components/layout/Logo';
 import { authApi } from '../api/auth.api';
@@ -33,6 +34,7 @@ export function ResetPasswordScreen() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const c = useThemeColors();
 
   const onSubmit = async () => {
     if (password.length < 8) return setError(S.passwordMin);
@@ -57,7 +59,7 @@ export function ResetPasswordScreen() {
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerClassName="px-6 pt-2 pb-8 flex-grow" keyboardShouldPersistTaps="handled">
           <Pressable onPress={() => router.replace('/login')} hitSlop={8} className="h-10 w-10 items-start justify-center">
-            <ArrowRight size={24} color="#1A3C34" />
+            <ArrowRight size={24} color={c.primary} />
           </Pressable>
           <View className="items-center mt-4 mb-8">
             <Logo height={38} />
@@ -88,7 +90,7 @@ export function ResetPasswordScreen() {
                   <Text className="text-sm font-cairo-medium text-foreground text-right">{S.newPasswordLabel}</Text>
                   <View className="flex-row items-center bg-secondary rounded-xl px-4 h-12">
                     <Pressable onPress={() => setShow((v) => !v)} hitSlop={8}>
-                      {show ? <EyeOff size={20} color="#737373" /> : <Eye size={20} color="#737373" />}
+                      {show ? <EyeOff size={20} color={c.muted} /> : <Eye size={20} color={c.muted} />}
                     </Pressable>
                     <TextInput
                       value={password}
@@ -125,7 +127,7 @@ export function ResetPasswordScreen() {
                   disabled={submitting}
                   className="bg-primary rounded-xl h-12 items-center justify-center active:opacity-90 mt-1">
                   {submitting ? (
-                    <ActivityIndicator color="#FFFFFF" />
+                    <ActivityIndicator color={c.primaryForeground} />
                   ) : (
                     <Text className="text-primary-foreground font-cairo-bold text-base">{S.setNewPassword}</Text>
                   )}

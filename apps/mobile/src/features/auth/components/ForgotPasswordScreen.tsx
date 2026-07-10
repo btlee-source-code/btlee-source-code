@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { HttpError } from '@/shared/api/httpClient';
 import { Logo } from '@/shared/components/layout/Logo';
 import { TextField } from '@/shared/components/ui/TextField';
@@ -30,6 +31,7 @@ export function ForgotPasswordScreen() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const c = useThemeColors();
 
   const onSubmit = async () => {
     if (!EMAIL_RE.test(email.trim())) {
@@ -53,7 +55,7 @@ export function ForgotPasswordScreen() {
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerClassName="px-6 pt-2 pb-8 flex-grow" keyboardShouldPersistTaps="handled">
           <Pressable onPress={() => router.back()} hitSlop={8} className="h-10 w-10 items-start justify-center">
-            <ArrowRight size={24} color="#1A3C34" />
+            <ArrowRight size={24} color={c.primary} />
           </Pressable>
           <View className="items-center mt-4 mb-8">
             <Logo height={38} />
@@ -88,7 +90,7 @@ export function ForgotPasswordScreen() {
                   disabled={submitting}
                   className="bg-primary rounded-xl h-12 items-center justify-center active:opacity-90 mt-1">
                   {submitting ? (
-                    <ActivityIndicator color="#FFFFFF" />
+                    <ActivityIndicator color={c.primaryForeground} />
                   ) : (
                     <Text className="text-primary-foreground font-cairo-bold text-base">{S.sendResetLink}</Text>
                   )}

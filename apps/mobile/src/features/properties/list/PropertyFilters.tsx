@@ -4,6 +4,7 @@ import { Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-nativ
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import {
   CATEGORY_LABELS,
   FINISHING_LABELS,
@@ -62,6 +63,7 @@ export function PropertyFilters({
   onClose: () => void;
 }) {
   const [draft, setDraft] = useState<Filters>(initial);
+  const c = useThemeColors();
   useEffect(() => {
     if (visible) setDraft(initial);
   }, [visible, initial]);
@@ -74,7 +76,7 @@ export function PropertyFilters({
       <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
         <View className="flex-row items-center justify-between px-5 py-3 border-b border-border">
           <Pressable onPress={onClose} hitSlop={8}>
-            <X size={24} color="#1C1C1C" />
+            <X size={24} color={c.foreground} />
           </Pressable>
           <Text className="text-lg font-cairo-bold text-foreground">{S.filterTitle}</Text>
           <Pressable onPress={() => setDraft({})} hitSlop={8}>
@@ -128,7 +130,7 @@ export function PropertyFilters({
                 onChangeText={(t) => set({ minPrice: toNum(t) })}
                 className={priceInput}
                 textAlign="right"
-                placeholderTextColor="#737373"
+                placeholderTextColor={c.muted}
               />
               <TextInput
                 placeholder={S.fMaxPrice}
@@ -137,7 +139,7 @@ export function PropertyFilters({
                 onChangeText={(t) => set({ maxPrice: toNum(t) })}
                 className={priceInput}
                 textAlign="right"
-                placeholderTextColor="#737373"
+                placeholderTextColor={c.muted}
               />
             </View>
           </View>
@@ -150,7 +152,7 @@ export function PropertyFilters({
               onChangeText={(t) => set({ minArea: toNum(t) })}
               className="bg-secondary rounded-xl px-4 h-12 text-foreground font-cairo text-right"
               textAlign="right"
-              placeholderTextColor="#737373"
+              placeholderTextColor={c.muted}
             />
           </View>
 

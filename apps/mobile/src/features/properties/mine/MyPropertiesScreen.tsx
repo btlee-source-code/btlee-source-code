@@ -7,13 +7,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { STATUS_LABELS } from '@/shared/lib/constants';
 import { formatPrice } from '@/shared/lib/format';
 import type { Property, PropertyStatus } from '@/shared/types/property';
 import { propertiesApi } from '../api/properties.api';
-
-const PRIMARY = '#1A3C34';
-const MUTED = '#737373';
 
 const STATUS_COLORS: Record<PropertyStatus, { bg: string; fg: string }> = {
   pending: { bg: '#FEF3C7', fg: '#B45309' },
@@ -29,6 +27,7 @@ export function MyPropertiesScreen() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [items, setItems] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const c = useThemeColors();
 
   const reload = useCallback(async () => {
     if (!isAuthenticated) {
@@ -74,7 +73,7 @@ export function MyPropertiesScreen() {
   if (authLoading) {
     return (
       <SafeAreaView className="flex-1 bg-background items-center justify-center" edges={['top']}>
-        <ActivityIndicator color={PRIMARY} />
+        <ActivityIndicator color={c.primary} />
       </SafeAreaView>
     );
   }
@@ -84,7 +83,7 @@ export function MyPropertiesScreen() {
       {/* Header */}
       <View className="flex-row items-center justify-between px-5 py-3 border-b border-border">
         <Pressable onPress={() => router.back()} hitSlop={8}>
-          <ArrowRight size={24} color={PRIMARY} />
+          <ArrowRight size={24} color={c.primary} />
         </Pressable>
         <Text className="text-lg font-cairo-bold text-foreground">{S.myPropertiesTitle}</Text>
         <View style={{ width: 24 }} />
@@ -113,7 +112,7 @@ export function MyPropertiesScreen() {
                       <Image source={{ uri: item.images[0].url }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
                     ) : (
                       <View className="flex-1 items-center justify-center">
-                        <Home size={22} color={MUTED} />
+                        <Home size={22} color={c.muted} />
                       </View>
                     )}
                   </View>
@@ -144,7 +143,7 @@ export function MyPropertiesScreen() {
                 {/* Actions */}
                 <View className="flex-row border-t border-border">
                   <Pressable onPress={() => router.push(`/my-properties/${item._id}/edit`)} className="flex-1 flex-row items-center justify-center gap-1.5 py-2.5 active:bg-secondary">
-                    <Pencil size={16} color={PRIMARY} />
+                    <Pencil size={16} color={c.primary} />
                     <Text className="text-sm font-cairo-medium text-foreground">{S.editListing}</Text>
                   </Pressable>
                   {item.status === 'approved' && (
@@ -155,7 +154,7 @@ export function MyPropertiesScreen() {
                     </Pressable>
                   )}
                   <Pressable onPress={() => onDelete(item)} className="flex-1 flex-row items-center justify-center gap-1.5 py-2.5 border-r border-border active:bg-secondary">
-                    <Trash2 size={16} color="#DC2626" />
+                    <Trash2 size={16} color={c.destructive} />
                     <Text className="text-sm font-cairo-medium text-destructive">{S.deleteListing}</Text>
                   </Pressable>
                 </View>
@@ -164,19 +163,19 @@ export function MyPropertiesScreen() {
           }}
           ListHeaderComponent={
             <Pressable onPress={() => router.push('/add-property')} className="bg-accent rounded-xl h-12 flex-row items-center justify-center gap-2 mb-4 active:opacity-90">
-              <Plus size={20} color="#FFFFFF" />
+              <Plus size={20} color={c.accentForeground} />
               <Text className="text-accent-foreground font-cairo-bold">{S.addNew}</Text>
             </Pressable>
           }
           ListEmptyComponent={
             loading ? (
               <View className="items-center py-20">
-                <ActivityIndicator color={PRIMARY} />
+                <ActivityIndicator color={c.primary} />
               </View>
             ) : (
               <View className="items-center py-16 gap-2">
                 <View className="h-16 w-16 rounded-full bg-secondary items-center justify-center mb-1">
-                  <Home size={28} color={MUTED} />
+                  <Home size={28} color={c.muted} />
                 </View>
                 <Text className="text-lg font-cairo-bold text-foreground">{S.noListingsTitle}</Text>
                 <Text className="text-sm text-muted-foreground font-cairo">{S.noListingsDesc}</Text>

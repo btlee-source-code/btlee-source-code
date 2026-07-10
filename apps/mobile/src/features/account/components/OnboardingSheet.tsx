@@ -4,6 +4,7 @@ import { ActivityIndicator, Modal, Pressable, Text, View } from 'react-native';
 
 import { S } from '@/config/strings';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import type { UserGoal } from '@/shared/types/user';
 import { accountApi } from '../api/account.api';
 
@@ -22,6 +23,7 @@ export function OnboardingSheet({ visible, onComplete }: { visible: boolean; onC
   const { setUser } = useAuth();
   const [goal, setGoal] = useState<UserGoal | null>(null);
   const [saving, setSaving] = useState(false);
+  const c = useThemeColors();
 
   const onContinue = async () => {
     if (!goal) return;
@@ -61,7 +63,7 @@ export function OnboardingSheet({ visible, onComplete }: { visible: boolean; onC
                     className={`h-12 w-12 rounded-full items-center justify-center ${
                       selected ? 'bg-primary' : 'bg-secondary'
                     }`}>
-                    <Icon size={22} color={selected ? '#FFFFFF' : '#1A3C34'} />
+                    <Icon size={22} color={selected ? c.primaryForeground : c.primary} />
                   </View>
                   <Text className={`font-cairo-semibold text-sm ${selected ? 'text-primary' : 'text-foreground'}`}>
                     {label}
@@ -82,7 +84,7 @@ export function OnboardingSheet({ visible, onComplete }: { visible: boolean; onC
               disabled={!goal || saving}
               className={`flex-1 rounded-xl h-12 items-center justify-center ${goal ? 'bg-primary' : 'bg-primary/40'}`}>
               {saving ? (
-                <ActivityIndicator color="#FFFFFF" />
+                <ActivityIndicator color={c.primaryForeground} />
               ) : (
                 <Text className="text-primary-foreground font-cairo-bold">{S.continue}</Text>
               )}

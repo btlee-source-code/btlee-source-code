@@ -6,11 +6,10 @@ import { ActivityIndicator, FlatList, Text, View } from 'react-native';
 import { S } from '@/config/strings';
 import { propertiesApi } from '@/features/properties/api/properties.api';
 import { PropertyCard } from '@/features/properties/components/PropertyCard';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { useFetch } from '@/shared/hooks/useFetch';
 import { formatDate } from '@/shared/lib/format';
 import { usersApi } from './api/users.api';
-
-const PRIMARY = '#1A3C34';
 
 /**
  * Public owner profile: header card (avatar/initial, name, member-since, count)
@@ -27,11 +26,12 @@ export function OwnerProfileScreen() {
     useCallback(() => propertiesApi.byOwner(id), [id]),
     id
   );
+  const c = useThemeColors();
 
   if (ownerLoading) {
     return (
       <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator color={PRIMARY} />
+        <ActivityIndicator color={c.primary} />
       </View>
     );
   }
@@ -67,7 +67,7 @@ export function OwnerProfileScreen() {
         ListEmptyComponent={
           listLoading ? (
             <View className="items-center py-16">
-              <ActivityIndicator color={PRIMARY} />
+              <ActivityIndicator color={c.primary} />
             </View>
           ) : (
             <View className="items-center py-16">

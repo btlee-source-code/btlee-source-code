@@ -2,6 +2,7 @@ import { Check } from 'lucide-react-native';
 import { Modal, Pressable, Text, View } from 'react-native';
 
 import { S } from '@/config/strings';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { SORT_OPTIONS } from '@/shared/lib/constants';
 
 export type SortValue = 'newest' | 'oldest' | 'price_asc' | 'price_desc';
@@ -17,6 +18,7 @@ export function SortSheet({
   onSelect: (v: SortValue) => void;
   onClose: () => void;
 }) {
+  const c = useThemeColors();
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable className="flex-1 justify-end" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }} onPress={onClose}>
@@ -32,7 +34,7 @@ export function SortSheet({
                   onClose();
                 }}
                 className="flex-row items-center justify-between py-3 active:opacity-70">
-                {active ? <Check size={20} color="#1A3C34" /> : <View style={{ width: 20 }} />}
+                {active ? <Check size={20} color={c.primary} /> : <View style={{ width: 20 }} />}
                 <Text className={`font-cairo-medium text-base ${active ? 'text-primary' : 'text-foreground'}`}>{opt.label}</Text>
               </Pressable>
             );

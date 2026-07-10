@@ -1,6 +1,8 @@
 import { forwardRef } from 'react';
 import { Text, TextInput, View, type TextInputProps } from 'react-native';
 
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
+
 interface TextFieldProps extends TextInputProps {
   label: string;
   error?: string | null;
@@ -11,12 +13,13 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
   { label, error, ...props },
   ref
 ) {
+  const c = useThemeColors();
   return (
     <View className="gap-1.5">
       <Text className="text-sm font-cairo-medium text-foreground text-right">{label}</Text>
       <TextInput
         ref={ref}
-        placeholderTextColor="#737373"
+        placeholderTextColor={c.muted}
         textAlign="right"
         className={`bg-secondary rounded-xl px-4 h-12 text-foreground font-cairo text-right ${
           error ? 'border border-destructive' : ''

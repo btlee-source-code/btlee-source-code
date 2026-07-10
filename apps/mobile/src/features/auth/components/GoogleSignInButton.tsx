@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { S } from '@/config/strings';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { useAuth } from '../hooks/useAuth';
 
 /** Official multi-color Google "G". */
@@ -34,6 +35,7 @@ export function GoogleSignInButton({ onSuccess }: { onSuccess: (isNewUser: boole
   const { loginWithGoogle } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const c = useThemeColors();
 
   const onPress = async () => {
     setLoading(true);
@@ -55,7 +57,7 @@ export function GoogleSignInButton({ onSuccess }: { onSuccess: (isNewUser: boole
         disabled={loading}
         className="flex-row items-center justify-center gap-2.5 border border-border rounded-xl h-12 bg-card active:opacity-90">
         {loading ? (
-          <ActivityIndicator color="#1A3C34" />
+          <ActivityIndicator color={c.primary} />
         ) : (
           <>
             <GoogleGlyph />

@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router';
 
 import { S } from '@/config/strings';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 
 /**
  * Main app group — everything reached from the tabs that isn't itself a tab:
@@ -9,15 +10,18 @@ import { S } from '@/config/strings';
  * Screens not listed here use the default (headerless) options.
  */
 export default function MainLayout() {
+  const c = useThemeColors();
   const nativeHeader = {
     headerShown: true,
     headerTitle: '',
     headerBackTitle: S.back,
-    headerTintColor: '#1A3C34',
-  } as const;
+    headerTintColor: c.primary,
+    headerStyle: { backgroundColor: c.background },
+    headerShadowVisible: false,
+  };
 
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#FFFFFF' } }}>
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.background } }}>
       <Stack.Screen name="properties/[id]" options={nativeHeader} />
       <Stack.Screen name="owners/[id]" options={nativeHeader} />
       <Stack.Screen name="legal/privacy" options={nativeHeader} />

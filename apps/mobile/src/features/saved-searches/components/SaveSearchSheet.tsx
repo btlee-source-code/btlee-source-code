@@ -3,11 +3,10 @@ import { useState } from 'react';
 import { ActivityIndicator, Alert, Modal, Pressable, Text, TextInput, View } from 'react-native';
 
 import { S } from '@/config/strings';
-import { HttpError } from '@/shared/api/httpClient';
 import type { Filters } from '@/features/properties/list/PropertyFilters';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { HttpError } from '@/shared/api/httpClient';
 import { savedSearchesApi, type SavedSearchInput } from '../api/savedSearches.api';
-
-const PRIMARY = '#1A3C34';
 
 /**
  * Names + saves the current search/filters. Web never built this UX, so mobile
@@ -27,6 +26,7 @@ export function SaveSearchSheet({
   const [name, setName] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const c = useThemeColors();
 
   const close = () => {
     setName('');
@@ -70,7 +70,7 @@ export function SaveSearchSheet({
       <View className="absolute bottom-0 left-0 right-0 bg-background rounded-t-2xl px-5 pt-4 pb-8 gap-4">
         <View className="flex-row items-center justify-between">
           <Pressable onPress={close} hitSlop={8}>
-            <X size={22} color={PRIMARY} />
+            <X size={22} color={c.primary} />
           </Pressable>
           <Text className="text-base font-cairo-bold text-foreground">{S.saveSearch}</Text>
           <View style={{ width: 22 }} />
@@ -85,7 +85,7 @@ export function SaveSearchSheet({
               setError(null);
             }}
             placeholder={S.savedSearchNamePlaceholder}
-            placeholderTextColor="#737373"
+            placeholderTextColor={c.muted}
             textAlign="right"
             maxLength={100}
             className="bg-secondary rounded-xl px-4 h-12 text-foreground font-cairo text-right"
@@ -98,7 +98,7 @@ export function SaveSearchSheet({
           disabled={saving}
           className="bg-primary rounded-xl h-12 items-center justify-center active:opacity-90">
           {saving ? (
-            <ActivityIndicator color="#FFFFFF" />
+            <ActivityIndicator color={c.primaryForeground} />
           ) : (
             <Text className="text-primary-foreground font-cairo-bold">{S.saveSearch}</Text>
           )}

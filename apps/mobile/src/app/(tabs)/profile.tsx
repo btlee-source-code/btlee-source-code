@@ -21,17 +21,20 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { S } from '@/config/strings';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { LanguageSwitcher } from '@/features/i18n/components/LanguageSwitcher';
+import { ThemeToggle } from '@/features/theme/components/ThemeToggle';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { useAppSelector } from '@/shared/store/hooks';
 
 export default function ProfileTab() {
   const router = useRouter();
+  const c = useThemeColors();
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const unreadCount = useAppSelector((s) => s.notifications.unreadCount);
 
   if (isLoading) {
     return (
       <SafeAreaView className="flex-1 bg-background items-center justify-center" edges={['top']}>
-        <ActivityIndicator color="#1A3C34" />
+        <ActivityIndicator color={c.primary} />
       </SafeAreaView>
     );
   }
@@ -42,18 +45,19 @@ export default function ProfileTab() {
       <SafeAreaView className="flex-1 bg-background" edges={['top']}>
         <View className="flex-1 items-center justify-center px-10 gap-4">
           <View className="h-20 w-20 rounded-full bg-secondary items-center justify-center">
-            <User size={34} color="#1A3C34" />
+            <User size={34} color={c.primary} />
           </View>
           <Text className="text-lg font-cairo-bold text-foreground text-center">{S.profileGuestTitle}</Text>
           <Text className="text-sm text-muted-foreground font-cairo text-center">{S.profileGuestDesc}</Text>
           <Pressable
             onPress={() => router.push('/login')}
             className="mt-1 bg-primary rounded-xl px-6 py-3 flex-row items-center gap-2 active:opacity-90">
-            <LogIn size={18} color="#FFFFFF" />
+            <LogIn size={18} color={c.primaryForeground} />
             <Text className="text-primary-foreground font-cairo-semibold">{S.signInTitle}</Text>
           </Pressable>
         </View>
-        <View className="px-5 pb-2">
+        <View className="px-5 pb-2 gap-4">
+          <ThemeToggle />
           <LanguageSwitcher />
         </View>
         <LegalLinks />
@@ -83,50 +87,51 @@ export default function ProfileTab() {
 
         {/* Menu */}
         <View className="bg-card border border-border rounded-xl overflow-hidden">
-          <MenuRow icon={<Home size={20} color="#1A3C34" />} label={S.myPropertiesTitle} onPress={() => router.push('/my-properties')} />
+          <MenuRow icon={<Home size={20} color={c.primary} />} label={S.myPropertiesTitle} onPress={() => router.push('/my-properties')} />
           <View className="h-px bg-border" />
-          <MenuRow icon={<Plus size={20} color="#1A3C34" />} label={S.addNew} onPress={() => router.push('/add-property')} />
+          <MenuRow icon={<Plus size={20} color={c.primary} />} label={S.addNew} onPress={() => router.push('/add-property')} />
           <View className="h-px bg-border" />
           <MenuRow
-            icon={<Bell size={20} color="#1A3C34" />}
+            icon={<Bell size={20} color={c.primary} />}
             label={S.notificationsTitle}
             badge={unreadCount}
             onPress={() => router.push('/notifications')}
           />
           <View className="h-px bg-border" />
-          <MenuRow icon={<Heart size={20} color="#1A3C34" />} label={S.tabWishlist} onPress={() => router.push('/wishlist')} />
+          <MenuRow icon={<Heart size={20} color={c.primary} />} label={S.tabWishlist} onPress={() => router.push('/wishlist')} />
           <View className="h-px bg-border" />
-          <MenuRow icon={<Bookmark size={20} color="#1A3C34" />} label={S.savedSearchesTitle} onPress={() => router.push('/saved-searches')} />
+          <MenuRow icon={<Bookmark size={20} color={c.primary} />} label={S.savedSearchesTitle} onPress={() => router.push('/saved-searches')} />
         </View>
 
         {/* Account settings */}
         <View className="bg-card border border-border rounded-xl overflow-hidden">
-          <MenuRow icon={<User size={20} color="#1A3C34" />} label={S.editProfileTitle} onPress={() => router.push('/account/edit')} />
+          <MenuRow icon={<User size={20} color={c.primary} />} label={S.editProfileTitle} onPress={() => router.push('/account/edit')} />
           <View className="h-px bg-border" />
           <MenuRow
-            icon={<KeyRound size={20} color="#1A3C34" />}
+            icon={<KeyRound size={20} color={c.primary} />}
             label={S.changePasswordTitle}
             onPress={() => router.push('/account/change-password')}
           />
         </View>
 
-        {/* Language */}
+        {/* Appearance + language */}
+        <ThemeToggle />
         <LanguageSwitcher />
 
         {/* About / legal */}
         <View className="bg-card border border-border rounded-xl overflow-hidden">
-          <MenuRow icon={<ShieldCheck size={20} color="#1A3C34" />} label={S.privacyTitle} onPress={() => router.push('/legal/privacy')} />
+          <MenuRow icon={<ShieldCheck size={20} color={c.primary} />} label={S.privacyTitle} onPress={() => router.push('/legal/privacy')} />
           <View className="h-px bg-border" />
-          <MenuRow icon={<ShieldAlert size={20} color="#1A3C34" />} label={S.disclaimerTitle} onPress={() => router.push('/legal/disclaimer')} />
+          <MenuRow icon={<ShieldAlert size={20} color={c.primary} />} label={S.disclaimerTitle} onPress={() => router.push('/legal/disclaimer')} />
           <View className="h-px bg-border" />
-          <MenuRow icon={<Trash2 size={20} color="#1A3C34" />} label={S.dataDeletionTitle} onPress={() => router.push('/legal/data-deletion')} />
+          <MenuRow icon={<Trash2 size={20} color={c.primary} />} label={S.dataDeletionTitle} onPress={() => router.push('/legal/data-deletion')} />
         </View>
 
         {/* Logout */}
         <Pressable
           onPress={logout}
           className="flex-row items-center justify-center gap-2 border border-destructive/30 rounded-xl h-12 active:opacity-80">
-          <LogOut size={18} color="#DC2626" />
+          <LogOut size={18} color={c.destructive} />
           <Text className="text-destructive font-cairo-semibold">{S.logout}</Text>
         </Pressable>
       </ScrollView>
@@ -165,9 +170,10 @@ function MenuRow({
   muted?: boolean;
   badge?: number;
 }) {
+  const c = useThemeColors();
   return (
     <Pressable onPress={onPress} className="flex-row items-center px-4 py-3.5 active:bg-secondary">
-      <ChevronLeft size={18} color="#737373" />
+      <ChevronLeft size={18} color={c.muted} />
       {badge && badge > 0 ? (
         <View className="ml-2 h-5 rounded-full bg-accent items-center justify-center px-1.5" style={{ minWidth: 20 }}>
           <Text className="text-[11px] font-cairo-bold text-accent-foreground">{badge > 9 ? '9+' : badge}</Text>

@@ -1,3 +1,53 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Color tokens copied 1:1 from the web (apps/web/src/app/globals.css) so the app
+   matches the site in both light and dark. NativeWind flips between the `:root`
+   (light) set and the `@media` (dark) set; the theme toggle drives it via
+   colorScheme.set() (see features/theme). */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 11%;
+    --primary: 169 38% 17%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 97%;
+    --secondary-foreground: 169 38% 17%;
+    --muted: 0 0% 97%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 39 65% 47%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 73% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: 30 11% 4%;
+      --foreground: 40 22% 92%;
+      --card: 30 9% 7%;
+      --card-foreground: 40 22% 92%;
+      --popover: 30 10% 6%;
+      --popover-foreground: 40 22% 92%;
+      --primary: 168 30% 52%;
+      --primary-foreground: 30 14% 6%;
+      --secondary: 30 7% 11%;
+      --secondary-foreground: 40 22% 92%;
+      --muted: 30 7% 11%;
+      --muted-foreground: 38 12% 60%;
+      --accent: 39 62% 55%;
+      --accent-foreground: 30 14% 6%;
+      --destructive: 0 62% 55%;
+      --destructive-foreground: 0 0% 100%;
+      --border: 34 9% 14%;
+      --input: 34 9% 14%;
+    }
+  }
+}

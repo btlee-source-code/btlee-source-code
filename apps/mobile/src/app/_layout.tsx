@@ -11,12 +11,15 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { View } from 'react-native';
 import { Provider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { THEME_COLORS } from '@/config/theme';
 import { AuthProvider } from '@/features/auth/components/AuthProvider';
 import { I18nProvider } from '@/features/i18n/components/I18nProvider';
 import { NotificationsProvider } from '@/features/notifications/components/NotificationsProvider';
+import { ThemeProvider } from '@/features/theme/components/ThemeProvider';
 import { WishlistProvider } from '@/features/wishlist/components/WishlistProvider';
 import { store } from '@/shared/store';
 import { useAppSelector } from '@/shared/store/hooks';
@@ -25,19 +28,33 @@ SplashScreen.preventAutoHideAsync();
 
 /**
  * Root navigator — registers the three route groups ((tabs), (auth), (main)),
- * mirroring the web's group-based `app/` layout. Each group owns its own
- * screen options in its `_layout.tsx`. Keyed by locale so a language switch
- * remounts the tree and every screen re-reads the localized strings.
+ * mirroring the web's group-based `app/` layout. Keyed by locale so a language
+ * switch remounts the tree and every screen re-reads the localized strings.
  */
 function RootNavigator() {
   const locale = useAppSelector((s) => s.locale.locale);
+  const mode = useAppSelector((s) => s.theme.mode);
 
   return (
-    <Stack key={locale} screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#FFFFFF' } }}>
+    <Stack
+      key={locale}
+      screenOptions={{ headerShown: false, contentStyle: { backgroundColor: THEME_COLORS[mode].background } }}>
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="(auth)" options={{ animation: 'slide_from_bottom' }} />
       <Stack.Screen name="(main)" />
     </Stack>
+  );
+}
+
+/** Root wrapper — themed background + a status bar that matches the scheme. */
+function ThemedRoot() {
+  const mode = useAppSelector((s) => s.theme.mode);
+
+  return (
+    <View className="flex-1 bg-background">
+      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
+      <RootNavigator />
+    </View>
   );
 }
 
@@ -62,10 +79,11 @@ export default function RootLayout() {
         <WishlistProvider>
           <NotificationsProvider>
             <I18nProvider>
-              <SafeAreaProvider>
-                <StatusBar style="dark" />
-                <RootNavigator />
-              </SafeAreaProvider>
+              <ThemeProvider>
+                <SafeAreaProvider>
+                  <ThemedRoot />
+                </SafeAreaProvider>
+              </ThemeProvider>
             </I18nProvider>
           </NotificationsProvider>
         </WishlistProvider>

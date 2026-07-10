@@ -6,14 +6,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { formatDate } from '@/shared/lib/format';
 import { useAppDispatch, useAppSelector } from '@/shared/store/hooks';
 import type { Notification } from '@/shared/types/notification';
 import { notificationsActions } from '../store/notifications.slice';
 import { notificationsApi } from '../api/notifications.api';
-
-const PRIMARY = '#1A3C34';
-const MUTED = '#737373';
 
 export function NotificationsScreen() {
   const router = useRouter();
@@ -23,6 +21,7 @@ export function NotificationsScreen() {
   const [items, setItems] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const c = useThemeColors();
 
   const reload = useCallback(async () => {
     if (!isAuthenticated) {
@@ -75,7 +74,7 @@ export function NotificationsScreen() {
   if (authLoading) {
     return (
       <SafeAreaView className="flex-1 bg-background items-center justify-center" edges={['top']}>
-        <ActivityIndicator color={PRIMARY} />
+        <ActivityIndicator color={c.primary} />
       </SafeAreaView>
     );
   }
@@ -85,12 +84,12 @@ export function NotificationsScreen() {
       {/* Header */}
       <View className="flex-row items-center justify-between px-5 py-3 border-b border-border">
         <Pressable onPress={() => router.back()} hitSlop={8}>
-          <ArrowRight size={24} color={PRIMARY} />
+          <ArrowRight size={24} color={c.primary} />
         </Pressable>
         <Text className="text-lg font-cairo-bold text-foreground">{S.notificationsTitle}</Text>
         {isAuthenticated && unreadCount > 0 ? (
           <Pressable onPress={onMarkAll} hitSlop={8} className="flex-row items-center gap-1 active:opacity-70">
-            <CheckCheck size={16} color={PRIMARY} />
+            <CheckCheck size={16} color={c.primary} />
             <Text className="text-xs font-cairo-medium text-primary">{S.markAllRead}</Text>
           </Pressable>
         ) : (
@@ -111,7 +110,7 @@ export function NotificationsScreen() {
           keyExtractor={(n) => n._id}
           contentContainerClassName="px-4 py-3"
           showsVerticalScrollIndicator={false}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={PRIMARY} />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={c.primary} />}
           renderItem={({ item }) => (
             <Pressable
               onPress={() => onTap(item)}
@@ -135,12 +134,12 @@ export function NotificationsScreen() {
           ListEmptyComponent={
             loading ? (
               <View className="items-center py-20">
-                <ActivityIndicator color={PRIMARY} />
+                <ActivityIndicator color={c.primary} />
               </View>
             ) : (
               <View className="items-center py-16 gap-2">
                 <View className="h-16 w-16 rounded-full bg-secondary items-center justify-center mb-1">
-                  <Bell size={28} color={MUTED} />
+                  <Bell size={28} color={c.muted} />
                 </View>
                 <Text className="text-lg font-cairo-bold text-foreground">{S.notificationsEmpty}</Text>
               </View>

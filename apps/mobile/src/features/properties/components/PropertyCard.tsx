@@ -4,16 +4,12 @@ import { Bath, BedDouble, Heart, Home, Maximize2, MapPin, Star } from 'lucide-re
 import { Pressable, Text, View } from 'react-native';
 
 import { S } from '@/config/strings';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { useWishlist } from '@/features/wishlist/hooks/useWishlist';
 import { LISTING_TYPE_LABELS, TYPE_LABELS } from '@/shared/lib/constants';
 import { formatPrice } from '@/shared/lib/format';
 import { useAppSelector } from '@/shared/store/hooks';
 import type { Property } from '@/shared/types/property';
-
-const MUTED = '#737373';
-const GOLD = '#C4922A';
-const FOREGROUND = '#1C1C1C';
-const RED = '#DC2626';
 
 /**
  * Property card — mobile parity with the web `PropertyCard.tsx`:
@@ -27,6 +23,7 @@ export function PropertyCard({ property }: { property: Property }) {
   const hasRating = property.ratingCount > 0;
   const saved = useAppSelector((s) => s.wishlist.ids.includes(property._id));
   const { toggle } = useWishlist();
+  const c = useThemeColors();
 
   return (
     <Pressable
@@ -38,7 +35,7 @@ export function PropertyCard({ property }: { property: Property }) {
           <Image source={{ uri: cover }} style={{ width: '100%', height: '100%' }} contentFit="cover" transition={200} />
         ) : (
           <View className="flex-1 items-center justify-center">
-            <Home size={40} color={`${MUTED}80`} />
+            <Home size={40} color={`${c.muted}80`} />
           </View>
         )}
 
@@ -53,7 +50,7 @@ export function PropertyCard({ property }: { property: Property }) {
             <View
               className="rounded-full px-3 py-1 flex-row items-center gap-1"
               style={{ backgroundColor: 'rgba(255,255,255,0.95)' }}>
-              <Star size={12} color={GOLD} fill={GOLD} />
+              <Star size={12} color={c.accent} fill={c.accent} />
               <Text className="text-primary text-xs font-cairo-semibold">{S.featured}</Text>
             </View>
           )}
@@ -65,7 +62,7 @@ export function PropertyCard({ property }: { property: Property }) {
           hitSlop={6}
           className="absolute top-3 left-3 h-9 w-9 rounded-full items-center justify-center"
           style={{ backgroundColor: 'rgba(255,255,255,0.9)' }}>
-          <Heart size={16} color={saved ? RED : FOREGROUND} fill={saved ? RED : 'transparent'} />
+          <Heart size={16} color={saved ? c.destructive : c.foreground} fill={saved ? c.destructive : 'transparent'} />
         </Pressable>
       </View>
 
@@ -89,7 +86,7 @@ export function PropertyCard({ property }: { property: Property }) {
 
           {hasRating ? (
             <View className="flex-row items-center gap-1">
-              <Star size={16} color={GOLD} fill={GOLD} />
+              <Star size={16} color={c.accent} fill={c.accent} />
               <Text className="text-sm font-cairo-semibold text-foreground">{property.ratingAvg.toFixed(1)}</Text>
               <Text className="text-xs text-muted-foreground font-cairo">({property.ratingCount})</Text>
             </View>
@@ -107,7 +104,7 @@ export function PropertyCard({ property }: { property: Property }) {
 
         {/* City */}
         <View className="flex-row items-center gap-1">
-          <MapPin size={14} color={MUTED} />
+          <MapPin size={14} color={c.muted} />
           <Text numberOfLines={1} className="text-sm text-muted-foreground font-cairo">
             {property.governorate}
           </Text>
@@ -116,16 +113,16 @@ export function PropertyCard({ property }: { property: Property }) {
         {/* Specs */}
         <View className="flex-row items-center gap-4 pt-2 border-t border-border">
           <View className="flex-row items-center gap-1">
-            <BedDouble size={16} color={MUTED} />
+            <BedDouble size={16} color={c.muted} />
             <Text className="text-sm text-muted-foreground font-cairo">{property.bedrooms}</Text>
           </View>
           <View className="flex-row items-center gap-1">
-            <Bath size={16} color={MUTED} />
+            <Bath size={16} color={c.muted} />
             <Text className="text-sm text-muted-foreground font-cairo">{property.bathrooms}</Text>
           </View>
           {property.area != null && (
             <View className="flex-row items-center gap-1">
-              <Maximize2 size={16} color={MUTED} />
+              <Maximize2 size={16} color={c.muted} />
               <Text className="text-sm text-muted-foreground font-cairo">
                 {property.area} {S.areaUnit}
               </Text>

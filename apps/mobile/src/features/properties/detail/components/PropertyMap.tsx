@@ -3,8 +3,7 @@ import { Linking, Pressable, Text, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 import { S } from '@/config/strings';
-
-const PRIMARY = '#1A3C34';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 
 /**
  * Static Leaflet/OpenStreetMap preview (no API key). Dragging/zoom are disabled
@@ -14,6 +13,7 @@ const PRIMARY = '#1A3C34';
  * NOTE: `coordinates` are GeoJSON [lng, lat]; Leaflet wants [lat, lng].
  */
 export function PropertyMap({ lng, lat }: { lng: number; lat: number }) {
+  const c = useThemeColors();
   const html = `<!DOCTYPE html>
 <html>
 <head>
@@ -48,7 +48,7 @@ export function PropertyMap({ lng, lat }: { lng: number; lat: number }) {
       <Pressable
         onPress={openExternal}
         className="flex-row items-center justify-center gap-2 rounded-xl border border-border h-11 active:bg-secondary">
-        <MapPin size={16} color={PRIMARY} />
+        <MapPin size={16} color={c.primary} />
         <Text className="text-sm font-cairo-semibold text-primary">{S.viewOnMap}</Text>
       </Pressable>
     </View>

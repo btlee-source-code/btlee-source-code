@@ -11,19 +11,42 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Brand identity: Dark Forest Green primary + Warm Gold accent
-        background: '#FFFFFF',
-        foreground: '#1C1C1C',
-        card: { DEFAULT: '#FFFFFF', foreground: '#1C1C1C' },
-        popover: { DEFAULT: '#FFFFFF', foreground: '#1C1C1C' },
-        primary: { DEFAULT: '#1A3C34', foreground: '#FFFFFF' }, // #1A3C34 forest green
-        secondary: { DEFAULT: '#F7F7F7', foreground: '#1A3C34' },
-        muted: { DEFAULT: '#F7F7F7', foreground: '#737373' },
-        accent: { DEFAULT: '#C4922A', foreground: '#FFFFFF' }, // #C4922A warm gold
-        destructive: { DEFAULT: '#DC2626', foreground: '#FFFFFF' },
-        border: '#E5E5E5',
-        input: '#E5E5E5',
-        ring: '#1A3C34',
+        // Semantic colors are HSL CSS variables copied from the web
+        // (src/global.css). They flip between light/dark automatically.
+        background: 'hsl(var(--background) / <alpha-value>)',
+        foreground: 'hsl(var(--foreground) / <alpha-value>)',
+        card: {
+          DEFAULT: 'hsl(var(--card) / <alpha-value>)',
+          foreground: 'hsl(var(--card-foreground) / <alpha-value>)',
+        },
+        popover: {
+          DEFAULT: 'hsl(var(--popover) / <alpha-value>)',
+          foreground: 'hsl(var(--popover-foreground) / <alpha-value>)',
+        },
+        primary: {
+          DEFAULT: 'hsl(var(--primary) / <alpha-value>)',
+          foreground: 'hsl(var(--primary-foreground) / <alpha-value>)',
+        },
+        secondary: {
+          DEFAULT: 'hsl(var(--secondary) / <alpha-value>)',
+          foreground: 'hsl(var(--secondary-foreground) / <alpha-value>)',
+        },
+        muted: {
+          DEFAULT: 'hsl(var(--muted) / <alpha-value>)',
+          foreground: 'hsl(var(--muted-foreground) / <alpha-value>)',
+        },
+        accent: {
+          DEFAULT: 'hsl(var(--accent) / <alpha-value>)',
+          foreground: 'hsl(var(--accent-foreground) / <alpha-value>)',
+        },
+        destructive: {
+          DEFAULT: 'hsl(var(--destructive) / <alpha-value>)',
+          foreground: 'hsl(var(--destructive-foreground) / <alpha-value>)',
+        },
+        border: 'hsl(var(--border) / <alpha-value>)',
+        input: 'hsl(var(--input) / <alpha-value>)',
+        ring: 'hsl(var(--primary) / <alpha-value>)',
+        // Fixed status hues (same in both themes).
         status: {
           approved: '#16A34A',
           pending: '#D97706',

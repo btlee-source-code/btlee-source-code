@@ -17,6 +17,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import {
   DEPOSIT_LABELS,
   DEPOSIT_OPTIONS,
@@ -38,8 +39,6 @@ import { uploadsApi, type LocalImage } from '../api/uploads.api';
 import { ImagePickerRow } from './ImagePickerRow';
 import { LocationPicker } from './LocationPicker';
 
-const PRIMARY = '#1A3C34';
-const MUTED = '#737373';
 const DURATIONS = [30, 60, 90, 180, 365];
 
 function Chip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
@@ -106,6 +105,7 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [phase, setPhase] = useState<'idle' | 'uploading' | 'saving'>('idle');
+  const c = useThemeColors();
 
   const toggleService = (s: string) =>
     setServices((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]));
@@ -176,7 +176,7 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
     <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
       <View className="flex-row items-center justify-between px-5 py-3 border-b border-border">
         <Pressable onPress={() => router.back()} hitSlop={8}>
-          <ArrowRight size={24} color={PRIMARY} />
+          <ArrowRight size={24} color={c.primary} />
         </Pressable>
         <Text className="text-lg font-cairo-bold text-foreground">
           {isEdit ? S.editPropertyTitle : S.addPropertyTitle}
@@ -233,12 +233,12 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
           <View className="flex-row gap-3">
             <View className="flex-1">
               <Field label={S.fBedrooms}>
-                <TextInput keyboardType="numeric" value={bedrooms != null ? String(bedrooms) : ''} onChangeText={(t) => setBedrooms(toNum(t))} className={inputCls} textAlign="right" placeholderTextColor={MUTED} />
+                <TextInput keyboardType="numeric" value={bedrooms != null ? String(bedrooms) : ''} onChangeText={(t) => setBedrooms(toNum(t))} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
               </Field>
             </View>
             <View className="flex-1">
               <Field label={S.fBathrooms}>
-                <TextInput keyboardType="numeric" value={bathrooms != null ? String(bathrooms) : ''} onChangeText={(t) => setBathrooms(toNum(t))} className={inputCls} textAlign="right" placeholderTextColor={MUTED} />
+                <TextInput keyboardType="numeric" value={bathrooms != null ? String(bathrooms) : ''} onChangeText={(t) => setBathrooms(toNum(t))} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
               </Field>
             </View>
           </View>
@@ -247,19 +247,19 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
             {type === 'apartment' && (
               <View className="flex-1">
                 <Field label={S.fFloor}>
-                  <TextInput keyboardType="numeric" value={floor != null ? String(floor) : ''} onChangeText={(t) => setFloor(toNum(t))} className={inputCls} textAlign="right" placeholderTextColor={MUTED} />
+                  <TextInput keyboardType="numeric" value={floor != null ? String(floor) : ''} onChangeText={(t) => setFloor(toNum(t))} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
                 </Field>
               </View>
             )}
             <View className="flex-1">
               <Field label={`${S.fAreaM} ${S.optional}`}>
-                <TextInput keyboardType="numeric" value={area != null ? String(area) : ''} onChangeText={(t) => setArea(toNum(t))} className={inputCls} textAlign="right" placeholderTextColor={MUTED} />
+                <TextInput keyboardType="numeric" value={area != null ? String(area) : ''} onChangeText={(t) => setArea(toNum(t))} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
               </Field>
             </View>
           </View>
 
           <Field label={`${S.fPriceOne} ${S.optional}`}>
-            <TextInput keyboardType="numeric" value={price != null ? String(price) : ''} onChangeText={(t) => setPrice(toNum(t))} className={inputCls} textAlign="right" placeholderTextColor={MUTED} />
+            <TextInput keyboardType="numeric" value={price != null ? String(price) : ''} onChangeText={(t) => setPrice(toNum(t))} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
           </Field>
 
           <Field label={S.fFinishing}>
@@ -289,11 +289,11 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
           </Field>
 
           <View className="flex-row items-center justify-between bg-secondary rounded-xl px-4 py-3">
-            <Switch value={hasElevator} onValueChange={setHasElevator} trackColor={{ true: PRIMARY }} />
+            <Switch value={hasElevator} onValueChange={setHasElevator} trackColor={{ true: c.primary }} />
             <Text className="font-cairo-medium text-foreground">{S.fElevator}</Text>
           </View>
           <View className="flex-row items-center justify-between bg-secondary rounded-xl px-4 py-3">
-            <Switch value={hasGarage} onValueChange={setHasGarage} trackColor={{ true: PRIMARY }} />
+            <Switch value={hasGarage} onValueChange={setHasGarage} trackColor={{ true: c.primary }} />
             <Text className="font-cairo-medium text-foreground">{S.fGarage}</Text>
           </View>
 
@@ -306,7 +306,7 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
           </Field>
 
           <Field label={S.fAreaName}>
-            <TextInput value={areaName} onChangeText={setAreaName} className={inputCls} textAlign="right" placeholderTextColor={MUTED} />
+            <TextInput value={areaName} onChangeText={setAreaName} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
           </Field>
 
           <Field label={`${S.fLocation} ${S.optional}`}>
@@ -323,13 +323,13 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
               className="bg-secondary rounded-xl px-4 py-3 text-foreground font-cairo text-right"
               style={{ minHeight: 100, textAlignVertical: 'top' }}
               textAlign="right"
-              placeholderTextColor={MUTED}
+              placeholderTextColor={c.muted}
             />
           </Field>
 
           {!isEdit && (
             <Field label={S.fWhatsapp} hint={S.whatsappHint}>
-              <TextInput value={whatsapp} onChangeText={setWhatsapp} keyboardType="phone-pad" placeholder="01xxxxxxxxx" className={inputCls} textAlign="right" placeholderTextColor={MUTED} />
+              <TextInput value={whatsapp} onChangeText={setWhatsapp} keyboardType="phone-pad" placeholder="01xxxxxxxxx" className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
             </Field>
           )}
 
@@ -354,14 +354,14 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
         <Pressable onPress={onSubmit} disabled={submitting} className="bg-primary rounded-xl h-12 flex-row items-center justify-center gap-2 active:opacity-90">
           {submitting ? (
             <>
-              <ActivityIndicator color="#FFFFFF" />
+              <ActivityIndicator color={c.primaryForeground} />
               <Text className="text-primary-foreground font-cairo-semibold">
                 {phase === 'uploading' ? S.uploadingImages : S.publishing}
               </Text>
             </>
           ) : (
             <>
-              <Check size={20} color="#FFFFFF" />
+              <Check size={20} color={c.primaryForeground} />
               <Text className="text-primary-foreground font-cairo-bold text-base">
                 {isEdit ? S.submitEdit : S.submitAdd}
               </Text>

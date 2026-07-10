@@ -3,11 +3,10 @@ import { useState } from 'react';
 import { ActivityIndicator, Alert, Modal, Pressable, Text, TextInput, View } from 'react-native';
 
 import { S } from '@/config/strings';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { HttpError } from '@/shared/api/httpClient';
 import { MAX_DESCRIPTION_LENGTH, REPORT_REASONS, REPORT_REASON_LABELS, type ReportReason } from '@/shared/lib/constants';
 import { reportsApi } from '../api/reports.api';
-
-const PRIMARY = '#1A3C34';
 
 /** Bottom-sheet report form. Caller renders the trigger only for authenticated users. */
 export function ReportSheet({
@@ -23,6 +22,7 @@ export function ReportSheet({
   const [details, setDetails] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const c = useThemeColors();
 
   const close = () => {
     setReason(null);
@@ -56,7 +56,7 @@ export function ReportSheet({
         {/* Header */}
         <View className="flex-row items-center justify-between">
           <Pressable onPress={close} hitSlop={8}>
-            <X size={22} color={PRIMARY} />
+            <X size={22} color={c.primary} />
           </Pressable>
           <Text className="text-base font-cairo-bold text-foreground">{S.reportTitle}</Text>
           <View style={{ width: 22 }} />
@@ -76,7 +76,7 @@ export function ReportSheet({
                 className={`flex-row items-center justify-between rounded-xl border px-4 py-3 active:opacity-90 ${
                   selected ? 'border-primary bg-primary/5' : 'border-border'
                 }`}>
-                {selected ? <Check size={18} color={PRIMARY} /> : <View style={{ width: 18 }} />}
+                {selected ? <Check size={18} color={c.primary} /> : <View style={{ width: 18 }} />}
                 <Text className={`font-cairo-medium text-right ${selected ? 'text-primary' : 'text-foreground'}`}>
                   {REPORT_REASON_LABELS[r]}
                 </Text>
@@ -88,7 +88,7 @@ export function ReportSheet({
         {/* Optional details */}
         <TextInput
           placeholder={S.reportDetailsPlaceholder}
-          placeholderTextColor="#737373"
+          placeholderTextColor={c.muted}
           value={details}
           onChangeText={setDetails}
           maxLength={MAX_DESCRIPTION_LENGTH}

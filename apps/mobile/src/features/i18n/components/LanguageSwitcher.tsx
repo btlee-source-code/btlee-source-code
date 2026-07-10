@@ -3,6 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 
 import { S } from '@/config/strings';
 import type { Locale } from '@/config/locale';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { useLocale } from '../hooks/useLocale';
 
 // Native language names are intentionally not translated (matches the web).
@@ -13,12 +14,13 @@ const OPTIONS: { value: Locale; label: string }[] = [
 
 export function LanguageSwitcher() {
   const { locale, setLocale } = useLocale();
+  const c = useThemeColors();
 
   return (
     <View className="bg-card border border-border rounded-xl p-3 gap-2.5">
       <View className="flex-row items-center gap-2 justify-end">
         <Text className="font-cairo-semibold text-foreground">{S.language}</Text>
-        <Globe size={18} color="#1A3C34" />
+        <Globe size={18} color={c.primary} />
       </View>
       <View className="flex-row gap-2">
         {OPTIONS.map((o) => {

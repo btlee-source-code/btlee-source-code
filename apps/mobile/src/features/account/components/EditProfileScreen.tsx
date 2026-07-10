@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { HttpError } from '@/shared/api/httpClient';
 import { TextField } from '@/shared/components/ui/TextField';
 import { accountApi } from '../api/account.api';
@@ -27,6 +28,7 @@ export function EditProfileScreen() {
   const [error, setError] = useState<string | null>(null);
   const [ok, setOk] = useState(false);
   const [saving, setSaving] = useState(false);
+  const c = useThemeColors();
 
   if (!user) return null;
 
@@ -57,7 +59,7 @@ export function EditProfileScreen() {
           {/* Header */}
           <View className="flex-row items-center justify-between mb-4">
             <Pressable onPress={() => router.back()} hitSlop={8}>
-              <ArrowRight size={24} color="#1A3C34" />
+              <ArrowRight size={24} color={c.primary} />
             </Pressable>
             <Text className="text-lg font-cairo-bold text-foreground">{S.editProfileTitle}</Text>
             <View style={{ width: 24 }} />
@@ -106,7 +108,7 @@ export function EditProfileScreen() {
               disabled={saving}
               className="bg-primary rounded-xl h-12 items-center justify-center active:opacity-90 mt-1">
               {saving ? (
-                <ActivityIndicator color="#FFFFFF" />
+                <ActivityIndicator color={c.primaryForeground} />
               ) : (
                 <Text className="text-primary-foreground font-cairo-bold text-base">{S.saveChanges}</Text>
               )}

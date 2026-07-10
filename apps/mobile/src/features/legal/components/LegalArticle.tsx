@@ -1,13 +1,12 @@
 import { Info, type LucideIcon } from 'lucide-react-native';
 import { ScrollView, Text, View } from 'react-native';
 
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import type { LegalArticleData } from '../content';
-
-const PRIMARY = '#1A3C34';
-const GOLD = '#C4922A';
 
 /** Reusable renderer for the three legal pages (RTL, numbered sections/steps). */
 export function LegalArticle({ data, Icon }: { data: LegalArticleData; Icon: LucideIcon }) {
+  const c = useThemeColors();
   return (
     <ScrollView
       className="flex-1 bg-background"
@@ -16,7 +15,7 @@ export function LegalArticle({ data, Icon }: { data: LegalArticleData; Icon: Luc
       {/* Header */}
       <View className="items-center gap-3">
         <View className="h-14 w-14 rounded-2xl bg-primary/10 items-center justify-center">
-          <Icon size={26} color={PRIMARY} />
+          <Icon size={26} color={c.primary} />
         </View>
         <Text className="text-2xl font-cairo-bold text-foreground text-center">{data.title}</Text>
         <Text className="text-sm text-muted-foreground font-cairo text-center leading-6">{data.intro}</Text>
@@ -26,7 +25,7 @@ export function LegalArticle({ data, Icon }: { data: LegalArticleData; Icon: Luc
       {/* Highlight callout */}
       {data.highlight ? (
         <View className="flex-row gap-2 rounded-2xl border border-accent/30 bg-accent/10 p-4">
-          <Info size={18} color={GOLD} />
+          <Info size={18} color={c.accent} />
           <Text className="flex-1 text-sm text-foreground font-cairo text-right leading-6">{data.highlight}</Text>
         </View>
       ) : null}
@@ -57,7 +56,7 @@ export function LegalArticle({ data, Icon }: { data: LegalArticleData; Icon: Luc
       {/* Note callout */}
       {data.note ? (
         <View className="flex-row gap-2 rounded-2xl border border-border bg-secondary/50 p-4">
-          <Info size={18} color={PRIMARY} />
+          <Info size={18} color={c.primary} />
           <Text className="flex-1 text-sm text-foreground font-cairo text-right leading-6">{data.note}</Text>
         </View>
       ) : null}

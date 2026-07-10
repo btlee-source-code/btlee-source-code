@@ -4,6 +4,7 @@ import { ImagePlus, X } from 'lucide-react-native';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { S } from '@/config/strings';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { MAX_IMAGES } from '@/shared/lib/constants';
 import type { LocalImage } from '../api/uploads.api';
 
@@ -15,6 +16,7 @@ export function ImagePickerRow({
   value: LocalImage[];
   onChange: (imgs: LocalImage[]) => void;
 }) {
+  const c = useThemeColors();
   const pick = async () => {
     const remaining = MAX_IMAGES - value.length;
     if (remaining <= 0) return;
@@ -38,7 +40,7 @@ export function ImagePickerRow({
       <Pressable
         onPress={pick}
         className="h-24 w-24 rounded-xl border border-dashed border-border bg-secondary items-center justify-center gap-1 active:opacity-80">
-        <ImagePlus size={22} color="#1A3C34" />
+        <ImagePlus size={22} color={c.primary} />
         <Text className="text-[11px] font-cairo-medium text-primary">
           {S.addImages} {value.length}/{MAX_IMAGES}
         </Text>

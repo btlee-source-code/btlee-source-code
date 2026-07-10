@@ -37,11 +37,19 @@ const ar = {
   featuredTitle: 'عقارات مميزة',
   latestTitle: 'أحدث العقارات',
   viewAll: 'عرض الكل',
+  addListingSub: 'انشر عقارك في دقائق',
+  browseProps: 'تصفّح العقارات',
+  browsePropsSub: 'آلاف العقارات',
+  listYourProperty: 'عندك عقار للبيع أو الإيجار؟',
+  listYourPropertySub: 'انشره مجاناً ووصّل لآلاف المهتمين',
 
   // Properties list
   searchPlaceholder: 'ابحث عن مدينة، منطقة، أو نوع عقار...',
   resultsCount: (n: number) => `${n} نتيجة`,
   searchNoMatches: 'لا نتائج مطابقة',
+  searchAndFilter: 'بحث وتصفية',
+  showResults: 'عرض النتائج',
+  searchHint: 'ابحث وفلتر النتائج',
 
   // Filters & sort
   filterBtn: 'تصفية',
@@ -255,8 +263,11 @@ const ar = {
   disclaimerTitle: 'إخلاء المسؤولية',
   dataDeletionTitle: 'حذف البيانات',
 
-  // Language
+  // Language + appearance
   language: 'اللغة',
+  appearance: 'المظهر',
+  light: 'فاتح',
+  dark: 'داكن',
 
   // Placeholders
   wishlistEmptyTitle: 'مفيش عقارات محفوظة',
@@ -294,10 +305,18 @@ const en: Partial<Strings> = {
   featuredTitle: 'Featured properties',
   latestTitle: 'Latest properties',
   viewAll: 'View all',
+  addListingSub: 'Post in minutes',
+  browseProps: 'Browse',
+  browsePropsSub: 'Thousands of listings',
+  listYourProperty: 'Have a property to list?',
+  listYourPropertySub: 'Post it free and reach thousands',
 
   searchPlaceholder: 'Search by city, area, or property type...',
   resultsCount: (n: number) => `${n} result${n === 1 ? '' : 's'}`,
   searchNoMatches: 'No matches',
+  searchAndFilter: 'Search & filter',
+  showResults: 'Show results',
+  searchHint: 'Search & filter listings',
 
   filterBtn: 'Filter',
   sortBtn: 'Sort',
@@ -496,6 +515,9 @@ const en: Partial<Strings> = {
   dataDeletionTitle: 'Data deletion',
 
   language: 'Language',
+  appearance: 'Appearance',
+  light: 'Light',
+  dark: 'Dark',
 
   wishlistEmptyTitle: 'No saved properties',
   wishlistEmptyDesc: 'Save the properties you like and find them here',

@@ -1,8 +1,7 @@
 import { Star } from 'lucide-react-native';
 import { Pressable, View } from 'react-native';
 
-const GOLD = '#C4922A';
-const EMPTY = '#D4D4D4';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 
 interface StarRatingProps {
   value: number;
@@ -17,12 +16,13 @@ interface StarRatingProps {
  * provided. Laid out RTL (star 1 on the right, filling leftward).
  */
 export function StarRating({ value, onChange, size = 22, disabled }: StarRatingProps) {
+  const c = useThemeColors();
   const filled = Math.round(value);
   return (
     <View className="flex-row-reverse gap-1">
       {[1, 2, 3, 4, 5].map((star) => {
         const active = star <= filled;
-        const icon = <Star size={size} color={active ? GOLD : EMPTY} fill={active ? GOLD : 'transparent'} />;
+        const icon = <Star size={size} color={active ? c.accent : c.border} fill={active ? c.accent : 'transparent'} />;
         if (!onChange) return <View key={star}>{icon}</View>;
         return (
           <Pressable key={star} disabled={disabled} hitSlop={4} onPress={() => onChange(star)} className="active:opacity-70">

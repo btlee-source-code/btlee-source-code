@@ -29,6 +29,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { S } from '@/config/strings';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { ReportSheet } from '@/features/reports/components/ReportSheet';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { useFetch } from '@/shared/hooks/useFetch';
 import {
   DEPOSIT_LABELS,
@@ -44,9 +45,6 @@ import { PropertyRating } from './components/PropertyRating';
 import { ShareButton } from './components/ShareButton';
 import { SimilarProperties } from './components/SimilarProperties';
 
-const PRIMARY = '#1A3C34';
-const MUTED = '#737373';
-const GOLD = '#C4922A';
 const { width } = Dimensions.get('window');
 
 export function PropertyDetailScreen() {
@@ -59,11 +57,12 @@ export function PropertyDetailScreen() {
   );
   const [imgIndex, setImgIndex] = useState(0);
   const [reportOpen, setReportOpen] = useState(false);
+  const c = useThemeColors();
 
   if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center bg-background">
-        <ActivityIndicator color={PRIMARY} />
+        <ActivityIndicator color={c.primary} />
       </View>
     );
   }
@@ -111,7 +110,7 @@ export function PropertyDetailScreen() {
             </ScrollView>
           ) : (
             <View className="flex-1 items-center justify-center">
-              <Building2 size={48} color={`${MUTED}80`} />
+              <Building2 size={48} color={`${c.muted}80`} />
             </View>
           )}
 
@@ -153,7 +152,7 @@ export function PropertyDetailScreen() {
             </View>
             {property.ratingCount > 0 && (
               <View className="flex-row items-center gap-1">
-                <Star size={18} color={GOLD} fill={GOLD} />
+                <Star size={18} color={c.accent} fill={c.accent} />
                 <Text className="text-base font-cairo-semibold text-foreground">{property.ratingAvg.toFixed(1)}</Text>
                 <Text className="text-xs text-muted-foreground font-cairo">({property.ratingCount})</Text>
               </View>
@@ -169,28 +168,28 @@ export function PropertyDetailScreen() {
               <Text className="text-sm text-muted-foreground font-cairo">
                 {property.area_name}، {property.governorate}
               </Text>
-              <MapPin size={15} color={MUTED} />
+              <MapPin size={15} color={c.muted} />
             </View>
           </View>
 
           {/* Specs */}
           <View className="flex-row flex-wrap gap-3 pt-3 border-t border-border">
-            <Spec icon={<BedDouble size={18} color={PRIMARY} />} label={S.bedrooms} value={String(property.bedrooms)} />
-            <Spec icon={<Bath size={18} color={PRIMARY} />} label={S.bathrooms} value={String(property.bathrooms)} />
+            <Spec icon={<BedDouble size={18} color={c.primary} />} label={S.bedrooms} value={String(property.bedrooms)} />
+            <Spec icon={<Bath size={18} color={c.primary} />} label={S.bathrooms} value={String(property.bathrooms)} />
             {property.area != null && (
-              <Spec icon={<Maximize2 size={18} color={PRIMARY} />} label={S.area} value={`${property.area} ${S.areaUnit}`} />
+              <Spec icon={<Maximize2 size={18} color={c.primary} />} label={S.area} value={`${property.area} ${S.areaUnit}`} />
             )}
             {property.floor != null && (
-              <Spec icon={<Layers size={18} color={PRIMARY} />} label={S.floor} value={String(property.floor)} />
+              <Spec icon={<Layers size={18} color={c.primary} />} label={S.floor} value={String(property.floor)} />
             )}
             <Spec
-              icon={<Paintbrush size={18} color={PRIMARY} />}
+              icon={<Paintbrush size={18} color={c.primary} />}
               label={S.finishingLabel}
               value={FINISHING_LABELS[property.finishing]}
             />
             {property.deposit && (
               <Spec
-                icon={<ArrowUpDown size={18} color={PRIMARY} />}
+                icon={<ArrowUpDown size={18} color={c.primary} />}
                 label={S.depositLabel}
                 value={DEPOSIT_LABELS[property.deposit]}
               />
@@ -230,7 +229,7 @@ export function PropertyDetailScreen() {
             onPress={() => property.owner?._id && router.push(`/owners/${property.owner._id}`)}
             disabled={!property.owner?._id}
             className="flex-row items-center gap-3 pt-3 border-t border-border active:opacity-70">
-            {property.owner?._id ? <ChevronLeft size={18} color={MUTED} /> : null}
+            {property.owner?._id ? <ChevronLeft size={18} color={c.muted} /> : null}
             <View className="flex-1">
               <Text className="font-cairo-semibold text-foreground text-right">{property.owner?.name ?? 'صاحب العقار'}</Text>
               <Text className="text-xs text-muted-foreground font-cairo text-right">
@@ -256,7 +255,7 @@ export function PropertyDetailScreen() {
             <Pressable
               onPress={() => setReportOpen(true)}
               className="flex-row items-center justify-center gap-2 pt-2 active:opacity-70">
-              <Flag size={15} color={MUTED} />
+              <Flag size={15} color={c.muted} />
               <Text className="text-sm text-muted-foreground font-cairo">{S.reportListing}</Text>
             </Pressable>
           )}
@@ -268,7 +267,7 @@ export function PropertyDetailScreen() {
         <Pressable
           onPress={openWhatsApp}
           className="bg-primary rounded-xl py-3.5 flex-row items-center justify-center gap-2 active:opacity-90">
-          <MessageCircle size={20} color="#FFFFFF" />
+          <MessageCircle size={20} color={c.primaryForeground} />
           <Text className="text-primary-foreground font-cairo-bold text-base">{S.contactOwner}</Text>
         </Pressable>
       </View>

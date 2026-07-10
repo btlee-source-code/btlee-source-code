@@ -6,12 +6,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { LISTING_TYPE_LABELS, TYPE_LABELS } from '@/shared/lib/constants';
 import { formatPrice } from '@/shared/lib/format';
 import { savedSearchesApi, type SavedSearch } from '../api/savedSearches.api';
-
-const PRIMARY = '#1A3C34';
-const MUTED = '#737373';
 
 /** Compact criteria badges (governorate/type/listingType/price), like the web card. */
 function badges(s: SavedSearch): string[] {
@@ -29,6 +27,7 @@ export function SavedSearchesScreen() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [items, setItems] = useState<SavedSearch[]>([]);
   const [loading, setLoading] = useState(true);
+  const c = useThemeColors();
 
   const reload = useCallback(async () => {
     if (!isAuthenticated) {
@@ -82,7 +81,7 @@ export function SavedSearchesScreen() {
   if (authLoading) {
     return (
       <SafeAreaView className="flex-1 bg-background items-center justify-center" edges={['top']}>
-        <ActivityIndicator color={PRIMARY} />
+        <ActivityIndicator color={c.primary} />
       </SafeAreaView>
     );
   }
@@ -92,7 +91,7 @@ export function SavedSearchesScreen() {
       {/* Header */}
       <View className="flex-row items-center justify-between px-5 py-3 border-b border-border">
         <Pressable onPress={() => router.back()} hitSlop={8}>
-          <ArrowRight size={24} color={PRIMARY} />
+          <ArrowRight size={24} color={c.primary} />
         </Pressable>
         <Text className="text-lg font-cairo-bold text-foreground">{S.savedSearchesTitle}</Text>
         <View style={{ width: 24 }} />
@@ -122,7 +121,7 @@ export function SavedSearchesScreen() {
               <View className="bg-card border border-border rounded-xl p-4 mb-3 gap-2">
                 <View className="flex-row items-start justify-between">
                   <Pressable onPress={() => onDelete(item)} hitSlop={8} className="active:opacity-70">
-                    <Trash2 size={18} color="#DC2626" />
+                    <Trash2 size={18} color={c.destructive} />
                   </Pressable>
                   <Text className="flex-1 text-base font-cairo-bold text-foreground text-right ml-2" numberOfLines={1}>
                     {item.name}
@@ -140,7 +139,7 @@ export function SavedSearchesScreen() {
                 <Pressable
                   onPress={() => onApply(item)}
                   className="mt-1 flex-row items-center justify-center gap-1.5 rounded-lg bg-primary/10 h-10 active:opacity-80">
-                  <Search size={15} color={PRIMARY} />
+                  <Search size={15} color={c.primary} />
                   <Text className="text-primary font-cairo-semibold text-sm">{S.applySearch}</Text>
                 </Pressable>
               </View>
@@ -149,12 +148,12 @@ export function SavedSearchesScreen() {
           ListEmptyComponent={
             loading ? (
               <View className="items-center py-20">
-                <ActivityIndicator color={PRIMARY} />
+                <ActivityIndicator color={c.primary} />
               </View>
             ) : (
               <View className="items-center py-16 gap-2">
                 <View className="h-16 w-16 rounded-full bg-secondary items-center justify-center mb-1">
-                  <BookmarkPlus size={28} color={MUTED} />
+                  <BookmarkPlus size={28} color={c.muted} />
                 </View>
                 <Text className="text-lg font-cairo-bold text-foreground">{S.savedSearchesEmpty}</Text>
                 <Text className="text-sm text-muted-foreground font-cairo text-center px-6">{S.savedSearchesEmptyDesc}</Text>
