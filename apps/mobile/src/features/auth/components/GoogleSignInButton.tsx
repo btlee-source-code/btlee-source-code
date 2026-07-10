@@ -55,7 +55,7 @@ export function GoogleSignInButton({ onSuccess }: { onSuccess: (isNewUser: boole
       <Pressable
         onPress={onPress}
         disabled={loading}
-        className="flex-row items-center justify-center gap-2.5 border border-border rounded-xl h-12 bg-card active:opacity-90">
+        className="flex-row items-center justify-center gap-2.5 border border-border rounded-full h-[52px] bg-card active:opacity-90">
         {loading ? (
           <ActivityIndicator color={c.primary} />
         ) : (

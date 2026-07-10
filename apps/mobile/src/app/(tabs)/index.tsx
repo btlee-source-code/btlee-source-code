@@ -1,15 +1,33 @@
 import { useRouter } from 'expo-router';
-import { Building2, ChevronLeft, Factory, Home, Hotel, Moon, Plus, Search, Store, Sun, Tent } from 'lucide-react-native';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import {
+  Building2,
+  Factory,
+  Home,
+  Hotel,
+  Moon,
+  Search,
+  SlidersHorizontal,
+  Store,
+  Sun,
+  Tent,
+} from 'lucide-react-native';
+import { useRef, useState } from 'react';
+import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
+import { AnimatedSearchHint } from '@/features/home/components/AnimatedSearchHint';
 import { PropertySection } from '@/features/home/components/PropertySection';
 import { NotificationsBell } from '@/features/notifications/components/NotificationsBell';
 import { propertiesApi } from '@/features/properties/api/properties.api';
 import { useTheme, useThemeColors } from '@/features/theme/hooks/useTheme';
 import { Logo } from '@/shared/components/layout/Logo';
+import { PressableScale } from '@/shared/components/ui/PressableScale';
+import { RailArrows } from '@/shared/components/ui/RailArrows';
+import { SectionHeader } from '@/shared/components/ui/SectionHeader';
+import { useTabPressScrollToTop } from '@/shared/hooks/useTabPressScrollToTop';
 import { TYPE_LABELS } from '@/shared/lib/constants';
+import { shadows } from '@/shared/lib/shadows';
 import type { PropertyType } from '@/shared/types/property';
 
 const CATEGORIES: { type: PropertyType; Icon: typeof Building2 }[] = [
@@ -21,107 +39,181 @@ const CATEGORIES: { type: PropertyType; Icon: typeof Building2 }[] = [
   { type: 'factory', Icon: Factory },
 ];
 
+// Curated home carousels beyond featured/latest — each is a distinct, logical
+// slice (listing type / city). An empty slice hides its own section, so these
+// are safe to always render.
+const rentFetcher = () => propertiesApi.list({ listingType: 'rent', limit: 10 }).then((r) => r.data);
+const saleFetcher = () => propertiesApi.list({ listingType: 'sale', limit: 10 }).then((r) => r.data);
+const cityFetcher = () => propertiesApi.list({ governorate: 'القاهرة', limit: 10 }).then((r) => r.data);
+
 export default function HomeScreen() {
   const router = useRouter();
   const c = useThemeColors();
   const { isDark, toggle } = useTheme();
 
+  // Category rail scroll position — drives the arrow buttons.
+  const railRef = useRef<ScrollView>(null);
+  const railX = useRef(0);
+  const stepRail = (dir: 1 | -1) =>
+    railRef.current?.scrollTo({ x: Math.max(0, railX.current + dir * 200), animated: true });
+
+  // Re-pressing the home tab scrolls back to the top.
+  const scrollRef = useRef<ScrollView>(null);
+  useTabPressScrollToTop(() => scrollRef.current?.scrollTo({ y: 0, animated: true }));
+
+  // Pull-to-refresh: bump the token so both carousels refetch.
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshToken, setRefreshToken] = useState(0);
+  const onRefresh = () => {
+    setRefreshing(true);
+    setRefreshToken((t) => t + 1);
+    setTimeout(() => setRefreshing(false), 900);
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-      <ScrollView contentContainerClassName="px-5 pt-3 pb-8 gap-6" showsVerticalScrollIndicator={false}>
-        {/* Header: logo + theme toggle + notifications */}
-        <View className="flex-row items-center justify-between">
-          <Logo height={30} />
+      <ScrollView
+        ref={scrollRef}
+        showsVerticalScrollIndicator={false}
+        contentContainerClassName="pb-12"
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={c.primary}
+            colors={[c.primary]}
+            progressBackgroundColor={c.card}
+          />
+        }>
+        {/* Top bar: wordmark + quiet utility controls */}
+        <View className="flex-row items-center justify-between px-5 pt-3">
+          <Logo height={26} />
           <View className="flex-row items-center gap-2">
             <Pressable
               onPress={toggle}
               hitSlop={6}
-              className="h-10 w-10 rounded-full bg-secondary items-center justify-center active:opacity-80">
-              {isDark ? <Sun size={19} color={c.foreground} /> : <Moon size={19} color={c.foreground} />}
+              className="h-10 w-10 rounded-full border border-border bg-card items-center justify-center active:opacity-70">
+              {isDark ? <Sun size={18} color={c.foreground} /> : <Moon size={18} color={c.foreground} />}
             </Pressable>
             <NotificationsBell />
           </View>
         </View>
 
-        {/* Greeting + prominent search */}
-        <View className="gap-3">
-          <View className="gap-1">
-            <Text className="text-2xl font-cairo-bold text-foreground text-right">{S.heroTitle} 🏠</Text>
-            <Text className="text-sm text-muted-foreground font-cairo text-right">{S.heroSubtitle}</Text>
-          </View>
-          <Pressable
+        {/* Hero — centered, with the value phrase picked out in gold */}
+        <View className="px-6 pt-7 items-center">
+          <Text className="text-[26px] leading-[38px] font-cairo-bold text-foreground text-center">
+            {S.heroTitleLead} <Text className="text-accent">{S.heroTitleEmphasis}</Text>
+          </Text>
+          <Text className="text-sm leading-6 text-muted-foreground font-cairo text-center mt-1.5">
+            {S.heroSubtitle}
+          </Text>
+        </View>
+
+        {/* Search — a chic, understated field: a plain grey magnifier, a
+            rotating example hint that seeds ideas, and a subtle filter
+            shortcut (refine by price/area/rooms). */}
+        <View className="px-5 mt-6">
+          <PressableScale
+            haptic
+            scaleTo={0.98}
             onPress={() => router.push({ pathname: '/properties', params: { openSearch: '1' } })}
-            className="flex-row items-center bg-secondary rounded-2xl px-4 h-14 active:opacity-90">
-            <Search size={22} color={c.muted} />
-            <Text className="flex-1 mx-3 text-muted-foreground font-cairo text-right" numberOfLines={1}>
-              {S.searchPlaceholder}
-            </Text>
-          </Pressable>
-        </View>
-
-        {/* Quick actions */}
-        <View className="flex-row gap-3">
-          <Pressable
-            onPress={() => router.push('/add-property')}
-            className="flex-1 bg-primary rounded-2xl p-4 gap-2 active:opacity-90">
-            <View className="h-9 w-9 rounded-full bg-white/15 items-center justify-center">
-              <Plus size={20} color={c.primaryForeground} />
+            className="flex-row items-center gap-3 bg-card border border-border rounded-2xl pl-3.5 pr-4 py-3.5"
+            style={shadows.sm}>
+            {/* Magnifier — no background, muted grey (RTL start = right) */}
+            <Search size={22} color={c.muted} strokeWidth={2} />
+            <View className="flex-1">
+              <Text className="text-[15px] font-cairo-semibold text-foreground text-right">{S.searchPillTitle}</Text>
+              <AnimatedSearchHint
+                prefix={S.searchExamplePrefix}
+                examples={S.searchExamples}
+                className="text-xs text-muted-foreground font-cairo text-right"
+              />
             </View>
-            <Text className="text-primary-foreground font-cairo-bold text-right">{S.addNew}</Text>
-            <Text className="text-primary-foreground/70 font-cairo text-xs text-right">{S.addListingSub}</Text>
-          </Pressable>
-          <Pressable
-            onPress={() => router.push('/properties')}
-            className="flex-1 bg-accent rounded-2xl p-4 gap-2 active:opacity-90">
-            <View className="h-9 w-9 rounded-full bg-white/15 items-center justify-center">
-              <Building2 size={20} color={c.accentForeground} />
-            </View>
-            <Text className="text-accent-foreground font-cairo-bold text-right">{S.browseProps}</Text>
-            <Text className="text-accent-foreground/70 font-cairo text-xs text-right">{S.browsePropsSub}</Text>
-          </Pressable>
+            {/* Subtle divider + filter affordance (RTL end = left) */}
+            <View className="w-px h-7 bg-border" />
+            <SlidersHorizontal size={20} color={c.muted} />
+          </PressableScale>
         </View>
 
-        {/* Explore by type */}
-        <View className="gap-3">
-          <View className="flex-row items-center justify-between">
-            <Pressable onPress={() => router.push('/properties')} hitSlop={6}>
-              <Text className="text-primary font-cairo-semibold text-sm">{S.viewAll}</Text>
-            </Pressable>
-            <Text className="text-lg font-cairo-bold text-foreground text-right">{S.exploreByType}</Text>
-          </View>
-          <View className="flex-row flex-wrap gap-3 justify-between">
-            {CATEGORIES.map(({ type, Icon }) => (
-              <Pressable
-                key={type}
-                onPress={() => router.push({ pathname: '/properties', params: { type } })}
-                className="items-center gap-2 bg-card border border-border rounded-2xl py-3.5 active:opacity-80"
-                style={{ width: '31%' }}>
-                <View className="h-11 w-11 rounded-full bg-secondary items-center justify-center">
-                  <Icon size={22} color={c.primary} />
-                </View>
-                <Text className="text-xs font-cairo-medium text-foreground">{TYPE_LABELS[type]}</Text>
-              </Pressable>
-            ))}
+        {/* Category rail */}
+        <View className="mt-8 gap-4">
+          <SectionHeader title={S.exploreByType} onViewAll={() => router.push('/properties')} />
+          <View>
+            <ScrollView
+              ref={railRef}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              onScroll={(e) => (railX.current = e.nativeEvent.contentOffset.x)}
+              scrollEventThrottle={32}
+              contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 4, gap: 10 }}>
+              {CATEGORIES.map(({ type, Icon }) => (
+                <Pressable
+                  key={type}
+                  onPress={() => router.push({ pathname: '/properties', params: { type } })}
+                  className="items-center justify-center gap-2 min-w-[86px] h-[84px] rounded-2xl border border-border bg-card px-4 active:bg-secondary"
+                  style={shadows.sm}>
+                  <Icon size={23} color={c.accent} strokeWidth={1.6} />
+                  <Text className="text-xs font-cairo-semibold text-foreground">{TYPE_LABELS[type]}</Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+            {/* 4px rail padding + centers the 36px button on the 84px chips */}
+            <RailArrows top={4 + (84 - 36) / 2} onStep={stepRail} />
           </View>
         </View>
 
-        {/* Featured + latest carousels (public endpoints) */}
-        <PropertySection title={S.featuredTitle} fetcher={propertiesApi.featured} cacheKey="home-featured" />
-        <PropertySection title={S.latestTitle} fetcher={propertiesApi.latest} cacheKey="home-latest" />
+        {/* Featured carousel */}
+        <View className="mt-8">
+          <PropertySection
+            title={S.featuredTitle}
+            fetcher={propertiesApi.featured}
+            cacheKey="home-featured"
+            refreshToken={refreshToken}
+          />
+        </View>
 
-        {/* List-your-property banner */}
-        <Pressable
-          onPress={() => router.push('/add-property')}
-          className="bg-secondary rounded-2xl p-4 flex-row items-center gap-3 active:opacity-90">
-          <View className="h-12 w-12 rounded-full bg-primary items-center justify-center">
-            <Plus size={24} color={c.primaryForeground} />
-          </View>
-          <View className="flex-1">
-            <Text className="font-cairo-bold text-foreground text-right">{S.listYourProperty}</Text>
-            <Text className="text-xs text-muted-foreground font-cairo text-right">{S.listYourPropertySub}</Text>
-          </View>
-          <ChevronLeft size={20} color={c.muted} />
-        </Pressable>
+        {/* For rent */}
+        <View className="mt-8">
+          <PropertySection
+            title={S.rentSectionTitle}
+            fetcher={rentFetcher}
+            cacheKey="home-rent"
+            refreshToken={refreshToken}
+            viewAllParams={{ listingType: 'rent' }}
+          />
+        </View>
+
+        {/* Latest carousel */}
+        <View className="mt-8">
+          <PropertySection
+            title={S.latestTitle}
+            fetcher={propertiesApi.latest}
+            cacheKey="home-latest"
+            refreshToken={refreshToken}
+          />
+        </View>
+
+        {/* For sale */}
+        <View className="mt-8">
+          <PropertySection
+            title={S.saleSectionTitle}
+            fetcher={saleFetcher}
+            cacheKey="home-sale"
+            refreshToken={refreshToken}
+            viewAllParams={{ listingType: 'sale' }}
+          />
+        </View>
+
+        {/* Properties in Cairo */}
+        <View className="mt-8">
+          <PropertySection
+            title={S.citySectionTitle}
+            fetcher={cityFetcher}
+            cacheKey="home-cairo"
+            refreshToken={refreshToken}
+            viewAllParams={{ governorate: 'القاهرة' }}
+          />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

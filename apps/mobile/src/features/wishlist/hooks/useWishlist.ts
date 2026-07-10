@@ -3,6 +3,8 @@ import { useCallback } from 'react';
 import { Alert } from 'react-native';
 
 import { S } from '@/config/strings';
+import { toast } from '@/shared/components/ui/Toast';
+import { successHaptic } from '@/shared/lib/haptics';
 import { useAppDispatch, useAppSelector } from '@/shared/store/hooks';
 import { wishlistActions } from '@/features/wishlist/store/wishlist.slice';
 import { wishlistApi } from '../api/wishlist.api';
@@ -28,9 +30,12 @@ export function useWishlist() {
       }
       if (saved) {
         dispatch(wishlistActions.removeId(propertyId));
+        toast.success(S.toastWishlistRemoved);
         wishlistApi.remove(propertyId).catch(() => dispatch(wishlistActions.addId(propertyId)));
       } else {
         dispatch(wishlistActions.addId(propertyId));
+        successHaptic();
+        toast.success(S.toastWishlistAdded);
         wishlistApi.add(propertyId).catch(() => dispatch(wishlistActions.removeId(propertyId)));
       }
     },

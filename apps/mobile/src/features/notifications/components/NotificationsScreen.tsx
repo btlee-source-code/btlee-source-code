@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { S } from '@/config/strings';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { EmptyState } from '@/shared/components/ui/EmptyState';
 import { formatDate } from '@/shared/lib/format';
 import { useAppDispatch, useAppSelector } from '@/shared/store/hooks';
 import type { Notification } from '@/shared/types/notification';
@@ -137,12 +138,7 @@ export function NotificationsScreen() {
                 <ActivityIndicator color={c.primary} />
               </View>
             ) : (
-              <View className="items-center py-16 gap-2">
-                <View className="h-16 w-16 rounded-full bg-secondary items-center justify-center mb-1">
-                  <Bell size={28} color={c.muted} />
-                </View>
-                <Text className="text-lg font-cairo-bold text-foreground">{S.notificationsEmpty}</Text>
-              </View>
+              <EmptyState icon={Bell} title={S.notificationsEmpty} />
             )
           }
         />

@@ -43,15 +43,13 @@ export default function ProfileTab() {
   if (!isAuthenticated || !user) {
     return (
       <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-        <View className="flex-1 items-center justify-center px-10 gap-4">
-          <View className="h-20 w-20 rounded-full bg-secondary items-center justify-center">
-            <User size={34} color={c.primary} />
-          </View>
-          <Text className="text-lg font-cairo-bold text-foreground text-center">{S.profileGuestTitle}</Text>
+        <View className="flex-1 items-center justify-center px-10 gap-3">
+          <User size={40} color={c.muted} strokeWidth={1.4} />
+          <Text className="text-lg font-cairo-bold text-foreground text-center mt-2">{S.profileGuestTitle}</Text>
           <Text className="text-sm text-muted-foreground font-cairo text-center">{S.profileGuestDesc}</Text>
           <Pressable
             onPress={() => router.push('/login')}
-            className="mt-1 bg-primary rounded-xl px-6 py-3 flex-row items-center gap-2 active:opacity-90">
+            className="mt-2 bg-primary rounded-full h-12 px-8 flex-row items-center gap-2 active:opacity-90">
             <LogIn size={18} color={c.primaryForeground} />
             <Text className="text-primary-foreground font-cairo-semibold">{S.signInTitle}</Text>
           </Pressable>
@@ -72,10 +70,14 @@ export default function ProfileTab() {
         {/* Header */}
         <View className="items-center gap-3 pt-4">
           {user.avatar ? (
-            <Image source={{ uri: user.avatar }} style={{ width: 88, height: 88, borderRadius: 44 }} contentFit="cover" />
+            <View className="rounded-full border-2 border-border p-1">
+              <Image source={{ uri: user.avatar }} style={{ width: 84, height: 84, borderRadius: 42 }} contentFit="cover" />
+            </View>
           ) : (
-            <View className="h-22 w-22 rounded-full bg-primary items-center justify-center" style={{ width: 88, height: 88 }}>
-              <Text className="text-primary-foreground text-3xl font-cairo-bold">{user.name.charAt(0)}</Text>
+            <View className="rounded-full border-2 border-border p-1">
+              <View className="rounded-full bg-primary items-center justify-center" style={{ width: 84, height: 84 }}>
+                <Text className="text-primary-foreground text-3xl font-cairo-bold">{user.name.charAt(0)}</Text>
+              </View>
             </View>
           )}
           <View className="items-center">
@@ -130,7 +132,7 @@ export default function ProfileTab() {
         {/* Logout */}
         <Pressable
           onPress={logout}
-          className="flex-row items-center justify-center gap-2 border border-destructive/30 rounded-xl h-12 active:opacity-80">
+          className="flex-row items-center justify-center gap-2 border border-destructive/30 rounded-full h-[50px] active:opacity-80">
           <LogOut size={18} color={c.destructive} />
           <Text className="text-destructive font-cairo-semibold">{S.logout}</Text>
         </Pressable>
@@ -172,8 +174,8 @@ function MenuRow({
 }) {
   const c = useThemeColors();
   return (
-    <Pressable onPress={onPress} className="flex-row items-center px-4 py-3.5 active:bg-secondary">
-      <ChevronLeft size={18} color={c.muted} />
+    <Pressable onPress={onPress} className="flex-row items-center px-4 py-4 active:bg-secondary">
+      <ChevronLeft size={17} color={c.muted} />
       {badge && badge > 0 ? (
         <View className="ml-2 h-5 rounded-full bg-accent items-center justify-center px-1.5" style={{ minWidth: 20 }}>
           <Text className="text-[11px] font-cairo-bold text-accent-foreground">{badge > 9 ? '9+' : badge}</Text>

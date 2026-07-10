@@ -10,11 +10,18 @@ const LOGO_LIGHT = require('@/assets/brand/btlee-logo.png');
 const LOGO_DARK = require('@/assets/brand/btlee-logo-dark.png');
 const ASPECT = 697 / 151;
 
-export function Logo({ height = 30 }: { height?: number }) {
+export function Logo({
+  height = 30,
+  variant = 'auto',
+}: {
+  height?: number;
+  /** 'onDark' forces the light artwork — for branded dark-green surfaces. */
+  variant?: 'auto' | 'onDark';
+}) {
   const { isDark } = useTheme();
   return (
     <Image
-      source={isDark ? LOGO_DARK : LOGO_LIGHT}
+      source={variant === 'onDark' || isDark ? LOGO_DARK : LOGO_LIGHT}
       style={{ height, width: height * ASPECT }}
       contentFit="contain"
       accessibilityLabel="Bt Lee"

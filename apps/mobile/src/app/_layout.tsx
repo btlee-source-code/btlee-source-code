@@ -10,10 +10,11 @@ import {
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 import { THEME_COLORS } from '@/config/theme';
+import { AnimatedSplash } from '@/shared/components/layout/AnimatedSplash';
 import { AppProviders } from '@/shared/components/providers/AppProviders';
 import { useAppSelector } from '@/shared/store/hooks';
 
@@ -60,6 +61,9 @@ export default function RootLayout() {
     Cairo_700Bold,
   });
 
+  // The animated intro overlays the app until its fade-out completes.
+  const [introDone, setIntroDone] = useState(false);
+
   useEffect(() => {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
@@ -69,6 +73,7 @@ export default function RootLayout() {
   return (
     <AppProviders>
       <ThemedRoot />
+      {!introDone && <AnimatedSplash onFinish={() => setIntroDone(true)} />}
     </AppProviders>
   );
 }

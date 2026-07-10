@@ -14,8 +14,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { HttpError } from '@/shared/api/httpClient';
 import { Logo } from '@/shared/components/layout/Logo';
+import { PressableScale } from '@/shared/components/ui/PressableScale';
 import { TextField } from '@/shared/components/ui/TextField';
 import { GoogleSignInButton } from './GoogleSignInButton';
 import { useAuth } from '../hooks/useAuth';
@@ -23,10 +25,12 @@ import { useAuth } from '../hooks/useAuth';
 export function LoginScreen() {
   const router = useRouter();
   const { login } = useAuth();
+  const c = useThemeColors();
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [pwFocused, setPwFocused] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -51,18 +55,25 @@ export function LoginScreen() {
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView contentContainerClassName="px-6 pt-2 pb-8 flex-grow" keyboardShouldPersistTaps="handled">
+        <ScrollView contentContainerClassName="px-6 pt-3 pb-8 flex-grow" keyboardShouldPersistTaps="handled">
           {/* Back */}
-          <Pressable onPress={() => router.back()} hitSlop={8} className="h-10 w-10 items-start justify-center">
-            <ArrowRight size={24} color="#1A3C34" />
+          <Pressable
+            onPress={() => router.back()}
+            hitSlop={8}
+            className="h-10 w-10 rounded-full border border-border bg-card items-center justify-center active:bg-secondary">
+            <ArrowRight size={20} color={c.foreground} />
           </Pressable>
 
-          {/* Brand */}
-          <View className="items-center mt-4 mb-8">
-            <Logo height={38} />
+          {/* Brand — logo on a soft blob with playful dots */}
+          <View className="items-center mt-5 mb-7">
+            <View className="px-8 py-6 rounded-[32px] bg-primary/5">
+              <Logo height={36} />
+            </View>
+            <View className="absolute top-1 right-[26%] h-3 w-3 rounded-full bg-accent/60" />
+            <View className="absolute bottom-0 left-[24%] h-2 w-2 rounded-full bg-primary/30" />
           </View>
 
-          <Text className="text-2xl font-cairo-bold text-foreground text-right">{S.signInTitle}</Text>
+          <Text className="text-[24px] font-cairo-bold text-foreground text-right">{S.signInTitle}</Text>
           <Text className="text-sm text-muted-foreground font-cairo text-right mb-6">{S.signInSubtitle}</Text>
 
           <GoogleSignInButton onSuccess={() => router.back()} />
@@ -79,16 +90,21 @@ export function LoginScreen() {
 
             <View className="gap-1.5">
               <Text className="text-sm font-cairo-medium text-foreground text-right">{S.passwordLabel}</Text>
-              <View className="flex-row items-center bg-secondary rounded-xl px-4 h-12">
+              <View
+                className={`flex-row items-center bg-card border rounded-2xl px-4 h-14 ${
+                  pwFocused ? 'border-primary' : 'border-border'
+                }`}>
                 <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={8}>
-                  {showPassword ? <EyeOff size={20} color="#737373" /> : <Eye size={20} color="#737373" />}
+                  {showPassword ? <EyeOff size={20} color={c.muted} /> : <Eye size={20} color={c.muted} />}
                 </Pressable>
                 <TextInput
                   value={password}
                   onChangeText={setPassword}
+                  onFocus={() => setPwFocused(true)}
+                  onBlur={() => setPwFocused(false)}
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"
-                  placeholderTextColor="#737373"
+                  placeholderTextColor={c.muted}
                   textAlign="right"
                   className="flex-1 ml-2 text-foreground font-cairo text-right"
                 />
@@ -99,21 +115,23 @@ export function LoginScreen() {
             </View>
 
             {error ? (
-              <View className="bg-destructive/10 rounded-lg px-3 py-2">
+              <View className="bg-destructive/10 rounded-xl px-3 py-2.5">
                 <Text className="text-destructive text-sm font-cairo text-right">{error}</Text>
               </View>
             ) : null}
 
-            <Pressable
+            <PressableScale
+              haptic
               onPress={onSubmit}
               disabled={submitting}
-              className="bg-primary rounded-xl h-12 items-center justify-center active:opacity-90 mt-1">
+              containerClassName="mt-1"
+              className="bg-primary rounded-full h-14 items-center justify-center">
               {submitting ? (
                 <ActivityIndicator color="#FFFFFF" />
               ) : (
                 <Text className="text-primary-foreground font-cairo-bold text-base">{S.signInBtn}</Text>
               )}
-            </Pressable>
+            </PressableScale>
 
             <View className="flex-row items-center justify-center gap-1 mt-2">
               <Pressable onPress={() => router.replace('/register')} hitSlop={8}>

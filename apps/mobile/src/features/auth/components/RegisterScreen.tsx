@@ -14,8 +14,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { OnboardingSheet } from '@/features/account/components/OnboardingSheet';
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { HttpError } from '@/shared/api/httpClient';
 import { Logo } from '@/shared/components/layout/Logo';
+import { PressableScale } from '@/shared/components/ui/PressableScale';
 import { TextField } from '@/shared/components/ui/TextField';
 import { GoogleSignInButton } from './GoogleSignInButton';
 import { useAuth } from '../hooks/useAuth';
@@ -28,6 +30,7 @@ type Errors = Partial<Record<'name' | 'email' | 'phone' | 'password' | 'form', s
 export function RegisterScreen() {
   const router = useRouter();
   const { register } = useAuth();
+  const c = useThemeColors();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -66,15 +69,23 @@ export function RegisterScreen() {
     <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerClassName="px-6 pt-2 pb-8 flex-grow" keyboardShouldPersistTaps="handled">
-          <Pressable onPress={() => router.back()} hitSlop={8} className="h-10 w-10 items-start justify-center">
-            <ArrowRight size={24} color="#1A3C34" />
+          <Pressable
+            onPress={() => router.back()}
+            hitSlop={8}
+            className="h-10 w-10 rounded-full border border-border bg-card items-center justify-center active:bg-secondary">
+            <ArrowRight size={20} color={c.foreground} />
           </Pressable>
 
-          <View className="items-center mt-2 mb-6">
-            <Logo height={36} />
+          {/* Brand — logo on a soft blob with playful dots */}
+          <View className="items-center mt-4 mb-6">
+            <View className="px-8 py-6 rounded-[32px] bg-primary/5">
+              <Logo height={34} />
+            </View>
+            <View className="absolute top-1 right-[26%] h-3 w-3 rounded-full bg-accent/60" />
+            <View className="absolute bottom-0 left-[24%] h-2 w-2 rounded-full bg-primary/30" />
           </View>
 
-          <Text className="text-2xl font-cairo-bold text-foreground text-right">{S.registerTitle}</Text>
+          <Text className="text-[24px] font-cairo-bold text-foreground text-right">{S.registerTitle}</Text>
           <Text className="text-sm text-muted-foreground font-cairo text-right mb-6">{S.registerSubtitle}</Text>
 
           <GoogleSignInButton onSuccess={(isNewUser) => (isNewUser ? setShowOnboarding(true) : router.back())} />
@@ -107,21 +118,23 @@ export function RegisterScreen() {
             />
 
             {errors.form ? (
-              <View className="bg-destructive/10 rounded-lg px-3 py-2">
+              <View className="bg-destructive/10 rounded-xl px-3 py-2.5">
                 <Text className="text-destructive text-sm font-cairo text-right">{errors.form}</Text>
               </View>
             ) : null}
 
-            <Pressable
+            <PressableScale
+              haptic
               onPress={onSubmit}
               disabled={submitting}
-              className="bg-primary rounded-xl h-12 items-center justify-center active:opacity-90 mt-1">
+              containerClassName="mt-1"
+              className="bg-primary rounded-full h-14 items-center justify-center">
               {submitting ? (
                 <ActivityIndicator color="#FFFFFF" />
               ) : (
                 <Text className="text-primary-foreground font-cairo-bold text-base">{S.createAccountBtn}</Text>
               )}
-            </Pressable>
+            </PressableScale>
 
             <View className="flex-row items-center justify-center gap-1 mt-2">
               <Pressable onPress={() => router.replace('/login')} hitSlop={8}>

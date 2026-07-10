@@ -1,11 +1,14 @@
-import { X } from 'lucide-react-native';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, Modal, Pressable, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Text, TextInput, View } from 'react-native';
 
 import { S } from '@/config/strings';
 import type { Filters } from '@/features/properties/list/PropertyFilters';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { HttpError } from '@/shared/api/httpClient';
+import { BottomSheet } from '@/shared/components/ui/BottomSheet';
+import { PressableScale } from '@/shared/components/ui/PressableScale';
+import { toast } from '@/shared/components/ui/Toast';
+import { successHaptic } from '@/shared/lib/haptics';
 import { savedSearchesApi, type SavedSearchInput } from '../api/savedSearches.api';
 
 /**
@@ -56,7 +59,8 @@ export function SaveSearchSheet({
     try {
       await savedSearchesApi.create(payload);
       close();
-      Alert.alert(S.savedSearchSaved);
+      successHaptic();
+      toast.success(S.savedSearchSaved);
     } catch (e) {
       setError(e instanceof HttpError ? e.message : S.genericError);
     } finally {
@@ -65,17 +69,8 @@ export function SaveSearchSheet({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={close}>
-      <Pressable className="flex-1 bg-black/40" onPress={close} />
-      <View className="absolute bottom-0 left-0 right-0 bg-background rounded-t-2xl px-5 pt-4 pb-8 gap-4">
-        <View className="flex-row items-center justify-between">
-          <Pressable onPress={close} hitSlop={8}>
-            <X size={22} color={c.primary} />
-          </Pressable>
-          <Text className="text-base font-cairo-bold text-foreground">{S.saveSearch}</Text>
-          <View style={{ width: 22 }} />
-        </View>
-
+    <BottomSheet visible={visible} onClose={close} title={S.saveSearch}>
+      <View className="gap-4 pt-2">
         <View className="gap-1.5">
           <Text className="text-sm font-cairo-medium text-foreground text-right">{S.savedSearchName}</Text>
           <TextInput
@@ -88,22 +83,23 @@ export function SaveSearchSheet({
             placeholderTextColor={c.muted}
             textAlign="right"
             maxLength={100}
-            className="bg-secondary rounded-xl px-4 h-12 text-foreground font-cairo text-right"
+            className="bg-card border border-border rounded-2xl px-4 h-14 text-foreground font-cairo text-right"
           />
           {error ? <Text className="text-xs text-destructive font-cairo text-right">{error}</Text> : null}
         </View>
 
-        <Pressable
+        <PressableScale
+          haptic
           onPress={onSave}
           disabled={saving}
-          className="bg-primary rounded-xl h-12 items-center justify-center active:opacity-90">
+          className="bg-primary rounded-full h-[50px] items-center justify-center">
           {saving ? (
             <ActivityIndicator color={c.primaryForeground} />
           ) : (
             <Text className="text-primary-foreground font-cairo-bold">{S.saveSearch}</Text>
           )}
-        </Pressable>
+        </PressableScale>
       </View>
-    </Modal>
+    </BottomSheet>
   );
 }

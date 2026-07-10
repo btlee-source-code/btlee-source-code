@@ -7,6 +7,7 @@ import { I18nProvider } from '@/features/i18n/components/I18nProvider';
 import { NotificationsProvider } from '@/features/notifications/components/NotificationsProvider';
 import { ThemeProvider } from '@/features/theme/components/ThemeProvider';
 import { WishlistProvider } from '@/features/wishlist/components/WishlistProvider';
+import { ToastHost } from '@/shared/components/ui/Toast';
 import { store } from '@/shared/store';
 
 /**
@@ -29,7 +30,11 @@ export function AppProviders({ children }: { children: ReactNode }) {
           <NotificationsProvider>
             <I18nProvider>
               <ThemeProvider>
-                <SafeAreaProvider>{children}</SafeAreaProvider>
+                <SafeAreaProvider>
+                  {children}
+                  {/* Global toast pill — rendered above the navigator */}
+                  <ToastHost />
+                </SafeAreaProvider>
               </ThemeProvider>
             </I18nProvider>
           </NotificationsProvider>

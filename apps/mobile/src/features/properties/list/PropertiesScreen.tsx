@@ -1,21 +1,26 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Bookmark, Plus, Search, SearchX, X } from 'lucide-react-native';
+import { ArrowUpDown, Bookmark, CircleAlert, Plus, Search, SearchX, X } from 'lucide-react-native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { SaveSearchSheet } from '@/features/saved-searches/components/SaveSearchSheet';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
-import { CATEGORY_LABELS, FINISHING_LABELS, LISTING_TYPE_LABELS, TYPE_LABELS } from '@/shared/lib/constants';
+import { EmptyState } from '@/shared/components/ui/EmptyState';
+import { PressableScale } from '@/shared/components/ui/PressableScale';
+import { SkeletonPropertyCard } from '@/shared/components/ui/Skeleton';
+import { useTabPressScrollToTop } from '@/shared/hooks/useTabPressScrollToTop';
+import { CATEGORY_LABELS, FINISHING_LABELS, LISTING_TYPE_LABELS, SORT_OPTIONS, TYPE_LABELS } from '@/shared/lib/constants';
 import { formatPrice } from '@/shared/lib/format';
+import { shadows } from '@/shared/lib/shadows';
 import type { Property } from '@/shared/types/property';
 import { propertiesApi, type PropertyQuery } from '../api/properties.api';
 import { PropertyCard } from '../components/PropertyCard';
 import type { Filters } from './PropertyFilters';
 import { SearchModal } from './SearchModal';
-import type { SortValue } from './SortSheet';
+import { SortSheet, type SortValue } from './SortSheet';
 
 const LIMIT = 12;
 
@@ -57,14 +62,20 @@ export function PropertiesScreen() {
   const [sort, setSort] = useState<SortValue>('newest');
   const [searchOpen, setSearchOpen] = useState(false);
   const [showSave, setShowSave] = useState(false);
+  const [showSort, setShowSort] = useState(false);
 
   const [items, setItems] = useState<Property[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const reqId = useRef(0);
+
+  // Re-pressing the tab scrolls back to the top.
+  const listRef = useRef<FlatList<Property>>(null);
+  useTabPressScrollToTop(() => listRef.current?.scrollToOffset({ offset: 0, animated: true }));
 
   // Apply incoming filters passed via navigation (home tap, applied saved search).
   useEffect(() => {
@@ -161,27 +172,29 @@ export function PropertiesScreen() {
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
       {/* Search bar (opens the unified search + filter sheet) + save */}
-      <View className="px-4 pt-3 pb-2">
-        <View className="flex-row items-center gap-2">
+      <View className="px-5 pt-3 pb-2">
+        <View className="flex-row items-center gap-2.5">
           <Pressable
             onPress={() => setSearchOpen(true)}
-            className="flex-1 flex-row items-center bg-secondary rounded-xl px-3 h-12 active:opacity-90">
-            <Search size={20} color={c.muted} />
-            <Text
-              className={`flex-1 mx-2 font-cairo text-right ${search ? 'text-foreground' : 'text-muted-foreground'}`}
-              numberOfLines={1}>
-              {search || S.searchPlaceholder}
-            </Text>
+            className="flex-1 flex-row items-center gap-2.5 bg-card border border-border rounded-full px-4 h-[50px] active:opacity-90"
+            style={shadows.sm}>
             {activeCount > 0 ? (
               <View className="bg-primary rounded-full min-w-5 h-5 items-center justify-center px-1">
                 <Text className="text-primary-foreground text-[11px] font-cairo-bold">{activeCount}</Text>
               </View>
             ) : null}
+            <Text
+              className={`flex-1 font-cairo-medium text-sm text-right ${search ? 'text-foreground' : 'text-muted-foreground'}`}
+              numberOfLines={1}>
+              {search || S.searchPlaceholder}
+            </Text>
+            <Search size={20} color={c.muted} strokeWidth={2} />
           </Pressable>
           <Pressable
             onPress={onSaveSearch}
-            className="items-center justify-center rounded-xl border border-border bg-card w-12 h-12 active:opacity-80">
-            <Bookmark size={18} color={c.primary} />
+            className="items-center justify-center rounded-full border border-border bg-card w-[50px] h-[50px] active:opacity-80"
+            style={shadows.sm}>
+            <Bookmark size={19} color={c.foreground} />
           </Pressable>
         </View>
 
@@ -202,40 +215,64 @@ export function PropertiesScreen() {
       </View>
 
       <FlatList
+        ref={listRef}
         data={items}
         keyExtractor={(p) => p._id}
         renderItem={({ item }) => <PropertyCard property={item} />}
-        contentContainerClassName="px-4 pb-24"
+        contentContainerClassName="px-5 pb-28 gap-6"
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         onEndReached={onEndReached}
         onEndReachedThreshold={0.5}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={async () => {
+              setRefreshing(true);
+              await load(1, true);
+              setRefreshing(false);
+            }}
+            tintColor={c.primary}
+            colors={[c.primary]}
+            progressBackgroundColor={c.card}
+          />
+        }
         ListHeaderComponent={
-          <Text className="text-sm text-muted-foreground font-cairo-medium py-2 text-right">
-            {isLoading ? S.loading : S.resultsCount(total)}
-          </Text>
+          <View className="flex-row items-center justify-between pt-1 pb-3.5">
+            {/* Sort shortcut (left) */}
+            <PressableScale
+              haptic
+              onPress={() => setShowSort(true)}
+              className="flex-row items-center gap-1.5 rounded-full border border-border bg-card h-9 pl-3.5 pr-3"
+              style={shadows.sm}>
+              <ArrowUpDown size={14} color={c.foreground} />
+              <Text className="text-[13px] font-cairo-semibold text-foreground">
+                {SORT_OPTIONS.find((o) => o.value === sort)?.label ?? S.sortLabel}
+              </Text>
+            </PressableScale>
+            {/* Result count (right) */}
+            <Text className="text-sm font-cairo-semibold text-foreground">
+              {isLoading ? S.loading : S.resultsCount(total)}
+            </Text>
+          </View>
         }
         ListEmptyComponent={
           isLoading ? (
-            <View className="items-center py-20">
-              <ActivityIndicator color={c.primary} />
+            <View className="gap-6">
+              <SkeletonPropertyCard />
+              <SkeletonPropertyCard />
+              <SkeletonPropertyCard />
             </View>
           ) : error ? (
-            <View className="items-center py-16 gap-2">
-              <Text className="text-lg font-cairo-bold text-foreground">{S.errorTitle}</Text>
-              <Text className="text-sm text-muted-foreground font-cairo text-center px-8">{S.errorDesc}</Text>
-              <Pressable onPress={() => load(1, true)} className="mt-2 bg-primary rounded-lg px-5 py-2.5 active:opacity-90">
-                <Text className="text-primary-foreground font-cairo-semibold">{S.retry}</Text>
-              </Pressable>
-            </View>
+            <EmptyState
+              icon={CircleAlert}
+              title={S.errorTitle}
+              description={S.errorDesc}
+              actionLabel={S.retry}
+              onAction={() => load(1, true)}
+            />
           ) : (
-            <View className="items-center py-20 gap-2">
-              <View className="h-16 w-16 rounded-full bg-secondary items-center justify-center mb-1">
-                <SearchX size={28} color={c.muted} />
-              </View>
-              <Text className="text-lg font-cairo-bold text-foreground">{S.noResultsTitle}</Text>
-              <Text className="text-sm text-muted-foreground font-cairo">{S.noResultsDesc}</Text>
-            </View>
+            <EmptyState icon={SearchX} title={S.noResultsTitle} description={S.noResultsDesc} />
           )
         }
         ListFooterComponent={
@@ -248,12 +285,14 @@ export function PropertiesScreen() {
       />
 
       {/* Add-listing FAB */}
-      <Pressable
+      <PressableScale
+        haptic
         onPress={() => router.push('/add-property')}
-        className="absolute bottom-5 left-5 h-14 w-14 rounded-full bg-primary items-center justify-center active:opacity-90"
-        style={{ elevation: 6, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 8, shadowOffset: { width: 0, height: 3 } }}>
+        containerClassName="absolute bottom-5 left-5"
+        className="h-14 w-14 rounded-full bg-primary items-center justify-center"
+        style={shadows.lg}>
         <Plus size={28} color={c.primaryForeground} />
-      </Pressable>
+      </PressableScale>
 
       <SearchModal
         visible={searchOpen}
@@ -266,6 +305,7 @@ export function PropertiesScreen() {
         }}
       />
       <SaveSearchSheet visible={showSave} onClose={() => setShowSave(false)} filters={filters} search={search} />
+      <SortSheet visible={showSort} value={sort} onSelect={setSort} onClose={() => setShowSort(false)} />
     </SafeAreaView>
   );
 }

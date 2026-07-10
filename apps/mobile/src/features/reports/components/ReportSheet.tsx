@@ -1,10 +1,14 @@
-import { Check, X } from 'lucide-react-native';
+import { Check } from 'lucide-react-native';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, Modal, Pressable, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, TextInput, View } from 'react-native';
 
 import { S } from '@/config/strings';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { HttpError } from '@/shared/api/httpClient';
+import { BottomSheet } from '@/shared/components/ui/BottomSheet';
+import { PressableScale } from '@/shared/components/ui/PressableScale';
+import { toast } from '@/shared/components/ui/Toast';
+import { successHaptic } from '@/shared/lib/haptics';
 import { MAX_DESCRIPTION_LENGTH, REPORT_REASONS, REPORT_REASON_LABELS, type ReportReason } from '@/shared/lib/constants';
 import { reportsApi } from '../api/reports.api';
 
@@ -41,7 +45,8 @@ export function ReportSheet({
     try {
       await reportsApi.create({ propertyId, reason, details: details.trim() || undefined });
       close();
-      Alert.alert(S.reportSuccess);
+      successHaptic();
+      toast.success(S.reportSuccess);
     } catch (e) {
       setError(e instanceof HttpError ? e.message : S.genericError);
     } finally {
@@ -50,18 +55,8 @@ export function ReportSheet({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={close}>
-      <Pressable className="flex-1 bg-black/40" onPress={close} />
-      <View className="absolute bottom-0 left-0 right-0 bg-background rounded-t-2xl px-5 pt-4 pb-8 gap-4">
-        {/* Header */}
-        <View className="flex-row items-center justify-between">
-          <Pressable onPress={close} hitSlop={8}>
-            <X size={22} color={c.primary} />
-          </Pressable>
-          <Text className="text-base font-cairo-bold text-foreground">{S.reportTitle}</Text>
-          <View style={{ width: 22 }} />
-        </View>
-
+    <BottomSheet visible={visible} onClose={close} title={S.reportTitle}>
+      <View className="gap-4 pt-2">
         {/* Reasons */}
         <View className="gap-2">
           {REPORT_REASONS.map((r) => {
@@ -73,7 +68,7 @@ export function ReportSheet({
                   setReason(r);
                   setError(null);
                 }}
-                className={`flex-row items-center justify-between rounded-xl border px-4 py-3 active:opacity-90 ${
+                className={`flex-row items-center justify-between rounded-2xl border px-4 py-3.5 active:opacity-90 ${
                   selected ? 'border-primary bg-primary/5' : 'border-border'
                 }`}>
                 {selected ? <Check size={18} color={c.primary} /> : <View style={{ width: 18 }} />}
@@ -94,24 +89,25 @@ export function ReportSheet({
           maxLength={MAX_DESCRIPTION_LENGTH}
           multiline
           textAlign="right"
-          className="bg-secondary rounded-xl px-4 py-3 text-foreground font-cairo text-right"
+          className="bg-card border border-border rounded-2xl px-4 py-3 text-foreground font-cairo text-right"
           style={{ minHeight: 80, textAlignVertical: 'top' }}
         />
 
         {error ? <Text className="text-xs text-destructive font-cairo text-right">{error}</Text> : null}
 
         {/* Submit */}
-        <Pressable
+        <PressableScale
+          haptic
           onPress={onSubmit}
           disabled={submitting}
-          className="bg-destructive rounded-xl h-12 flex-row items-center justify-center active:opacity-90">
+          className="bg-destructive rounded-full h-[50px] flex-row items-center justify-center">
           {submitting ? (
             <ActivityIndicator color="#FFFFFF" />
           ) : (
             <Text className="text-white font-cairo-bold">{S.reportSubmit}</Text>
           )}
-        </Pressable>
+        </PressableScale>
       </View>
-    </Modal>
+    </BottomSheet>
   );
 }

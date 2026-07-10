@@ -19,8 +19,8 @@ export function NotificationsBell() {
     <Pressable
       onPress={() => router.push('/notifications')}
       hitSlop={6}
-      className="h-10 w-10 rounded-full bg-secondary items-center justify-center active:opacity-80">
-      <Bell size={20} color={c.primary} />
+      className="h-10 w-10 rounded-full border border-border bg-card items-center justify-center active:opacity-70">
+      <Bell size={18} color={c.foreground} />
       {unreadCount > 0 ? (
         <View
           className="absolute -top-1 -right-1 h-4 rounded-full bg-accent items-center justify-center px-1"
