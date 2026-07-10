@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "1bcd08d3-965f-4bb9-83e5-7c13ce3266a6"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/1bcd08d3-965f-4bb9-83e5-7c13ce3266a6"
+    },
+    "android": {},
+    "ios": {}
+  }
+}
