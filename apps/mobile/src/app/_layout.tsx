@@ -12,16 +12,9 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { View } from 'react-native';
-import { Provider } from 'react-redux';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { THEME_COLORS } from '@/config/theme';
-import { AuthProvider } from '@/features/auth/components/AuthProvider';
-import { I18nProvider } from '@/features/i18n/components/I18nProvider';
-import { NotificationsProvider } from '@/features/notifications/components/NotificationsProvider';
-import { ThemeProvider } from '@/features/theme/components/ThemeProvider';
-import { WishlistProvider } from '@/features/wishlist/components/WishlistProvider';
-import { store } from '@/shared/store';
+import { AppProviders } from '@/shared/components/providers/AppProviders';
 import { useAppSelector } from '@/shared/store/hooks';
 
 SplashScreen.preventAutoHideAsync();
@@ -74,20 +67,8 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <Provider store={store}>
-      <AuthProvider>
-        <WishlistProvider>
-          <NotificationsProvider>
-            <I18nProvider>
-              <ThemeProvider>
-                <SafeAreaProvider>
-                  <ThemedRoot />
-                </SafeAreaProvider>
-              </ThemeProvider>
-            </I18nProvider>
-          </NotificationsProvider>
-        </WishlistProvider>
-      </AuthProvider>
-    </Provider>
+    <AppProviders>
+      <ThemedRoot />
+    </AppProviders>
   );
 }

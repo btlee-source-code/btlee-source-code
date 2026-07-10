@@ -26,8 +26,12 @@ export async function createReport(
     throw new ConflictError('لقد قمت بالإبلاغ عن هذا العقار بالفعل');
   }
 
+  const propertyOid = new Types.ObjectId(propertyId);
   return Report.create({
-    property: new Types.ObjectId(propertyId),
+    // Dual-write: legacy `property` + domain-agnostic target.
+    property: propertyOid,
+    targetType: 'property',
+    targetId: propertyOid,
     reporter: new Types.ObjectId(reporterId),
     reason,
     details: details ?? null,

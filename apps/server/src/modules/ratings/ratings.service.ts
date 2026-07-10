@@ -42,9 +42,13 @@ export async function rateProperty(userId: string, propertyId: string, value: nu
     throw new BadRequestError('Only approved properties can be rated');
   }
 
+  const propertyOid = new Types.ObjectId(propertyId);
   await Rating.findOneAndUpdate(
-    { user: new Types.ObjectId(userId), property: new Types.ObjectId(propertyId) },
-    { value },
+    { user: new Types.ObjectId(userId), property: propertyOid },
+    // Dual-write the domain-agnostic target on insert; `value` on every upsert.
+    // `targetType` comes from its schema default via setDefaultsOnInsert — do NOT
+    // also put it in $setOnInsert (Mongoose would flag a path conflict).
+    { $set: { value }, $setOnInsert: { targetId: propertyOid } },
     { upsert: true, setDefaultsOnInsert: true }
   );
 

@@ -22,8 +22,10 @@ export default function MainLayout() {
 
   return (
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.background } }}>
-      <Stack.Screen name="properties/[id]" options={nativeHeader} />
-      <Stack.Screen name="owners/[id]" options={nativeHeader} />
+      {/* Route groups ((properties)/(account)) are organizational only — they
+          don't change URLs, but they DO prefix the screen name here. */}
+      <Stack.Screen name="(properties)/properties/[id]" options={nativeHeader} />
+      <Stack.Screen name="(properties)/owners/[id]" options={nativeHeader} />
       <Stack.Screen name="legal/privacy" options={nativeHeader} />
       <Stack.Screen name="legal/disclaimer" options={nativeHeader} />
       <Stack.Screen name="legal/data-deletion" options={nativeHeader} />

@@ -13,14 +13,7 @@ import {
   DEPOSIT_OPTIONS,
   PROPERTY_STATUS,
 } from '../../config/constants.js';
-
-const imageSchema = new Schema(
-  {
-    publicId: { type: String, required: true },
-    url: { type: String, required: true },
-  },
-  { _id: false }
-);
+import { baseListingFields } from '../../shared/models/baseListing.js';
 
 // Optional GeoJSON point. Kept as its own sub-schema with `default: undefined`
 // (below) so a listing without coordinates has NO `location` field at all —
@@ -35,14 +28,12 @@ const locationSchema = new Schema(
 
 const propertySchema = new Schema(
   {
-    // Human-friendly sequential listing number (1, 2, 3, …) shown to users
-    // instead of the opaque ObjectId. Assigned on creation from an atomic
-    // counter; see shared/models/counter.model.ts. Sparse so legacy docs
-    // without it don't collide on the unique index before backfill runs.
-    seq: { type: Number, unique: true, sparse: true, index: true },
+    // Domain-agnostic listing spine (seq, owner, price, images, contact,
+    // duration/expiry, featured flag, counters, rating aggregates). Shared by
+    // any future listing domain — see shared/models/baseListing.ts.
+    ...baseListingFields,
 
-    // Owner
-    owner: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    // ── Property-specific below ──
 
     // Core classification
     type: { type: String, enum: PROPERTY_TYPES, required: true, index: true },
@@ -64,23 +55,14 @@ const propertySchema = new Schema(
     // Required deposit for rentals (التأمين المطلوب) — optional.
     deposit: { type: String, enum: DEPOSIT_OPTIONS, default: null },
 
-    // Price — optional (owner may hide it; UI shows "price on request")
-    price: { type: Number, default: null, min: 1 },
-
     // Location
     governorate: { type: String, required: true, index: true, trim: true },
     area_name: { type: String, required: true, trim: true }, // المنطقة
     // Optional — absent entirely when the owner skips pinning a map location.
     location: { type: locationSchema, default: undefined },
 
-    // Content
-    description: { type: String, required: true, maxlength: 500, trim: true },
-    images: { type: [imageSchema], required: true, validate: (v: unknown[]) => v.length >= 1 },
-
-    // Contact
-    whatsappNumber: { type: String, required: true, trim: true },
-
-    // Lifecycle
+    // Moderation state — its enum is property-specific, so it stays here (the
+    // base is kept enum-free). A future domain declares its own `status`.
     status: {
       type: String,
       enum: PROPERTY_STATUS,
@@ -88,22 +70,6 @@ const propertySchema = new Schema(
       index: true,
     },
     rejectionReason: { type: String, default: null },
-
-    // Listing duration (days the owner requested) + expiry timestamp
-    durationDays: { type: Number, required: true, min: 30, max: 365 },
-    expiresAt: { type: Date, required: true, index: true },
-
-    // Admin flags
-    isFeatured: { type: Boolean, default: false, index: true },
-
-    // Counters
-    viewCount: { type: Number, default: 0 },
-
-    // Ratings — denormalized aggregates kept in sync by the ratings service so
-    // listing queries can sort/read them cheaply without joining the Rating
-    // collection. Source of truth is the Rating collection.
-    ratingAvg: { type: Number, default: 0, min: 0, max: 5 },
-    ratingCount: { type: Number, default: 0, min: 0 },
   },
   { timestamps: true }
 );

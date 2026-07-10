@@ -8,12 +8,18 @@ import {
   PROPERTY_TYPES,
   LISTING_TYPES,
   PROPERTY_CATEGORIES,
+  TARGET_TYPES,
 } from '../../config/constants.js';
 
 const savedSearchSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     name: { type: String, required: true, trim: true, maxlength: 100 },
+
+    // Which domain this saved search matches (domain-readiness). No `targetId`
+    // here — a saved search matches MANY future items, not one target. A future
+    // domain stores its own criteria shape under the same `targetType`.
+    targetType: { type: String, enum: TARGET_TYPES, default: 'property' },
 
     // Filter criteria (subset of public list query)
     search: { type: String, default: null },

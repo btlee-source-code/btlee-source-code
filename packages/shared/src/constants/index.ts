@@ -1,7 +1,8 @@
 /**
- * Shared domain constants.
- * `LISTING_KINDS` anchors the domain-readiness design: today only 'property',
- * but any future domain slots in here + its own enum file.
+ * Shared domain constants barrel.
+ * - `shared.ts`   → cross-domain spine (LISTING_KINDS, TARGET_TYPES).
+ * - `property.ts` → the property domain's enum values (today's only domain).
+ * A future domain adds its own file here and registers itself in `shared.ts`.
  */
-export const LISTING_KINDS = ['property'] as const;
-export type ListingKind = (typeof LISTING_KINDS)[number];
+export * from './shared';
+export * from './property';

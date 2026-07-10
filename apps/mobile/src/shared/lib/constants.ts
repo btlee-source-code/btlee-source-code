@@ -1,8 +1,10 @@
 /**
- * Domain enums + their Arabic labels. Values are server-synced string literals
- * (mirrors apps/web/src/shared/lib/constants.ts + the `property.*` message keys).
+ * Domain enum VALUES come from `@btlee/shared` (canonical, shared with the
+ * server + web). This file keeps only the Arabic/English LABEL maps + mobile-UI
+ * bits (SORT_OPTIONS) — locale concerns that don't belong in the shared package.
  */
 import { localeMap } from '@/config/locale';
+import type { ReportReason } from '@btlee/shared';
 import type {
   DepositOption,
   FinishingType,
@@ -13,24 +15,21 @@ import type {
   PropertyType,
 } from '@/shared/types/property';
 
-export const PROPERTY_TYPES: readonly PropertyType[] = [
-  'apartment',
-  'villa',
-  'chalet',
-  'shop',
-  'building',
-  'factory',
-];
-export const LISTING_TYPES: readonly ListingType[] = ['sale', 'rent'];
-export const PROPERTY_CATEGORIES: readonly PropertyCategory[] = ['residential', 'commercial'];
-export const FINISHING_TYPES: readonly FinishingType[] = ['furnished', 'unfurnished', 'semi-finished'];
-export const PROPERTY_SERVICES: readonly PropertyService[] = ['gas', 'water', 'electricity', 'wifi'];
-export const DEPOSIT_OPTIONS: readonly DepositOption[] = [
-  'half_month',
-  'one_month',
-  'two_months',
-  'three_months',
-];
+// Enum arrays + limits — re-exported from the shared package so every call site
+// (`@/shared/lib/constants`) stays unchanged while the source of truth is single.
+export {
+  DEPOSIT_OPTIONS,
+  FINISHING_TYPES,
+  GOVERNORATES,
+  LISTING_TYPES,
+  MAX_DESCRIPTION_LENGTH,
+  MAX_IMAGES,
+  PROPERTY_CATEGORIES,
+  PROPERTY_SERVICES,
+  PROPERTY_TYPES,
+  REPORT_REASONS,
+} from '@btlee/shared';
+export type { ReportReason };
 
 export const TYPE_LABELS = localeMap<PropertyType>(
   { apartment: 'شقة', villa: 'فيلا', chalet: 'شاليه', shop: 'محل', building: 'مبنى', factory: 'مصنع' },
@@ -81,58 +80,12 @@ export const STATUS_LABELS = localeMap<PropertyStatus>(
   }
 );
 
-/** 27 Egyptian governorates — the stored Arabic values ARE the labels. */
-export const GOVERNORATES: readonly string[] = [
-  'القاهرة',
-  'الجيزة',
-  'الإسكندرية',
-  'الدقهلية',
-  'البحر الأحمر',
-  'البحيرة',
-  'الفيوم',
-  'الغربية',
-  'الإسماعيلية',
-  'المنوفية',
-  'المنيا',
-  'القليوبية',
-  'الوادي الجديد',
-  'السويس',
-  'أسوان',
-  'أسيوط',
-  'بني سويف',
-  'بورسعيد',
-  'دمياط',
-  'الشرقية',
-  'جنوب سيناء',
-  'كفر الشيخ',
-  'مطروح',
-  'الأقصر',
-  'قنا',
-  'شمال سيناء',
-  'سوهاج',
-];
-
 export const SORT_OPTIONS = [
   { value: 'newest', label: 'الأحدث' },
   { value: 'oldest', label: 'الأقدم' },
   { value: 'price_asc', label: 'السعر: من الأقل للأعلى' },
   { value: 'price_desc', label: 'السعر: من الأعلى للأقل' },
 ] as const;
-
-export const MAX_IMAGES = 15;
-export const MAX_DESCRIPTION_LENGTH = 500;
-
-/** Report reasons — must match the server enum exactly. */
-export type ReportReason = 'fake_listing' | 'wrong_info' | 'duplicate' | 'inappropriate' | 'spam' | 'other';
-
-export const REPORT_REASONS: readonly ReportReason[] = [
-  'fake_listing',
-  'wrong_info',
-  'duplicate',
-  'inappropriate',
-  'spam',
-  'other',
-];
 
 export const REPORT_REASON_LABELS = localeMap<ReportReason>(
   {

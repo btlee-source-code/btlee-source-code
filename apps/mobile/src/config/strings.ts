@@ -30,8 +30,8 @@ const ar = {
   tabProfile: 'حسابي',
 
   // Home
-  heroTitle: 'لاقي بيتك الجديد',
-  heroSubtitle: 'آلاف العقارات للبيع والإيجار في مكان واحد',
+  heroTitle: ' اعلــن عقــارك من غيـر عمـولٓة',
+  heroSubtitle: 'آلاف العقارات للبيع والإيجار في مكان واحد منغ غير عمولة',
   startSearch: 'ابدأ البحث',
   exploreByType: 'استكشف حسب النوع',
   featuredTitle: 'عقارات مميزة',

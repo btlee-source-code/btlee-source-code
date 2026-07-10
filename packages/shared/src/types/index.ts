@@ -1,5 +1,5 @@
 /**
- * Shared TypeScript types + API envelope shapes.
- * Populated during the backend-prep phase.
+ * Shared TypeScript types barrel.
+ * `property.ts` holds the Property wire shape (web + mobile consume it).
  */
-export {};
+export * from './property';

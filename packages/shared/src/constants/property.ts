@@ -1,6 +1,13 @@
 /**
- * Application-wide constants.
- * Domain enums used across modules — keep in sync with the client.
+ * Property-domain constants — canonical source of truth for the enum VALUES
+ * shared across server / web / mobile.
+ *
+ * Adding a new domain later = a sibling file (e.g. `car.ts`) exporting that
+ * domain's enums, registered in `shared.ts` via `LISTING_KINDS`/`TARGET_TYPES`.
+ *
+ * NOTE: label maps (Arabic/English text) stay in each client — they are
+ * locale/UI concerns, not domain contract. This file holds only the raw
+ * literals that the server validates against and every client agrees on.
  */
 
 export const PROPERTY_TYPES = ['apartment', 'villa', 'chalet', 'shop', 'building', 'factory'] as const;
@@ -26,27 +33,6 @@ export type DepositOption = (typeof DEPOSIT_OPTIONS)[number];
 export const PROPERTY_STATUS = ['pending', 'approved', 'rejected', 'sold', 'rented', 'expired'] as const;
 export type PropertyStatus = (typeof PROPERTY_STATUS)[number];
 
-// ── Cross-domain (domain-readiness) ──
-// What the SHARED systems (wishlist / ratings / reports / saved-searches) can
-// point at. Today only 'property'; a future domain (e.g. 'car') is added here.
-// Mirrors packages/shared `TARGET_TYPES` (the server owns its own copy for
-// Mongoose validation — it does not import the shared package at runtime yet).
-export const TARGET_TYPES = ['property'] as const;
-export type TargetType = (typeof TARGET_TYPES)[number];
-export const DEFAULT_TARGET_TYPE: TargetType = 'property';
-
-export const USER_GOALS = ['buy', 'rent', 'sell', 'browse'] as const;
-export type UserGoal = (typeof USER_GOALS)[number];
-
-export const NOTIFICATION_TYPES = [
-  'listing_approved',
-  'listing_rejected',
-  'listing_expired',
-  'saved_search_match',
-  'listing_reported',
-] as const;
-export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
-
 export const REPORT_REASONS = [
   'fake_listing',
   'wrong_info',
@@ -57,7 +43,18 @@ export const REPORT_REASONS = [
 ] as const;
 export type ReportReason = (typeof REPORT_REASONS)[number];
 
-export const MAX_IMAGES_PER_PROPERTY = 15;
+/** 27 Egyptian governorates — the stored Arabic values ARE the labels. */
+export const GOVERNORATES = [
+  'القاهرة', 'الجيزة', 'الإسكندرية', 'الدقهلية', 'البحر الأحمر',
+  'البحيرة', 'الفيوم', 'الغربية', 'الإسماعيلية', 'المنوفية',
+  'المنيا', 'القليوبية', 'الوادي الجديد', 'السويس', 'أسوان',
+  'أسيوط', 'بني سويف', 'بورسعيد', 'دمياط', 'الشرقية',
+  'جنوب سيناء', 'كفر الشيخ', 'مطروح', 'الأقصر', 'قنا',
+  'شمال سيناء', 'سوهاج',
+] as const;
+
+// Listing limits (shared by validation + upload UIs).
+export const MAX_IMAGES = 15;
 export const MAX_DESCRIPTION_LENGTH = 500;
 export const MIN_LISTING_DURATION_DAYS = 30;
 export const MAX_LISTING_DURATION_DAYS = 365;
