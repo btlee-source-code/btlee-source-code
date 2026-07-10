@@ -11,9 +11,19 @@ import type { Response } from 'express';
 import { env } from '../../../config/env.js';
 
 export const OAUTH_STATE_COOKIE = 'oauth_state';
+/** Mobile-only: where to hand the browser back to (an app deep link) after the flow. */
+export const OAUTH_RETURN_COOKIE = 'oauth_return';
 
 const isProd = env.NODE_ENV === 'production';
 const secure = isProd || env.COOKIE_SAMESITE === 'none';
+const sameSite = env.COOKIE_SAMESITE === 'strict' ? 'lax' : env.COOKIE_SAMESITE;
+const cookieBase = {
+  httpOnly: true,
+  secure,
+  sameSite,
+  path: '/',
+  ...(env.COOKIE_DOMAIN ? { domain: env.COOKIE_DOMAIN } : {}),
+} as const;
 
 export function createState(): string {
   return crypto.randomBytes(32).toString('hex');
@@ -41,6 +51,26 @@ export function clearStateCookie(res: Response): void {
     path: '/',
     ...(env.COOKIE_DOMAIN ? { domain: env.COOKIE_DOMAIN } : {}),
   });
+}
+
+/**
+ * Mobile-only return URL. Stashed in a short-lived cookie at the start of the
+ * flow and read on the callback so we can hand the browser back to the app deep
+ * link. Only the app's own schemes are accepted (prevents an open redirect).
+ */
+const ALLOWED_RETURN_SCHEMES = ['btlee://', 'exp://', 'exps://'];
+
+export function safeReturnUrl(url: unknown): string | null {
+  if (typeof url !== 'string') return null;
+  return ALLOWED_RETURN_SCHEMES.some((s) => url.startsWith(s)) ? url : null;
+}
+
+export function setReturnCookie(res: Response, url: string): void {
+  res.cookie(OAUTH_RETURN_COOKIE, url, { ...cookieBase, maxAge: 10 * 60 * 1000 });
+}
+
+export function clearReturnCookie(res: Response): void {
+  res.clearCookie(OAUTH_RETURN_COOKIE, cookieBase);
 }
 
 /** Constant-time compare to avoid leaking timing info on the state check. */

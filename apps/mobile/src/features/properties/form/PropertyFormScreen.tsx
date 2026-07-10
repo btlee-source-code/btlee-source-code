@@ -36,6 +36,7 @@ import type { Property, PropertyImage } from '@/shared/types/property';
 import { propertiesApi, type PropertyInput } from '../api/properties.api';
 import { uploadsApi, type LocalImage } from '../api/uploads.api';
 import { ImagePickerRow } from './ImagePickerRow';
+import { LocationPicker } from './LocationPicker';
 
 const PRIMARY = '#1A3C34';
 const MUTED = '#737373';
@@ -84,6 +85,9 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
   const [finishing, setFinishing] = useState(initial?.finishing ?? '');
   const [governorate, setGovernorate] = useState(initial?.governorate ?? '');
   const [areaName, setAreaName] = useState(initial?.area_name ?? '');
+  const [coordinates, setCoordinates] = useState<[number, number] | undefined>(
+    initial?.location?.coordinates ?? undefined
+  );
   const [bedrooms, setBedrooms] = useState<number | undefined>(initial?.bedrooms ?? undefined);
   const [bathrooms, setBathrooms] = useState<number | undefined>(initial?.bathrooms ?? undefined);
   const [floor, setFloor] = useState<number | undefined>(initial?.floor ?? undefined);
@@ -147,6 +151,7 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
         price: price ?? null,
         governorate,
         area_name: areaName.trim(),
+        coordinates,
         description: description.trim(),
         images,
         whatsappNumber: isEdit ? initial!.whatsappNumber : normalizeWhatsapp(whatsapp),
@@ -302,6 +307,10 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
 
           <Field label={S.fAreaName}>
             <TextInput value={areaName} onChangeText={setAreaName} className={inputCls} textAlign="right" placeholderTextColor={MUTED} />
+          </Field>
+
+          <Field label={`${S.fLocation} ${S.optional}`}>
+            <LocationPicker value={coordinates} onChange={setCoordinates} />
           </Field>
 
           <Field label={S.fDescription} hint={S.descriptionHint}>

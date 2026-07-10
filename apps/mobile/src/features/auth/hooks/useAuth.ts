@@ -1,5 +1,9 @@
+import * as Linking from 'expo-linking';
+import * as WebBrowser from 'expo-web-browser';
 import { useCallback } from 'react';
 
+import { API_URL } from '@/config/env';
+import { HttpError } from '@/shared/api/httpClient';
 import { clearTokens, getRefreshToken, setTokens } from '@/shared/api/authStorage';
 import { authActions } from '@/features/auth/store/auth.slice';
 import { useAppDispatch, useAppSelector } from '@/shared/store/hooks';
@@ -34,6 +38,30 @@ export function useAuth() {
     [dispatch]
   );
 
+  /**
+   * Google sign-in via the backend OAuth flow (reuses the web Google client).
+   * Opens the consent screen in an in-app browser; the backend hands the tokens
+   * back through the app deep link. Returns null if the user cancels.
+   */
+  const loginWithGoogle = useCallback(async (): Promise<{ user: User; isNewUser: boolean } | null> => {
+    const returnUrl = Linking.createURL('oauth');
+    const startUrl = `${API_URL}/auth/google?client=mobile&returnUrl=${encodeURIComponent(returnUrl)}`;
+    const result = await WebBrowser.openAuthSessionAsync(startUrl, returnUrl);
+    if (result.type !== 'success' || !result.url) return null; // cancelled / dismissed
+
+    const { queryParams } = Linking.parse(result.url);
+    const accessToken = queryParams?.accessToken;
+    const refreshToken = queryParams?.refreshToken;
+    if (queryParams?.status !== 'success' || typeof accessToken !== 'string' || typeof refreshToken !== 'string') {
+      throw new HttpError(typeof queryParams?.reason === 'string' ? queryParams.reason : 'failed', 400);
+    }
+
+    await setTokens(accessToken, refreshToken);
+    const user = await authApi.me();
+    dispatch(authActions.setAuth(user));
+    return { user, isNewUser: queryParams?.onboarding === '1' };
+  }, [dispatch]);
+
   const logout = useCallback(async (): Promise<void> => {
     const refreshToken = await getRefreshToken();
     if (refreshToken) await authApi.logout(refreshToken).catch(() => {});
@@ -50,6 +78,7 @@ export function useAuth() {
     isLoading: status === 'loading',
     login,
     register,
+    loginWithGoogle,
     logout,
     setUser,
   };

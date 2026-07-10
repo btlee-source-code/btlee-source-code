@@ -111,6 +111,9 @@ const ar = {
   invalidPhone: 'أدخل رقم هاتف مصري صحيح (مثال: 01012345678)',
   passwordMin: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
   loginFailed: 'بيانات الدخول غير صحيحة',
+  or: 'أو',
+  googleSignIn: 'المتابعة بحساب جوجل',
+  googleSignInFailed: 'تعذّر تسجيل الدخول عبر جوجل',
 
   // Add / edit property
   addPropertyTitle: 'أضف إعلانك',
@@ -142,6 +145,9 @@ const ar = {
   imagesRequired: 'أضف صورة واحدة على الأقل',
   whatsappHint: 'مثال: 01012345678',
   descriptionHint: 'اكتب تفاصيل العقار (10 أحرف على الأقل)',
+  fLocation: 'موقع العقار على الخريطة',
+  tapToSetLocation: 'دوس على الخريطة لتحديد موقع العقار',
+  locationSelected: 'تم تحديد الموقع ✓',
 
   // My properties
   myPropertiesTitle: 'إعلاناتي',
@@ -357,6 +363,9 @@ const en: Partial<Strings> = {
   invalidPhone: 'Enter a valid Egyptian phone number (e.g. 01012345678)',
   passwordMin: 'Password must be at least 8 characters',
   loginFailed: 'Invalid login credentials',
+  or: 'or',
+  googleSignIn: 'Continue with Google',
+  googleSignInFailed: 'Google sign-in failed',
 
   addPropertyTitle: 'Add your listing',
   editPropertyTitle: 'Edit listing',
@@ -387,6 +396,9 @@ const en: Partial<Strings> = {
   imagesRequired: 'Add at least one photo',
   whatsappHint: 'e.g. 01012345678',
   descriptionHint: 'Write the property details (at least 10 characters)',
+  fLocation: 'Property location on the map',
+  tapToSetLocation: 'Tap the map to set the property location',
+  locationSelected: 'Location set ✓',
 
   myPropertiesTitle: 'My listings',
   addNew: 'Add listing',

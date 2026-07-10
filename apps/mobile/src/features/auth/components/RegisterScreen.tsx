@@ -17,6 +17,7 @@ import { OnboardingSheet } from '@/features/account/components/OnboardingSheet';
 import { HttpError } from '@/shared/api/httpClient';
 import { Logo } from '@/shared/components/layout/Logo';
 import { TextField } from '@/shared/components/ui/TextField';
+import { GoogleSignInButton } from './GoogleSignInButton';
 import { useAuth } from '../hooks/useAuth';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -75,6 +76,8 @@ export function RegisterScreen() {
 
           <Text className="text-2xl font-cairo-bold text-foreground text-right">{S.registerTitle}</Text>
           <Text className="text-sm text-muted-foreground font-cairo text-right mb-6">{S.registerSubtitle}</Text>
+
+          <GoogleSignInButton onSuccess={(isNewUser) => (isNewUser ? setShowOnboarding(true) : router.back())} />
 
           <View className="gap-4">
             <TextField label={S.nameLabel} value={name} onChangeText={setName} error={errors.name} />

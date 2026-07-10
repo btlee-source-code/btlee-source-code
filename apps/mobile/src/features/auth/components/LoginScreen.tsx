@@ -17,6 +17,7 @@ import { S } from '@/config/strings';
 import { HttpError } from '@/shared/api/httpClient';
 import { Logo } from '@/shared/components/layout/Logo';
 import { TextField } from '@/shared/components/ui/TextField';
+import { GoogleSignInButton } from './GoogleSignInButton';
 import { useAuth } from '../hooks/useAuth';
 
 export function LoginScreen() {
@@ -63,6 +64,8 @@ export function LoginScreen() {
 
           <Text className="text-2xl font-cairo-bold text-foreground text-right">{S.signInTitle}</Text>
           <Text className="text-sm text-muted-foreground font-cairo text-right mb-6">{S.signInSubtitle}</Text>
+
+          <GoogleSignInButton onSuccess={() => router.back()} />
 
           <View className="gap-4">
             <TextField
