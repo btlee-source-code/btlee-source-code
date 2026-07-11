@@ -17,12 +17,17 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { S } from '@/config/strings';
 import { carsApi } from '@/features/cars/api/cars.api';
+import { ShareCarButton } from '@/features/cars/detail/components/ShareCarButton';
+import { SimilarCars } from '@/features/cars/detail/components/SimilarCars';
 import {
   CAR_BODY_TYPE_LABELS,
   CAR_CONDITION_LABELS,
   CAR_FUEL_TYPE_LABELS,
   CAR_TRANSMISSION_LABELS,
 } from '@/features/cars/lib/carConstants';
+// Reuse the property detail's generic gallery viewer + map.
+import { ImageViewer } from '@/features/properties/detail/components/ImageViewer';
+import { PropertyMap } from '@/features/properties/detail/components/PropertyMap';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { WhatsAppIcon } from '@/shared/components/icons/WhatsAppIcon';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
@@ -43,6 +48,7 @@ export function CarDetailScreen() {
     id
   );
   const [imgIndex, setImgIndex] = useState(0);
+  const [viewerOpen, setViewerOpen] = useState(false);
   const c = useThemeColors();
 
   const galleryHeight = Math.round(width * 0.78);
@@ -111,15 +117,16 @@ export function CarDetailScreen() {
               showsHorizontalScrollIndicator={false}
               onMomentumScrollEnd={(e) => setImgIndex(Math.round(e.nativeEvent.contentOffset.x / width))}>
               {images.map((img) => (
-                <Image
-                  key={img.publicId}
-                  source={{ uri: img.url }}
-                  placeholder={blurPlaceholder(img.url) ? { uri: blurPlaceholder(img.url) } : undefined}
-                  placeholderContentFit="cover"
-                  style={{ width, height: galleryHeight }}
-                  contentFit="cover"
-                  transition={250}
-                />
+                <Pressable key={img.publicId} onPress={() => setViewerOpen(true)}>
+                  <Image
+                    source={{ uri: img.url }}
+                    placeholder={blurPlaceholder(img.url) ? { uri: blurPlaceholder(img.url) } : undefined}
+                    placeholderContentFit="cover"
+                    style={{ width, height: galleryHeight }}
+                    contentFit="cover"
+                    transition={250}
+                  />
+                </Pressable>
               ))}
             </ScrollView>
           ) : (
@@ -241,17 +248,31 @@ export function CarDetailScreen() {
               </View>
             )}
           </View>
+
+          {/* Location map (only when a pin was set) */}
+          {car.location?.coordinates && (
+            <PropertyMap lng={car.location.coordinates[0]} lat={car.location.coordinates[1]} />
+          )}
+
+          {/* Similar cars */}
+          <SimilarCars id={car._id} />
         </View>
       </ScrollView>
 
-      {/* Floating back button over the gallery (RTL start = right) */}
-      <Pressable
-        onPress={() => router.back()}
-        hitSlop={6}
-        className="absolute right-4 h-10 w-10 rounded-full items-center justify-center active:opacity-80"
-        style={[{ top: insets.top + 10, backgroundColor: 'rgba(255,255,255,0.95)' }, shadows.sm]}>
-        <ArrowRight size={20} color="#1C1C1C" />
-      </Pressable>
+      {/* Floating controls over the gallery: share (left) + back (right, RTL) */}
+      <View
+        className="absolute left-4 right-4 flex-row items-center justify-between"
+        style={{ top: insets.top + 10 }}
+        pointerEvents="box-none">
+        <ShareCarButton car={car} />
+        <Pressable
+          onPress={() => router.back()}
+          hitSlop={6}
+          className="h-10 w-10 rounded-full items-center justify-center active:opacity-80"
+          style={[{ backgroundColor: 'rgba(255,255,255,0.95)' }, shadows.sm]}>
+          <ArrowRight size={20} color="#1C1C1C" />
+        </Pressable>
+      </View>
 
       {/* Sticky bottom bar: WhatsApp CTA (left) + price (right, RTL) */}
       <View className="absolute bottom-0 left-0 right-0 flex-row items-center justify-between gap-3 px-5 pt-3 pb-3 bg-background border-t border-border">
@@ -276,6 +297,13 @@ export function CarDetailScreen() {
           </View>
         )}
       </View>
+
+      <ImageViewer
+        images={images}
+        initialIndex={imgIndex}
+        visible={viewerOpen}
+        onClose={() => setViewerOpen(false)}
+      />
     </SafeAreaView>
   );
 }

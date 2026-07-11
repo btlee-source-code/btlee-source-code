@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import {
   Bell,
   Bookmark,
+  Car,
   ChevronLeft,
   Heart,
   Home,
@@ -21,6 +22,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { S } from '@/config/strings';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { LanguageSwitcher } from '@/features/i18n/components/LanguageSwitcher';
+import { useSection } from '@/features/section/hooks/useSection';
 import { ThemeToggle } from '@/features/theme/components/ThemeToggle';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { useAppSelector } from '@/shared/store/hooks';
@@ -29,6 +31,7 @@ export default function ProfileTab() {
   const router = useRouter();
   const c = useThemeColors();
   const { user, isAuthenticated, isLoading, logout } = useAuth();
+  const { isCars } = useSection();
   const unreadCount = useAppSelector((s) => s.notifications.unreadCount);
 
   if (isLoading) {
@@ -89,9 +92,17 @@ export default function ProfileTab() {
 
         {/* Menu */}
         <View className="bg-card border border-border rounded-xl overflow-hidden">
-          <MenuRow icon={<Home size={20} color={c.primary} />} label={S.myPropertiesTitle} onPress={() => router.push('/my-properties')} />
+          {isCars ? (
+            <MenuRow icon={<Car size={20} color={c.primary} />} label={S.myCarsTitle} onPress={() => router.push('/my-cars')} />
+          ) : (
+            <MenuRow icon={<Home size={20} color={c.primary} />} label={S.myPropertiesTitle} onPress={() => router.push('/my-properties')} />
+          )}
           <View className="h-px bg-border" />
-          <MenuRow icon={<Plus size={20} color={c.primary} />} label={S.addNew} onPress={() => router.push('/add-property')} />
+          <MenuRow
+            icon={<Plus size={20} color={c.primary} />}
+            label={isCars ? S.addNewCar : S.addNew}
+            onPress={() => router.push(isCars ? '/add-car' : '/add-property')}
+          />
           <View className="h-px bg-border" />
           <MenuRow
             icon={<Bell size={20} color={c.primary} />}

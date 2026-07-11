@@ -1,5 +1,6 @@
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { ArrowRight, Check } from 'lucide-react-native';
+import { ArrowRight, Check, X } from 'lucide-react-native';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -16,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { carsApi, type CarInput } from '@/features/cars/api/cars.api';
+import type { Car, CarImage } from '@/shared/types/car';
 import {
   CAR_BODY_TYPES,
   CAR_BODY_TYPE_LABELS,
@@ -68,27 +70,31 @@ function normalizeWhatsapp(raw: string): string {
   return `20${d}`;
 }
 
-export function CarFormScreen() {
+export function CarFormScreen({ initial }: { initial?: Car } = {}) {
   const router = useRouter();
   const c = useThemeColors();
+  const isEdit = !!initial;
 
-  const [listingType, setListingType] = useState('');
-  const [condition, setCondition] = useState('');
-  const [make, setMake] = useState('');
-  const [model, setModel] = useState('');
-  const [year, setYear] = useState<number | undefined>();
-  const [mileage, setMileage] = useState<number | undefined>();
-  const [transmission, setTransmission] = useState('');
-  const [fuelType, setFuelType] = useState('');
-  const [bodyType, setBodyType] = useState('');
-  const [color, setColor] = useState('');
-  const [price, setPrice] = useState<number | undefined>();
-  const [governorate, setGovernorate] = useState('');
-  const [areaName, setAreaName] = useState('');
-  const [coordinates, setCoordinates] = useState<[number, number] | undefined>();
-  const [description, setDescription] = useState('');
+  const [listingType, setListingType] = useState(initial?.listingType ?? '');
+  const [condition, setCondition] = useState(initial?.condition ?? '');
+  const [make, setMake] = useState(initial?.make ?? '');
+  const [model, setModel] = useState(initial?.model ?? '');
+  const [year, setYear] = useState<number | undefined>(initial?.year ?? undefined);
+  const [mileage, setMileage] = useState<number | undefined>(initial?.mileage ?? undefined);
+  const [transmission, setTransmission] = useState(initial?.transmission ?? '');
+  const [fuelType, setFuelType] = useState(initial?.fuelType ?? '');
+  const [bodyType, setBodyType] = useState(initial?.bodyType ?? '');
+  const [color, setColor] = useState(initial?.color ?? '');
+  const [price, setPrice] = useState<number | undefined>(initial?.price ?? undefined);
+  const [governorate, setGovernorate] = useState(initial?.governorate ?? '');
+  const [areaName, setAreaName] = useState(initial?.area_name ?? '');
+  const [coordinates, setCoordinates] = useState<[number, number] | undefined>(
+    initial?.location?.coordinates ?? undefined
+  );
+  const [description, setDescription] = useState(initial?.description ?? '');
   const [whatsapp, setWhatsapp] = useState('');
-  const [durationDays, setDurationDays] = useState(30);
+  const [durationDays, setDurationDays] = useState(initial?.durationDays ?? 30);
+  const [keptImages, setKeptImages] = useState<CarImage[]>(initial?.images ?? []);
   const [newImages, setNewImages] = useState<LocalImage[]>([]);
 
   const [error, setError] = useState<string | null>(null);
@@ -100,8 +106,8 @@ export function CarFormScreen() {
     if (!make.trim() || !model.trim() || !areaName.trim()) return S.fillRequired;
     if (year == null || year < 1950 || year > CURRENT_YEAR + 1) return S.fillRequired;
     if (description.trim().length < 10) return S.descriptionHint;
-    if (!/^01[0125][0-9]{8}$/.test(whatsapp.replace(/\D/g, ''))) return S.whatsappHint;
-    if (newImages.length < 1) return S.imagesRequired;
+    if (!isEdit && !/^01[0125][0-9]{8}$/.test(whatsapp.replace(/\D/g, ''))) return S.whatsappHint;
+    if (keptImages.length + newImages.length < 1) return S.imagesRequired;
     return null;
   };
 
@@ -115,7 +121,8 @@ export function CarFormScreen() {
     setError(null);
     try {
       setPhase('uploading');
-      const images = await uploadsApi.images(newImages);
+      const uploaded = newImages.length ? await uploadsApi.images(newImages) : [];
+      const images = [...keptImages, ...uploaded];
 
       setPhase('saving');
       const body: CarInput = {
@@ -135,14 +142,15 @@ export function CarFormScreen() {
         coordinates,
         description: description.trim(),
         images,
-        whatsappNumber: normalizeWhatsapp(whatsapp),
+        whatsappNumber: isEdit ? initial!.whatsappNumber : normalizeWhatsapp(whatsapp),
         durationDays,
       };
 
-      await carsApi.create(body);
+      if (isEdit) await carsApi.update(initial!._id, body);
+      else await carsApi.create(body);
 
       Alert.alert(S.addSuccessTitle, S.addCarSuccessDesc, [
-        { text: 'تمام', onPress: () => router.back() },
+        { text: 'تمام', onPress: () => router.replace('/my-cars') },
       ]);
     } catch (e) {
       setError(e instanceof Error ? e.message : S.genericError);
@@ -158,13 +166,29 @@ export function CarFormScreen() {
         <Pressable onPress={() => router.back()} hitSlop={8}>
           <ArrowRight size={24} color={c.primary} />
         </Pressable>
-        <Text className="text-lg font-cairo-bold text-foreground">{S.addCarTitle}</Text>
+        <Text className="text-lg font-cairo-bold text-foreground">{isEdit ? S.editCarTitle : S.addCarTitle}</Text>
         <View style={{ width: 24 }} />
       </View>
 
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerClassName="px-5 py-4 gap-5" keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           <Field label={S.fCarImages}>
+            {keptImages.length > 0 && (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, marginBottom: 10 }}>
+                {keptImages.map((img) => (
+                  <View key={img.publicId} className="h-24 w-24 rounded-xl overflow-hidden">
+                    <Image source={{ uri: img.url }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
+                    <Pressable
+                      onPress={() => setKeptImages((k) => k.filter((x) => x.publicId !== img.publicId))}
+                      hitSlop={6}
+                      className="absolute top-1 left-1 h-6 w-6 rounded-full items-center justify-center"
+                      style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
+                      <X size={14} color="#FFFFFF" />
+                    </Pressable>
+                  </View>
+                ))}
+              </ScrollView>
+            )}
             <ImagePickerRow value={newImages} onChange={setNewImages} />
           </Field>
 
@@ -277,9 +301,11 @@ export function CarFormScreen() {
             />
           </Field>
 
-          <Field label={S.fWhatsapp} hint={S.whatsappHint}>
-            <TextInput value={whatsapp} onChangeText={setWhatsapp} keyboardType="phone-pad" placeholder="01xxxxxxxxx" className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
-          </Field>
+          {!isEdit && (
+            <Field label={S.fWhatsapp} hint={S.whatsappHint}>
+              <TextInput value={whatsapp} onChangeText={setWhatsapp} keyboardType="phone-pad" placeholder="01xxxxxxxxx" className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+            </Field>
+          )}
 
           <Field label={S.fDuration}>
             <View className="flex-row flex-wrap gap-2 justify-end">
@@ -310,7 +336,7 @@ export function CarFormScreen() {
           ) : (
             <>
               <Check size={20} color={c.primaryForeground} />
-              <Text className="text-primary-foreground font-cairo-bold text-base">{S.submitAdd}</Text>
+              <Text className="text-primary-foreground font-cairo-bold text-base">{isEdit ? S.submitEdit : S.submitAdd}</Text>
             </>
           )}
         </Pressable>

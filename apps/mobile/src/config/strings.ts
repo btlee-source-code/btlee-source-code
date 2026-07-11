@@ -348,6 +348,15 @@ const ar = {
   fColor: 'اللون',
   makeHint: 'مثال: تويوتا',
   modelHint: 'مثال: كورولا',
+  editCarTitle: 'تعديل إعلان العربية',
+  // Cars — my listings
+  myCarsTitle: 'عربياتي',
+  addNewCar: 'أضف عربية',
+  noCarsMineTitle: 'مفيش عربيات',
+  noCarsMineDesc: 'ابدأ بإضافة أول عربية ليك',
+  // Cars — detail extras
+  similarCars: 'عربيات مشابهة',
+  reportCar: 'الإبلاغ عن الإعلان',
 };
 
 type Strings = typeof ar;
@@ -663,6 +672,13 @@ const en: Partial<Strings> = {
   fColor: 'Color',
   makeHint: 'e.g. Toyota',
   modelHint: 'e.g. Corolla',
+  editCarTitle: 'Edit car listing',
+  myCarsTitle: 'My cars',
+  addNewCar: 'Add a car',
+  noCarsMineTitle: 'No cars yet',
+  noCarsMineDesc: 'Start by adding your first car',
+  similarCars: 'Similar cars',
+  reportCar: 'Report listing',
 };
 
 /** Locale-aware strings — `S.x` returns the English value when active, else Arabic. */
