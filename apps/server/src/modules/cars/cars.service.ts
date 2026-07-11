@@ -25,6 +25,7 @@ import type {
   UpdateCarInput,
   CarListQuery,
 } from './cars.validators.js';
+import { resolveCarSearch, buildCarTextClause } from './carSearchHelpers.js';
 
 /** Escapes a user string so it can be used literally inside a RegExp. */
 function escapeRegex(input: string): string {
@@ -65,15 +66,31 @@ function buildPublicFilter(query: CarListQuery) {
     filter.price = priceFilter;
   }
 
-  // Free-text search over make / model / description.
+  // Smart bilingual (Arabic/English) search:
+  //   1. Map make/model + body/fuel/transmission/condition/listing words to enum
+  //      filters — but only when the user hasn't pinned them via an explicit filter.
+  //   2. Whatever is left → fuzzy regex over make/model/description, with
+  //      recognized makes/models expanded to ALL language variants so "تويوتا"
+  //      and "toyota" return the same cars.
+  const andClauses: Record<string, unknown>[] = [];
   if (query.search && query.search.trim()) {
-    const pattern = escapeRegex(query.search.trim());
-    filter.$or = [
-      { make: { $regex: pattern, $options: 'i' } },
-      { model: { $regex: pattern, $options: 'i' } },
-      { description: { $regex: pattern, $options: 'i' } },
-    ];
+    const resolved = resolveCarSearch(query.search);
+    if (resolved.listingTypes.length && !query.listingType)
+      andClauses.push({ listingType: { $in: resolved.listingTypes } });
+    if (resolved.conditions.length && !query.condition)
+      andClauses.push({ condition: { $in: resolved.conditions } });
+    if (resolved.bodyTypes.length && !query.bodyType)
+      andClauses.push({ bodyType: { $in: resolved.bodyTypes } });
+    if (resolved.fuelTypes.length && !query.fuelType)
+      andClauses.push({ fuelType: { $in: resolved.fuelTypes } });
+    if (resolved.transmissions.length && !query.transmission)
+      andClauses.push({ transmission: { $in: resolved.transmissions } });
+
+    const textClause = buildCarTextClause(resolved);
+    if (textClause) andClauses.push(textClause);
   }
+
+  if (andClauses.length) filter.$and = andClauses;
 
   return filter;
 }

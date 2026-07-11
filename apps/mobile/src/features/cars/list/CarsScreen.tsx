@@ -1,5 +1,5 @@
-import { useLocalSearchParams } from 'expo-router';
-import { CircleAlert, Search, SearchX, X } from 'lucide-react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { CircleAlert, Plus, Search, SearchX, X } from 'lucide-react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,6 +10,7 @@ import { CarCard } from '@/features/cars/components/CarCard';
 import { CAR_BODY_TYPE_LABELS } from '@/features/cars/lib/carConstants';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { EmptyState } from '@/shared/components/ui/EmptyState';
+import { PressableScale } from '@/shared/components/ui/PressableScale';
 import { SkeletonPropertyCard } from '@/shared/components/ui/Skeleton';
 import { useTabPressScrollToTop } from '@/shared/hooks/useTabPressScrollToTop';
 import { LISTING_TYPE_LABELS } from '@/shared/lib/constants';
@@ -26,6 +27,7 @@ const LIMIT = 12;
  */
 export function CarsScreen() {
   const params = useLocalSearchParams<{ bodyType?: string; listingType?: string; make?: string }>();
+  const router = useRouter();
   const c = useThemeColors();
 
   const [search, setSearch] = useState('');
@@ -198,6 +200,17 @@ export function CarsScreen() {
           ) : null
         }
       />
+
+      {/* Add-car FAB — extended (icon + label), mirrors the properties list */}
+      <PressableScale
+        haptic
+        onPress={() => router.push('/add-car')}
+        containerClassName="absolute bottom-5 left-5"
+        className="flex-row items-center gap-2 h-14 rounded-full bg-primary pl-4 pr-5"
+        style={shadows.lg}>
+        <Plus size={22} color={c.primaryForeground} strokeWidth={2.8} />
+        <Text className="text-primary-foreground font-cairo-bold text-[15px]">{S.addCarTitle}</Text>
+      </PressableScale>
     </SafeAreaView>
   );
 }

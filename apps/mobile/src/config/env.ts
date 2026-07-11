@@ -1,17 +1,22 @@
 import { Platform } from 'react-native';
 
+/** Live API — the safe default for any RELEASE build (preview/production). */
+const PRODUCTION_API_URL = 'https://btlee-api.up.railway.app/api';
+
 /**
  * Resolves the backend API base URL for the current runtime.
  *
  * Precedence:
- *   1. EXPO_PUBLIC_API_URL — set this when testing on a REAL device (use your
- *      laptop's LAN IP, e.g. http://192.168.1.16:5000/api). Also how production
- *      builds point at the live API.
- *   2. Android emulator → 10.0.2.2 is the host-loopback alias (the emulator's
- *      own "localhost" is the emulator itself, not your laptop).
- *   3. iOS simulator / web → localhost reaches the laptop directly.
- *
- * The local dev server runs on http://localhost:5000 (see apps/server).
+ *   1. EXPO_PUBLIC_API_URL — injected at bundle time (from .env / eas.json /
+ *      EAS env). This is how builds normally point at the live API, and how you
+ *      override to a LAN IP when testing on a real device.
+ *   2. Fallback when the var is missing:
+ *      - In local dev (Metro, __DEV__) → the local dev server (10.0.2.2 for the
+ *        Android emulator, localhost otherwise). The dev server runs on :5000.
+ *      - In a RELEASE build (__DEV__ === false) → PRODUCTION. Never localhost —
+ *        so a missing/failed env injection can't ship an app that silently talks
+ *        to a dead local address (that was the "server not working on the APK"
+ *        bug: the app fell back to localhost, unreachable from a real device).
  */
 const DEV_FALLBACK =
   Platform.select({
@@ -19,7 +24,9 @@ const DEV_FALLBACK =
     default: 'http://localhost:5000/api',
   }) ?? 'http://localhost:5000/api';
 
-export const API_URL = process.env.EXPO_PUBLIC_API_URL ?? DEV_FALLBACK;
+const FALLBACK = __DEV__ ? DEV_FALLBACK : PRODUCTION_API_URL;
+
+export const API_URL = process.env.EXPO_PUBLIC_API_URL ?? FALLBACK;
 
 /**
  * Public web-site base URL — used to build canonical share links

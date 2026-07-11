@@ -332,6 +332,22 @@ const ar = {
   carConditionLabel: 'الحالة',
   carColorLabel: 'اللون',
   carContactSeller: 'تواصل مع البائع',
+
+  // Cars — add form
+  addCarTitle: 'أضف عربيتك',
+  addCarSuccessDesc: 'هتظهر بعد مراجعة الفريق',
+  fCarImages: 'صور العربية',
+  fMake: 'الماركة',
+  fModel: 'الموديل',
+  fYear: 'سنة الصنع',
+  fMileage: 'الكيلومترات',
+  fTransmission: 'ناقل الحركة',
+  fFuel: 'الوقود',
+  fBodyType: 'نوع الهيكل',
+  fCondition: 'الحالة',
+  fColor: 'اللون',
+  makeHint: 'مثال: تويوتا',
+  modelHint: 'مثال: كورولا',
 };
 
 type Strings = typeof ar;
@@ -632,6 +648,21 @@ const en: Partial<Strings> = {
   carConditionLabel: 'Condition',
   carColorLabel: 'Color',
   carContactSeller: 'Contact the seller',
+
+  addCarTitle: 'List your car',
+  addCarSuccessDesc: 'It will appear after the team reviews it',
+  fCarImages: 'Car photos',
+  fMake: 'Make',
+  fModel: 'Model',
+  fYear: 'Year',
+  fMileage: 'Mileage (km)',
+  fTransmission: 'Transmission',
+  fFuel: 'Fuel',
+  fBodyType: 'Body type',
+  fCondition: 'Condition',
+  fColor: 'Color',
+  makeHint: 'e.g. Toyota',
+  modelHint: 'e.g. Corolla',
 };
 
 /** Locale-aware strings — `S.x` returns the English value when active, else Arabic. */
