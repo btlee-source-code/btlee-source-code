@@ -100,7 +100,7 @@ export default function ProfileTab() {
           <View className="h-px bg-border" />
           <MenuRow
             icon={<Plus size={20} color={c.primary} />}
-            label={isCars ? S.addNewCar : S.addNew}
+            label={S.addNew}
             onPress={() => router.push(isCars ? '/add-car' : '/add-property')}
           />
           <View className="h-px bg-border" />

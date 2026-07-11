@@ -13,14 +13,19 @@ const OPTIONS: { key: Section; label: () => string; Icon: typeof Building2 }[] =
 ];
 
 /**
- * Segmented toggle that switches the active section (properties ⇄ cars). The
- * active pill uses `bg-primary`, which is the CURRENT section's brand color, so
- * the control itself reflects the active brand (green for properties, blue for
- * cars). Flipping it re-tints the whole app + swaps the logo via the store.
+ * Segmented toggle that switches the active section (properties ⇄ cars).
+ * The active pill uses a per-section brand color: GOLD (accent) for properties,
+ * BLUE (primary) for cars — so the control reflects the active brand. Flipping
+ * it re-tints the whole app + swaps the logo via the store.
  */
 export function SectionSwitcher() {
   const { section, setSection } = useSection();
   const c = useThemeColors();
+
+  // The active pill is always the current section: properties → gold (accent),
+  // cars → blue (primary). White foreground works on both.
+  const activeBg = section === 'cars' ? c.primary : c.accent;
+  const activeFg = section === 'cars' ? c.primaryForeground : c.accentForeground;
 
   return (
     <View className="flex-row bg-secondary border border-border rounded-2xl p-1">
@@ -33,10 +38,10 @@ export function SectionSwitcher() {
             scaleTo={0.97}
             onPress={() => setSection(key)}
             containerClassName="flex-1"
-            className={`flex-row items-center justify-center gap-2 rounded-xl py-2.5 ${active ? 'bg-primary' : ''}`}>
-            <Icon size={18} color={active ? c.primaryForeground : c.muted} strokeWidth={2.2} />
-            <Text
-              className={`font-cairo-bold text-[14px] ${active ? 'text-primary-foreground' : 'text-muted-foreground'}`}>
+            className="flex-row items-center justify-center gap-2 rounded-xl py-2.5"
+            style={active ? { backgroundColor: activeBg } : undefined}>
+            <Icon size={18} color={active ? activeFg : c.muted} strokeWidth={2.2} />
+            <Text className="font-cairo-bold text-[14px]" style={{ color: active ? activeFg : c.muted }}>
               {label()}
             </Text>
           </PressableScale>
