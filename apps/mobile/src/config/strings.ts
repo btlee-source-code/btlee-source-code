@@ -300,6 +300,38 @@ const ar = {
   comingSoon: 'قريباً',
   loginToSave: 'سجل دخولك أولاً لحفظ العقارات',
   genericError: 'حدث خطأ، حاول مرة أخرى',
+
+  // Section switcher
+  sectionProperties: 'عقارات',
+  sectionCars: 'عربيات',
+
+  // Cars — home
+  carsHeroLead: 'اعلن عربيتك',
+  carsHeroEmphasis: 'من غير عمولة',
+  carsHeroSubtitle: 'آلاف العربيات للبيع والإيجار في كل محافظات مصر',
+  carsSearchPillTitle: 'دوّر على عربيتك',
+  carsSearchExamples: ['تويوتا كورولا', 'هيونداي إلنترا', 'كيا سبورتاج', 'مرسيدس C180', 'BMW 320i'],
+  carsExploreByType: 'استكشف حسب النوع',
+  carsFeaturedTitle: 'عربيات مميزة',
+  carsLatestTitle: 'أحدث العربيات',
+  carsSaleSectionTitle: 'عربيات للبيع',
+  carsRentSectionTitle: 'عربيات للإيجار',
+
+  // Cars — list + errors
+  carsSearchPlaceholder: 'ابحث بالماركة أو الموديل...',
+  carsResultsCount: (n: number) => `${n} عربية`,
+  carsErrorDesc: 'تعذّر تحميل العربيات، حاول تاني',
+
+  // Cars — spec labels
+  kmUnit: 'كم',
+  carYearLabel: 'سنة الصنع',
+  carMileageLabel: 'الكيلومترات',
+  carTransmissionLabel: 'ناقل الحركة',
+  carFuelLabel: 'الوقود',
+  carBodyTypeLabel: 'نوع الهيكل',
+  carConditionLabel: 'الحالة',
+  carColorLabel: 'اللون',
+  carContactSeller: 'تواصل مع البائع',
 };
 
 type Strings = typeof ar;
@@ -572,6 +604,34 @@ const en: Partial<Strings> = {
   comingSoon: 'Coming soon',
   loginToSave: 'Sign in first to save properties',
   genericError: 'Something went wrong, please try again',
+
+  sectionProperties: 'Properties',
+  sectionCars: 'Cars',
+
+  carsHeroLead: 'List your car',
+  carsHeroEmphasis: 'commission-free',
+  carsHeroSubtitle: 'Thousands of cars for sale and rent across Egypt',
+  carsSearchPillTitle: 'Find your car',
+  carsSearchExamples: ['Toyota Corolla', 'Hyundai Elantra', 'Kia Sportage', 'Mercedes C180', 'BMW 320i'],
+  carsExploreByType: 'Explore by type',
+  carsFeaturedTitle: 'Featured cars',
+  carsLatestTitle: 'Latest cars',
+  carsSaleSectionTitle: 'Cars for sale',
+  carsRentSectionTitle: 'Cars for rent',
+
+  carsSearchPlaceholder: 'Search by make or model...',
+  carsResultsCount: (n: number) => `${n} car${n === 1 ? '' : 's'}`,
+  carsErrorDesc: 'Could not load cars, please try again',
+
+  kmUnit: 'km',
+  carYearLabel: 'Year',
+  carMileageLabel: 'Mileage',
+  carTransmissionLabel: 'Transmission',
+  carFuelLabel: 'Fuel',
+  carBodyTypeLabel: 'Body type',
+  carConditionLabel: 'Condition',
+  carColorLabel: 'Color',
+  carContactSeller: 'Contact the seller',
 };
 
 /** Locale-aware strings — `S.x` returns the English value when active, else Arabic. */

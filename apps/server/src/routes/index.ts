@@ -6,6 +6,7 @@ import { Router } from 'express';
 import { authRouter } from '../modules/auth/auth.routes.js';
 import { usersRouter } from '../modules/users/users.routes.js';
 import { propertiesRouter } from '../modules/properties/properties.routes.js';
+import { carsRouter } from '../modules/cars/cars.routes.js';
 import { wishlistRouter } from '../modules/wishlist/wishlist.routes.js';
 import { ratingsRouter } from '../modules/ratings/ratings.routes.js';
 import { notificationsRouter } from '../modules/notifications/notifications.routes.js';
@@ -25,6 +26,7 @@ apiRouter.get('/health', (_req, res) => {
 apiRouter.use('/auth', authRouter);
 apiRouter.use('/users', usersRouter);
 apiRouter.use('/properties', propertiesRouter);
+apiRouter.use('/cars', carsRouter);
 apiRouter.use('/wishlist', wishlistRouter);
 apiRouter.use('/ratings', ratingsRouter);
 apiRouter.use('/notifications', notificationsRouter);

@@ -1,28 +1,25 @@
 import { Image } from 'expo-image';
 
-import { useTheme } from '@/features/theme/hooks/useTheme';
+import { useSection } from '@/features/section/hooks/useSection';
 
-// The site's brand wordmark (same assets as the web navbar), swapped by theme:
-//   light mode → the default (dark-coloured) logo,
-//   dark mode  → the light-green logo, legible on the near-black background.
-// Both artworks share the same 697×151 canvas so they render identically.
-const LOGO_LIGHT = require('@/assets/brand/btlee-logo.png');
-const LOGO_DARK = require('@/assets/brand/btlee-logo-dark.png');
-const ASPECT = 697 / 151;
+// Section-branded wordmarks (fingerprint icon + "BtLee egypt"). Each section
+// ships its own artwork; the active section is read from the store so the logo
+// swaps together with the section switcher and its brand colors.
+//   properties → silver/gold artwork
+//   cars       → blue/white artwork
+const LOGOS = {
+  properties: { source: require('@/assets/brand/btlee-properties-logo.png'), aspect: 690 / 287 },
+  cars: { source: require('@/assets/brand/btlee-cars-logo.png'), aspect: 681 / 246 },
+} as const;
 
-export function Logo({
-  height = 30,
-  variant = 'auto',
-}: {
-  height?: number;
-  /** 'onDark' forces the light artwork — for branded dark-green surfaces. */
-  variant?: 'auto' | 'onDark';
-}) {
-  const { isDark } = useTheme();
+export function Logo({ height = 30 }: { height?: number }) {
+  const { section } = useSection();
+  const { source, aspect } = LOGOS[section];
+
   return (
     <Image
-      source={variant === 'onDark' || isDark ? LOGO_DARK : LOGO_LIGHT}
-      style={{ height, width: height * ASPECT }}
+      source={source}
+      style={{ height, width: height * aspect }}
       contentFit="contain"
       accessibilityLabel="Bt Lee"
     />

@@ -28,11 +28,12 @@ SplashScreen.preventAutoHideAsync();
 function RootNavigator() {
   const locale = useAppSelector((s) => s.locale.locale);
   const mode = useAppSelector((s) => s.theme.mode);
+  const section = useAppSelector((s) => s.section.section);
 
   return (
     <Stack
       key={locale}
-      screenOptions={{ headerShown: false, contentStyle: { backgroundColor: THEME_COLORS[mode].background } }}>
+      screenOptions={{ headerShown: false, contentStyle: { backgroundColor: THEME_COLORS[section][mode].background } }}>
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="(auth)" options={{ animation: 'slide_from_bottom' }} />
       <Stack.Screen name="(main)" />

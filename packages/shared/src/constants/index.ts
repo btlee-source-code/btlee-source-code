@@ -6,3 +6,4 @@
  */
 export * from './shared';
 export * from './property';
+export * from './car';

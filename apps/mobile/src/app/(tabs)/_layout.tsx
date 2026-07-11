@@ -4,11 +4,13 @@ import { StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
+import { useSection } from '@/features/section/hooks/useSection';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { tapHaptic } from '@/shared/lib/haptics';
 
 export default function TabsLayout() {
   const c = useThemeColors();
+  const { isCars } = useSection();
   // Respect the device's gesture/nav bar — a fixed height clips the labels on
   // phones with a bottom inset.
   const insets = useSafeAreaInsets();
@@ -36,7 +38,7 @@ export default function TabsLayout() {
       />
       <Tabs.Screen
         name="properties"
-        options={{ title: S.tabProperties, tabBarIcon: ({ color }) => <Search color={color} size={23} /> }}
+        options={{ title: isCars ? S.sectionCars : S.tabProperties, tabBarIcon: ({ color }) => <Search color={color} size={23} /> }}
       />
       <Tabs.Screen
         name="wishlist"

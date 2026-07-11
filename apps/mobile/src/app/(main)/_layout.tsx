@@ -27,6 +27,8 @@ export default function MainLayout() {
       {/* Property detail draws its own floating controls over the full-bleed
           gallery — no native header. */}
       <Stack.Screen name="(properties)/properties/[id]" options={{ headerShown: false }} />
+      {/* Car detail draws its own floating controls over the gallery — no header. */}
+      <Stack.Screen name="(cars)/cars/[id]" options={{ headerShown: false }} />
       <Stack.Screen name="(properties)/owners/[id]" options={nativeHeader} />
       <Stack.Screen name="legal/privacy" options={nativeHeader} />
       <Stack.Screen name="legal/disclaimer" options={nativeHeader} />

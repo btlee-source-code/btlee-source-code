@@ -25,8 +25,13 @@ export function useTheme() {
   return { mode, isDark: mode === 'dark', setMode, toggle };
 }
 
-/** Raw hex colors for the active theme — for imperative `color=` props (icons). */
+/**
+ * Raw hex colors for the active theme — for imperative `color=` props (icons).
+ * Keyed by BOTH the light/dark mode and the active section, so the brand colors
+ * (primary / accent) follow the current section (properties | cars).
+ */
 export function useThemeColors(): ThemeColors {
   const mode = useAppSelector((s) => s.theme.mode);
-  return THEME_COLORS[mode];
+  const section = useAppSelector((s) => s.section.section);
+  return THEME_COLORS[section][mode];
 }

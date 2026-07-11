@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from '@/features/auth/components/AuthProvider';
 import { I18nProvider } from '@/features/i18n/components/I18nProvider';
 import { NotificationsProvider } from '@/features/notifications/components/NotificationsProvider';
+import { SectionBrandProvider } from '@/features/section/components/SectionBrandProvider';
 import { ThemeProvider } from '@/features/theme/components/ThemeProvider';
 import { WishlistProvider } from '@/features/wishlist/components/WishlistProvider';
 import { ToastHost } from '@/shared/components/ui/Toast';
@@ -30,11 +31,14 @@ export function AppProviders({ children }: { children: ReactNode }) {
           <NotificationsProvider>
             <I18nProvider>
               <ThemeProvider>
-                <SafeAreaProvider>
-                  {children}
-                  {/* Global toast pill — rendered above the navigator */}
-                  <ToastHost />
-                </SafeAreaProvider>
+                {/* Applies the active section's brand colors over the whole UI */}
+                <SectionBrandProvider>
+                  <SafeAreaProvider>
+                    {children}
+                    {/* Global toast pill — rendered above the navigator */}
+                    <ToastHost />
+                  </SafeAreaProvider>
+                </SectionBrandProvider>
               </ThemeProvider>
             </I18nProvider>
           </NotificationsProvider>

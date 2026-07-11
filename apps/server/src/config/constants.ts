@@ -26,12 +26,37 @@ export type DepositOption = (typeof DEPOSIT_OPTIONS)[number];
 export const PROPERTY_STATUS = ['pending', 'approved', 'rejected', 'sold', 'rented', 'expired'] as const;
 export type PropertyStatus = (typeof PROPERTY_STATUS)[number];
 
+// ── Car domain enums ──
+// Server-side mirror of packages/shared `constants/car.ts` (the server owns its
+// own copy for Mongoose validation — it does not import the shared package at
+// runtime). `make` / `model` / `color` are free-text (validated as strings),
+// so there is no server enum for them.
+export const CAR_LISTING_TYPES = ['sale', 'rent'] as const;
+export type CarListingType = (typeof CAR_LISTING_TYPES)[number];
+
+export const CAR_CONDITIONS = ['new', 'used'] as const;
+export type CarCondition = (typeof CAR_CONDITIONS)[number];
+
+export const CAR_TRANSMISSIONS = ['automatic', 'manual'] as const;
+export type CarTransmission = (typeof CAR_TRANSMISSIONS)[number];
+
+export const CAR_FUEL_TYPES = ['petrol', 'diesel', 'hybrid', 'electric', 'natural_gas'] as const;
+export type CarFuelType = (typeof CAR_FUEL_TYPES)[number];
+
+export const CAR_BODY_TYPES = ['sedan', 'suv', 'hatchback', 'coupe', 'pickup', 'minivan', 'crossover'] as const;
+export type CarBodyType = (typeof CAR_BODY_TYPES)[number];
+
+export const CAR_STATUS = ['pending', 'approved', 'rejected', 'sold', 'rented', 'expired'] as const;
+export type CarStatus = (typeof CAR_STATUS)[number];
+
+export const MIN_CAR_YEAR = 1950;
+
 // ── Cross-domain (domain-readiness) ──
 // What the SHARED systems (wishlist / ratings / reports / saved-searches) can
-// point at. Today only 'property'; a future domain (e.g. 'car') is added here.
-// Mirrors packages/shared `TARGET_TYPES` (the server owns its own copy for
-// Mongoose validation — it does not import the shared package at runtime yet).
-export const TARGET_TYPES = ['property'] as const;
+// point at. Mirrors packages/shared `TARGET_TYPES` (the server owns its own copy
+// for Mongoose validation — it does not import the shared package at runtime).
+// Widening this automatically widens the `enum` on the ratings/reports models.
+export const TARGET_TYPES = ['property', 'car'] as const;
 export type TargetType = (typeof TARGET_TYPES)[number];
 export const DEFAULT_TARGET_TYPE: TargetType = 'property';
 

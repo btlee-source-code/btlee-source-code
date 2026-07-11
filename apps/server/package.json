@@ -12,6 +12,7 @@
     "start": "node dist/server.js",
     "type-check": "tsc --noEmit",
     "seed": "tsx src/seeds/index.ts",
+    "seed:cars": "tsx src/scripts/seedCars.ts",
     "backfill:seq": "tsx src/scripts/backfillListingSeq.ts"
   },
   "keywords": [

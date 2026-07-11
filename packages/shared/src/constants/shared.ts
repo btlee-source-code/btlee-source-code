@@ -10,8 +10,8 @@
  * shared system might later target something that is NOT a listing (e.g. a user
  * profile) without having to widen the set of listing kinds.
  */
-export const LISTING_KINDS = ['property'] as const;
+export const LISTING_KINDS = ['property', 'car'] as const;
 export type ListingKind = (typeof LISTING_KINDS)[number];
 
-export const TARGET_TYPES = ['property'] as const;
+export const TARGET_TYPES = ['property', 'car'] as const;
 export type TargetType = (typeof TARGET_TYPES)[number];
