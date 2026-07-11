@@ -1,11 +1,13 @@
 import { useRouter } from 'expo-router';
-import { Building2, Factory, Home, Hotel, Search, SlidersHorizontal, Store, Tent } from 'lucide-react-native';
+import { Search, SlidersHorizontal } from 'lucide-react-native';
 import { useRef, useState } from 'react';
-import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { PROPERTY_ICONS } from '@/assets/icons3d/registry';
 import { S } from '@/config/strings';
 import { AnimatedSearchHint } from '@/features/home/components/AnimatedSearchHint';
+import { CategoryChip } from '@/features/home/components/CategoryChip';
 import { HomeTopBar } from '@/features/home/components/HomeTopBar';
 import { PropertySection } from '@/features/home/components/PropertySection';
 import { propertiesApi } from '@/features/properties/api/properties.api';
@@ -18,14 +20,7 @@ import { TYPE_LABELS } from '@/shared/lib/constants';
 import { shadows } from '@/shared/lib/shadows';
 import type { PropertyType } from '@/shared/types/property';
 
-const CATEGORIES: { type: PropertyType; Icon: typeof Building2 }[] = [
-  { type: 'apartment', Icon: Building2 },
-  { type: 'villa', Icon: Home },
-  { type: 'chalet', Icon: Tent },
-  { type: 'shop', Icon: Store },
-  { type: 'building', Icon: Hotel },
-  { type: 'factory', Icon: Factory },
-];
+const CATEGORIES: PropertyType[] = ['apartment', 'villa', 'chalet', 'shop', 'building', 'factory'];
 
 // Curated home carousels beyond featured/latest — each is a distinct, logical
 // slice (listing type / city). An empty slice hides its own section, so these
@@ -91,8 +86,8 @@ export function PropertiesHome() {
             haptic
             scaleTo={0.98}
             onPress={() => router.push({ pathname: '/properties', params: { openSearch: '1' } })}
-            className="flex-row items-center gap-3 bg-card border border-border rounded-2xl pl-3.5 pr-4 py-3.5"
-            style={shadows.sm}>
+            className="flex-row items-center gap-3 bg-card border rounded-2xl pl-3.5 pr-4 py-3.5"
+            style={[shadows.sm, { borderColor: `${c.accent}4D` }]}>
             <Search size={22} color={c.muted} strokeWidth={2} />
             <View className="flex-1">
               <Text className="text-[15px] font-cairo-semibold text-foreground text-right">{S.searchPillTitle}</Text>
@@ -118,15 +113,15 @@ export function PropertiesHome() {
               onScroll={(e) => (railX.current = e.nativeEvent.contentOffset.x)}
               scrollEventThrottle={32}
               contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 4, gap: 10 }}>
-              {CATEGORIES.map(({ type, Icon }) => (
-                <Pressable
+              {CATEGORIES.map((type, i) => (
+                <CategoryChip
                   key={type}
+                  label={TYPE_LABELS[type]}
+                  icon={PROPERTY_ICONS[type]}
+                  accent={c.accent}
+                  index={i}
                   onPress={() => router.push({ pathname: '/properties', params: { type } })}
-                  className="items-center justify-center gap-2 min-w-[86px] h-[84px] rounded-2xl border border-border bg-card px-4 active:bg-secondary"
-                  style={shadows.sm}>
-                  <Icon size={23} color={c.accent} strokeWidth={1.6} />
-                  <Text className="text-xs font-cairo-semibold text-foreground">{TYPE_LABELS[type]}</Text>
-                </Pressable>
+                />
               ))}
             </ScrollView>
             {/* 4px rail padding + centers the 36px button on the 84px chips */}

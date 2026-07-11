@@ -21,7 +21,8 @@ export type Section = 'properties' | 'cars';
 // Neutral surfaces — identical across sections, only flip with light/dark.
 const NEUTRAL = {
   light: {
-    background: '#FFFFFF',
+    // Soft off-white canvas (not pure white) so white cards lift off it.
+    background: '#F5F5F5',
     foreground: '#1C1C1C',
     card: '#FFFFFF',
     secondary: '#F7F7F7',
@@ -47,7 +48,10 @@ const NEUTRAL = {
 // `cars` is a clean blue (on the shared white/grey neutrals) per the brief.
 const BRAND = {
   properties: {
-    light: { primary: '#1A3C34', primaryForeground: '#FFFFFF', accent: '#FDB803', accentForeground: '#1C1C1C' },
+    // Light: a slightly deeper golden-amber (a touch of orange warmth) so the
+    // accent doesn't wash out on the bright white canvas — without going full
+    // orange. Dark keeps the brighter #FDB803 (reads great on near-black).
+    light: { primary: '#1A3C34', primaryForeground: '#FFFFFF', accent: '#E89A00', accentForeground: '#1C1C1C' },
     dark: { primary: '#60A99B', primaryForeground: '#110F0D', accent: '#FDB803', accentForeground: '#110F0D' },
   },
   cars: {

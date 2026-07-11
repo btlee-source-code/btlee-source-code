@@ -13,8 +13,6 @@ import { S } from '@/config/strings';
 import { useTheme, useThemeColors } from '@/features/theme/hooks/useTheme';
 import { Logo } from '@/shared/components/layout/Logo';
 
-const GOLD = '#FDB803';
-
 /**
  * Launch intro — deliberately understated. On a soft off-white (or the dark
  * ground in dark mode) the brand mark eases in with a gentle scale, a short
@@ -61,7 +59,7 @@ export function AnimatedSplash({ onFinish }: { onFinish: () => void }) {
           <Logo height={50} />
         </Animated.View>
         <Animated.View
-          style={[{ height: 2.5, width: 52, borderRadius: 2, backgroundColor: GOLD, marginTop: 20 }, lineStyle]}
+          style={[{ height: 2.5, width: 52, borderRadius: 2, backgroundColor: c.accent, marginTop: 20 }, lineStyle]}
         />
         <Animated.View style={tagStyle}>
           <Text style={{ marginTop: 14, color: c.muted, fontFamily: 'Cairo_500Medium', fontSize: 12.5 }}>

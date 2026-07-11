@@ -20,7 +20,9 @@ export const BRAND_VARS = {
       '--primary': '169 38% 17%',
       '--primary-foreground': '0 0% 100%',
       '--secondary-foreground': '169 38% 17%',
-      '--accent': '44 98% 50%',
+      // Slightly deeper golden-amber in light mode (matches theme.ts #E89A00) —
+      // the brighter 44 98% 50% washed out on white. Dark keeps the bright value.
+      '--accent': '40 100% 45%',
       '--accent-foreground': '0 0% 11%',
     }),
     dark: vars({

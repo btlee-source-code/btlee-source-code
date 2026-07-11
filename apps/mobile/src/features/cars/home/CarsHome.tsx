@@ -1,14 +1,16 @@
 import { useRouter } from 'expo-router';
-import { Car, CarFront, Caravan, Search, SlidersHorizontal, Truck } from 'lucide-react-native';
+import { Search, SlidersHorizontal } from 'lucide-react-native';
 import { useRef, useState } from 'react';
-import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { CAR_ICONS } from '@/assets/icons3d/registry';
 import { S } from '@/config/strings';
 import { carsApi } from '@/features/cars/api/cars.api';
 import { CarSection } from '@/features/cars/components/CarSection';
 import { CAR_BODY_TYPE_LABELS } from '@/features/cars/lib/carConstants';
 import { AnimatedSearchHint } from '@/features/home/components/AnimatedSearchHint';
+import { CategoryChip } from '@/features/home/components/CategoryChip';
 import { HomeTopBar } from '@/features/home/components/HomeTopBar';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
@@ -18,14 +20,7 @@ import { useTabPressScrollToTop } from '@/shared/hooks/useTabPressScrollToTop';
 import { shadows } from '@/shared/lib/shadows';
 import type { CarBodyType } from '@/shared/types/car';
 
-const CATEGORIES: { type: CarBodyType; Icon: typeof Car }[] = [
-  { type: 'sedan', Icon: Car },
-  { type: 'suv', Icon: CarFront },
-  { type: 'hatchback', Icon: Car },
-  { type: 'pickup', Icon: Truck },
-  { type: 'minivan', Icon: Caravan },
-  { type: 'crossover', Icon: CarFront },
-];
+const CATEGORIES: CarBodyType[] = ['sedan', 'suv', 'hatchback', 'pickup', 'minivan', 'crossover'];
 
 // Curated cars carousels — each hides itself when empty (safe to always render).
 const rentFetcher = () => carsApi.list({ listingType: 'rent', limit: 10 }).then((r) => r.data);
@@ -85,8 +80,8 @@ export function CarsHome() {
             haptic
             scaleTo={0.98}
             onPress={() => router.push('/properties')}
-            className="flex-row items-center gap-3 bg-card border border-border rounded-2xl pl-3.5 pr-4 py-3.5"
-            style={shadows.sm}>
+            className="flex-row items-center gap-3 bg-card border rounded-2xl pl-3.5 pr-4 py-3.5"
+            style={[shadows.sm, { borderColor: `${c.accent}4D` }]}>
             <Search size={22} color={c.muted} strokeWidth={2} />
             <View className="flex-1">
               <Text className="text-[15px] font-cairo-semibold text-foreground text-right">
@@ -114,15 +109,15 @@ export function CarsHome() {
               onScroll={(e) => (railX.current = e.nativeEvent.contentOffset.x)}
               scrollEventThrottle={32}
               contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 4, gap: 10 }}>
-              {CATEGORIES.map(({ type, Icon }) => (
-                <Pressable
+              {CATEGORIES.map((type, i) => (
+                <CategoryChip
                   key={type}
+                  label={CAR_BODY_TYPE_LABELS[type]}
+                  icon={CAR_ICONS[type]}
+                  accent={c.accent}
+                  index={i}
                   onPress={() => router.push({ pathname: '/properties', params: { bodyType: type } })}
-                  className="items-center justify-center gap-2 min-w-[86px] h-[84px] rounded-2xl border border-border bg-card px-4 active:bg-secondary"
-                  style={shadows.sm}>
-                  <Icon size={23} color={c.accent} strokeWidth={1.6} />
-                  <Text className="text-xs font-cairo-semibold text-foreground">{CAR_BODY_TYPE_LABELS[type]}</Text>
-                </Pressable>
+                />
               ))}
             </ScrollView>
             <RailArrows top={4 + (84 - 36) / 2} onStep={stepRail} />
