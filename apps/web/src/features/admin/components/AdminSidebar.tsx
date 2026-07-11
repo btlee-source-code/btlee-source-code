@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
   Building2,
+  Car,
   Users,
   Flag,
   Star,
@@ -25,6 +26,7 @@ import { cn } from '@/shared/lib/utils';
 const links = [
   { href: '/admin/dashboard', label: 'الرئيسية', icon: LayoutDashboard },
   { href: '/admin/properties', label: 'العقارات', icon: Building2 },
+  { href: '/admin/cars', label: 'العربيات', icon: Car },
   { href: '/admin/featured', label: 'المميزة', icon: Star },
   { href: '/admin/users', label: 'المستخدمين', icon: Users },
   { href: '/admin/reports', label: 'التقارير', icon: Flag },

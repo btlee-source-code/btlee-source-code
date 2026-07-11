@@ -3,6 +3,7 @@
  * Dashboard stats, user management, listing review actions.
  */
 import { Property } from '../properties/property.model.js';
+import { Car } from '../cars/car.model.js';
 import { User } from '../users/user.model.js';
 import { Report } from '../reports/report.model.js';
 import { NotFoundError } from '../../shared/errors/AppError.js';
@@ -19,6 +20,13 @@ export async function getDashboardStats() {
     rentedProperties,
     openReports,
     featuredCount,
+    totalCars,
+    pendingCars,
+    approvedCars,
+    rejectedCars,
+    soldCars,
+    rentedCars,
+    featuredCars,
   ] = await Promise.all([
     User.countDocuments({}),
     User.countDocuments({ isBlocked: true }),
@@ -30,6 +38,13 @@ export async function getDashboardStats() {
     Property.countDocuments({ status: 'rented' }),
     Report.countDocuments({ status: 'open' }),
     Property.countDocuments({ isFeatured: true, status: 'approved' }),
+    Car.countDocuments({}),
+    Car.countDocuments({ status: 'pending' }),
+    Car.countDocuments({ status: 'approved' }),
+    Car.countDocuments({ status: 'rejected' }),
+    Car.countDocuments({ status: 'sold' }),
+    Car.countDocuments({ status: 'rented' }),
+    Car.countDocuments({ isFeatured: true, status: 'approved' }),
   ]);
 
   return {
@@ -42,6 +57,15 @@ export async function getDashboardStats() {
       sold: soldProperties,
       rented: rentedProperties,
       featured: featuredCount,
+    },
+    cars: {
+      total: totalCars,
+      pending: pendingCars,
+      approved: approvedCars,
+      rejected: rejectedCars,
+      sold: soldCars,
+      rented: rentedCars,
+      featured: featuredCars,
     },
     reports: { open: openReports },
   };

@@ -113,6 +113,24 @@ export const adminApi = {
       adminAxios.post('/admin/properties/bulk-delete', { ids })
     ),
 
+  // ── Cars management (mirrors the property methods against /admin/cars) ──
+  listCarsPaged: async (params: Record<string, string | number | undefined>) => {
+    const res = await adminAxios.get<Envelope<unknown[]>>('/admin/cars', { params });
+    return { items: res.data.data, meta: res.data.meta?.pagination };
+  },
+
+  reviewCar: (id: string, status: 'approved' | 'rejected', rejectionReason?: string) =>
+    unwrap<unknown>(adminAxios.post(`/admin/cars/${id}/review`, { status, rejectionReason })),
+
+  setCarFeatured: (id: string, isFeatured: boolean) =>
+    unwrap<unknown>(adminAxios.post(`/admin/cars/${id}/featured`, { isFeatured })),
+
+  deleteCar: (id: string) =>
+    unwrap<{ message: string }>(adminAxios.delete(`/admin/cars/${id}`)),
+
+  bulkDeleteCars: (ids: string[]) =>
+    unwrap<{ deletedCount: number }>(adminAxios.post('/admin/cars/bulk-delete', { ids })),
+
   listUsers: () => unwrap<UserAdmin[]>(adminAxios.get('/admin/users')),
 
   blockUser: (userId: string, isBlocked: boolean) =>
@@ -130,6 +148,15 @@ export const adminApi = {
 export interface DashboardStats {
   users: { total: number; blocked: number };
   properties: {
+    total: number;
+    pending: number;
+    approved: number;
+    rejected: number;
+    sold: number;
+    rented: number;
+    featured: number;
+  };
+  cars: {
     total: number;
     pending: number;
     approved: number;

@@ -1,7 +1,7 @@
 'use client';
 import { motion } from 'framer-motion';
 import {
-  Building2, Users, Clock, CheckCircle, XCircle, Flag, Star, Ban, ShoppingBag, KeyRound,
+  Building2, Car, Users, Clock, CheckCircle, XCircle, Flag, Star, Ban, ShoppingBag, KeyRound,
 } from 'lucide-react';
 import { Card } from '@/shared/components/ui/card';
 import { useFetch } from '@/shared/hooks/useFetch';
@@ -46,6 +46,21 @@ export default function AdminDashboardPage() {
                 <StatCard label="مباعة" value={stats.properties.sold} icon={ShoppingBag} accent="violet" />
                 <StatCard label="مؤجرة" value={stats.properties.rented} icon={KeyRound} accent="violet" />
                 <StatCard label="مميزة" value={stats.properties.featured} icon={Star} accent="amber" />
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-xs sm:text-sm font-semibold uppercase text-muted-foreground mb-3">
+                العربيات
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                <StatCard label="إجمالي" value={stats.cars.total} icon={Car} />
+                <StatCard label="بانتظار المراجعة" value={stats.cars.pending} icon={Clock} accent="amber" />
+                <StatCard label="منشورة" value={stats.cars.approved} icon={CheckCircle} accent="emerald" />
+                <StatCard label="مرفوضة" value={stats.cars.rejected} icon={XCircle} accent="red" />
+                <StatCard label="مباعة" value={stats.cars.sold} icon={ShoppingBag} accent="violet" />
+                <StatCard label="مؤجرة" value={stats.cars.rented} icon={KeyRound} accent="violet" />
+                <StatCard label="مميزة" value={stats.cars.featured} icon={Star} accent="amber" />
               </div>
             </section>
 

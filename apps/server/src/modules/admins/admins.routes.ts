@@ -13,6 +13,11 @@ import {
   propertyIdParamsSchema,
   reviewPropertySchema,
 } from '../properties/properties.validators.js';
+import {
+  carListQuerySchema,
+  carIdParamsSchema,
+  reviewCarSchema,
+} from '../cars/cars.validators.js';
 
 const userIdParams = z.object({
   userId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid user id'),
@@ -63,6 +68,38 @@ adminsRouter.delete(
   adminProtect,
   validate({ params: propertyIdParamsSchema }),
   asyncHandler(controller.deleteProperty)
+);
+
+// Cars management (mirrors the properties block)
+adminsRouter.get(
+  '/cars',
+  adminProtect,
+  validate({ query: carListQuerySchema.extend({ status: z.string().optional() }) }),
+  asyncHandler(controller.listCars)
+);
+adminsRouter.post(
+  '/cars/:id/review',
+  adminProtect,
+  validate({ params: carIdParamsSchema, body: reviewCarSchema }),
+  asyncHandler(controller.reviewCar)
+);
+adminsRouter.post(
+  '/cars/:id/featured',
+  adminProtect,
+  validate({ params: carIdParamsSchema, body: featuredSchema }),
+  asyncHandler(controller.setCarFeatured)
+);
+adminsRouter.post(
+  '/cars/bulk-delete',
+  adminProtect,
+  validate({ body: bulkDeleteSchema }),
+  asyncHandler(controller.bulkDeleteCars)
+);
+adminsRouter.delete(
+  '/cars/:id',
+  adminProtect,
+  validate({ params: carIdParamsSchema }),
+  asyncHandler(controller.deleteCar)
 );
 
 // Users management

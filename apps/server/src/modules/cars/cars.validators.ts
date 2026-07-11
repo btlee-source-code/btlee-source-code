@@ -94,6 +94,23 @@ export const markAsSoldRentedSchema = z.object({
   status: z.enum(['sold', 'rented']),
 });
 
+// Admin review (approve/reject). A rejection reason (≥5 chars) is required when
+// rejecting — same contract as the property domain.
+export const reviewCarSchema = z
+  .object({
+    status: z.enum(['approved', 'rejected']),
+    rejectionReason: z.string().max(500).optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.status === 'rejected') {
+        return Boolean(data.rejectionReason && data.rejectionReason.trim().length >= 5);
+      }
+      return true;
+    },
+    { message: 'A rejection reason (at least 5 chars) is required when rejecting', path: ['rejectionReason'] }
+  );
+
 export type CreateCarInput = z.infer<typeof createCarSchema>;
 export type UpdateCarInput = z.infer<typeof updateCarSchema>;
 export type CarListQuery = z.infer<typeof carListQuerySchema>;
