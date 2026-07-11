@@ -284,14 +284,15 @@ export function PropertiesScreen() {
         }
       />
 
-      {/* Add-listing FAB */}
+      {/* Add-listing FAB — extended (icon + label) */}
       <PressableScale
         haptic
         onPress={() => router.push('/add-property')}
         containerClassName="absolute bottom-5 left-5"
-        className="h-14 w-14 rounded-full bg-primary items-center justify-center"
+        className="flex-row items-center gap-2 h-14 rounded-full bg-primary pl-4 pr-5"
         style={shadows.lg}>
-        <Plus size={28} color={c.primaryForeground} />
+        <Plus size={22} color={c.primaryForeground} strokeWidth={2.8} />
+        <Text className="text-primary-foreground font-cairo-bold text-[15px]">{S.addPropertyTitle}</Text>
       </PressableScale>
 
       <SearchModal
