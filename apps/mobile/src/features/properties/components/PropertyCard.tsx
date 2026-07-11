@@ -86,9 +86,9 @@ export function PropertyCard({ property }: { property: Property }) {
           {property.isFeatured && (
             <View
               className="rounded-full px-2.5 py-[5px] flex-row items-center gap-1"
-              style={{ backgroundColor: '#C4922A' }}>
-              <Star size={10} color="#FFFFFF" fill="#FFFFFF" />
-              <Text className="text-[11px] font-cairo-bold text-white">{S.featured}</Text>
+              style={{ backgroundColor: '#FDB803' }}>
+              <Star size={10} color="#1C1C1C" fill="#1C1C1C" />
+              <Text className="text-[11px] font-cairo-bold" style={{ color: '#1C1C1C' }}>{S.featured}</Text>
             </View>
           )}
         </View>

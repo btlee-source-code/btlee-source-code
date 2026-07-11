@@ -55,8 +55,8 @@ export function ToastHost() {
           <Text className="text-background font-cairo-semibold text-[13px]">{current.message}</Text>
           <View
             className="h-7 w-7 rounded-full items-center justify-center"
-            style={{ backgroundColor: success ? '#C4922A' : '#DC2626' }}>
-            {success ? <Check size={14} color="#FFFFFF" strokeWidth={3} /> : <X size={14} color="#FFFFFF" strokeWidth={3} />}
+            style={{ backgroundColor: success ? '#FDB803' : '#DC2626' }}>
+            {success ? <Check size={14} color="#1C1C1C" strokeWidth={3} /> : <X size={14} color="#FFFFFF" strokeWidth={3} />}
           </View>
         </View>
       </Animated.View>

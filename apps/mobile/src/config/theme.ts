@@ -47,8 +47,8 @@ const NEUTRAL = {
 // `cars` is a clean blue (on the shared white/grey neutrals) per the brief.
 const BRAND = {
   properties: {
-    light: { primary: '#1A3C34', primaryForeground: '#FFFFFF', accent: '#C4922A', accentForeground: '#FFFFFF' },
-    dark: { primary: '#60A99B', primaryForeground: '#110F0D', accent: '#D1A23E', accentForeground: '#110F0D' },
+    light: { primary: '#1A3C34', primaryForeground: '#FFFFFF', accent: '#FDB803', accentForeground: '#1C1C1C' },
+    dark: { primary: '#60A99B', primaryForeground: '#110F0D', accent: '#FDB803', accentForeground: '#110F0D' },
   },
   cars: {
     light: { primary: '#0F76C4', primaryForeground: '#FFFFFF', accent: '#23AFE7', accentForeground: '#FFFFFF' },

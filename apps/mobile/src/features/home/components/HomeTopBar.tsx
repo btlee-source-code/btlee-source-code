@@ -18,7 +18,7 @@ export function HomeTopBar() {
   return (
     <View className="px-5 pt-3 gap-3">
       <View className="flex-row items-center justify-between">
-        <Logo height={34} />
+        <Logo height={44} />
         <View className="flex-row items-center gap-2">
           <Pressable
             onPress={toggle}

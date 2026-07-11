@@ -33,7 +33,7 @@ export const shadows = {
   /** Warm gold glow — brand-accent cards and CTAs (mirrors the web's
       `shadow-accent/25`). Android falls back to a plain elevation shadow. */
   gold: {
-    shadowColor: '#C4922A',
+    shadowColor: '#FDB803',
     shadowOpacity: 0.28,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },

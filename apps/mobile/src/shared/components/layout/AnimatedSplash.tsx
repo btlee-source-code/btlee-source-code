@@ -13,7 +13,7 @@ import { S } from '@/config/strings';
 import { useTheme, useThemeColors } from '@/features/theme/hooks/useTheme';
 import { Logo } from '@/shared/components/layout/Logo';
 
-const GOLD = '#C4922A';
+const GOLD = '#FDB803';
 
 /**
  * Launch intro — deliberately understated. On a soft off-white (or the dark
