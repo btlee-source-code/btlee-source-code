@@ -14,6 +14,16 @@ export const OAUTH_STATE_COOKIE = 'oauth_state';
 /** Mobile-only: where to hand the browser back to (an app deep link) after the flow. */
 export const OAUTH_RETURN_COOKIE = 'oauth_return';
 
+/**
+ * Prefix marking a mobile flow. The web flow uses a plain random `state`
+ * validated against a cookie (double-submit). The mobile flow instead SIGNS the
+ * return deep-link into the state itself, so the callback needs no cookie —
+ * cookies are unreliable across the in-app-browser → Google → callback round
+ * trip (cross-site redirects, Custom Tabs, a mismatched COOKIE_DOMAIN can all
+ * drop them, which silently sent the user to the website instead of the app).
+ */
+export const MOBILE_STATE_PREFIX = 'm.';
+
 const isProd = env.NODE_ENV === 'production';
 const secure = isProd || env.COOKIE_SAMESITE === 'none';
 const sameSite = env.COOKIE_SAMESITE === 'strict' ? 'lax' : env.COOKIE_SAMESITE;
@@ -27,6 +37,54 @@ const cookieBase = {
 
 export function createState(): string {
   return crypto.randomBytes(32).toString('hex');
+}
+
+export function isMobileState(s: unknown): boolean {
+  return typeof s === 'string' && s.startsWith(MOBILE_STATE_PREFIX);
+}
+
+// HMAC key for signed mobile states. It's a server-only signing key (never
+// leaves the process), so reusing the existing access secret is safe here.
+const STATE_SIGNING_KEY = env.JWT_ACCESS_SECRET;
+
+function signPayload(payload: string): string {
+  return crypto.createHmac('sha256', STATE_SIGNING_KEY).update(payload).digest('base64url');
+}
+
+/**
+ * Mobile flow: encode the app's return deep-link into a SIGNED state so the
+ * callback can recover it without any cookie. Shape: `m.<payloadB64>.<hmacB64>`.
+ * The HMAC proves we minted it (CSRF protection), and a random nonce keeps every
+ * state unique. Google echoes `state` back verbatim, so this survives reliably.
+ */
+export function createMobileState(returnUrl: string): string {
+  const payload = Buffer.from(
+    JSON.stringify({ r: returnUrl, n: crypto.randomBytes(16).toString('hex') })
+  ).toString('base64url');
+  return `${MOBILE_STATE_PREFIX}${payload}.${signPayload(payload)}`;
+}
+
+/**
+ * Verify a signed mobile state and return its (validated) return URL, or null if
+ * the state isn't a well-formed, correctly-signed mobile state.
+ */
+export function readMobileState(state: unknown): { returnUrl: string } | null {
+  if (!isMobileState(state)) return null;
+  const body = (state as string).slice(MOBILE_STATE_PREFIX.length);
+  const dot = body.lastIndexOf('.');
+  if (dot <= 0) return null;
+  const payload = body.slice(0, dot);
+  const mac = body.slice(dot + 1);
+  const expected = signPayload(payload);
+  if (mac.length !== expected.length) return null;
+  if (!crypto.timingSafeEqual(Buffer.from(mac), Buffer.from(expected))) return null;
+  try {
+    const parsed = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as { r?: unknown };
+    const returnUrl = safeReturnUrl(parsed.r);
+    return returnUrl ? { returnUrl } : null;
+  } catch {
+    return null;
+  }
 }
 
 export function setStateCookie(res: Response, state: string): void {

@@ -16,29 +16,25 @@ import * as google from './google.provider.js';
 import * as oauthService from './oauth.service.js';
 import {
   createState,
+  createMobileState,
+  readMobileState,
+  isMobileState,
   setStateCookie,
   clearStateCookie,
   isValidState,
   OAUTH_STATE_COOKIE,
-  OAUTH_RETURN_COOKIE,
   safeReturnUrl,
-  setReturnCookie,
-  clearReturnCookie,
 } from './oauth.state.js';
 
 // Where the browser lands after the callback finishes (success or failure).
 const CALLBACK_PATH = '/oauth/callback';
 
 // Mobile flow (additive): the app opens the same web start URL with
-// `?client=mobile&returnUrl=<app deep link>`. We mark the flow by prefixing the
-// state, reuse the SAME Google callback (so no OAuth-console change is needed),
-// and at the end redirect the in-app browser back to the app with tokens in the
-// URL instead of setting web cookies. The web flow is completely unaffected.
-const MOBILE_STATE_PREFIX = 'm.';
-
-function isMobileState(s: unknown): boolean {
-  return typeof s === 'string' && s.startsWith(MOBILE_STATE_PREFIX);
-}
+// `?client=mobile&returnUrl=<app deep link>`. We reuse the SAME Google callback
+// (so no OAuth-console change is needed). The return deep-link is SIGNED into the
+// `state` param (cookie-free — cookies don't survive the in-app-browser round
+// trip), and at the end we redirect the browser back to the app with tokens in
+// the URL instead of setting web cookies. The web flow is completely unaffected.
 
 /** Append query params to a URL of any scheme (avoids URL()'s custom-scheme quirks). */
 function withParams(url: string, params: Record<string, string>): string {
@@ -64,7 +60,9 @@ function startFlow(name: 'google') {
   return (req: Request, res: Response): void => {
     const mobile = req.query.client === 'mobile';
     const returnUrl = mobile ? safeReturnUrl(req.query.returnUrl) : null;
-    const state = (mobile ? MOBILE_STATE_PREFIX : '') + createState();
+    // Mobile with a valid return link → sign it into the state (cookie-free).
+    // Everything else → plain random state validated against a cookie (web).
+    const state = returnUrl ? createMobileState(returnUrl) : createState();
     let authUrl: string;
     try {
       authUrl = PROVIDERS[name].getAuthUrl(state);
@@ -75,8 +73,8 @@ function startFlow(name: 'google') {
       res.redirect(returnUrl ? withParams(returnUrl, { status: 'error', reason }) : clientRedirect({ status: 'error', reason }));
       return;
     }
+    // Cookie still set for the web flow; the mobile flow ignores it on callback.
     setStateCookie(res, state);
-    if (returnUrl) setReturnCookie(res, returnUrl);
     res.redirect(authUrl);
   };
 }
@@ -86,13 +84,15 @@ function handleCallback(name: 'google') {
   return async (req: Request, res: Response): Promise<void> => {
     const cookies = req.cookies as Record<string, string> | undefined;
     const cookieState = cookies?.[OAUTH_STATE_COOKIE];
-    const returnUrl = safeReturnUrl(cookies?.[OAUTH_RETURN_COOKIE]);
     clearStateCookie(res); // single-use, regardless of outcome
-    clearReturnCookie(res);
 
     const queryState = req.query.state;
-    // Mobile if either side carries the marker (query is authoritative once validated).
-    const mobile = isMobileState(queryState) || isMobileState(cookieState);
+    // Mobile: recover the return link from the SIGNED state (no cookie needed).
+    // A verified signed state is self-sufficient; the `m.` marker alone (without a
+    // valid signature) is not trusted.
+    const signed = readMobileState(queryState);
+    const mobile = signed !== null || isMobileState(queryState);
+    const returnUrl = signed?.returnUrl ?? null;
     const fail = (reason: string): void => {
       res.redirect(
         mobile && returnUrl
@@ -108,7 +108,9 @@ function handleCallback(name: 'google') {
     }
 
     const code = req.query.code;
-    if (typeof code !== 'string' || !isValidState(cookieState, queryState)) {
+    // Mobile: the signed state is self-validating (HMAC). Web: double-submit cookie.
+    const stateOk = signed !== null || isValidState(cookieState, queryState);
+    if (typeof code !== 'string' || !stateOk) {
       fail('invalid_state');
       return;
     }
