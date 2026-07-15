@@ -9,6 +9,10 @@ import {
   LISTING_TYPES,
   PROPERTY_CATEGORIES,
   TARGET_TYPES,
+  CAR_CONDITIONS,
+  CAR_BODY_TYPES,
+  CAR_FUEL_TYPES,
+  CAR_TRANSMISSIONS,
 } from '../../config/constants.js';
 
 const savedSearchSchema = new Schema(
@@ -21,7 +25,8 @@ const savedSearchSchema = new Schema(
     // domain stores its own criteria shape under the same `targetType`.
     targetType: { type: String, enum: TARGET_TYPES, default: 'property' },
 
-    // Filter criteria (subset of public list query)
+    // Filter criteria (subset of public list query). Shared by both domains:
+    // search / listingType / governorate / minPrice / maxPrice.
     search: { type: String, default: null },
     type: { type: String, enum: PROPERTY_TYPES, default: null },
     listingType: { type: String, enum: LISTING_TYPES, default: null },
@@ -31,6 +36,15 @@ const savedSearchSchema = new Schema(
     maxPrice: { type: Number, default: null },
     minBedrooms: { type: Number, default: null },
     minArea: { type: Number, default: null },
+
+    // Car-only criteria (null for property searches).
+    condition: { type: String, enum: CAR_CONDITIONS, default: null },
+    bodyType: { type: String, enum: CAR_BODY_TYPES, default: null },
+    fuelType: { type: String, enum: CAR_FUEL_TYPES, default: null },
+    transmission: { type: String, enum: CAR_TRANSMISSIONS, default: null },
+    minYear: { type: Number, default: null },
+    maxYear: { type: Number, default: null },
+    maxMileage: { type: Number, default: null },
 
     lastNotifiedAt: { type: Date, default: () => new Date() },
   },

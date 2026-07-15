@@ -1,38 +1,84 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { CircleAlert, Plus, Search, SearchX, X } from 'lucide-react-native';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, TextInput, View } from 'react-native';
+import { ArrowUpDown, Bookmark, CircleAlert, Plus, Search, SearchX, X } from 'lucide-react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { carsApi, type CarQuery } from '@/features/cars/api/cars.api';
 import { CarCard } from '@/features/cars/components/CarCard';
-import { CAR_BODY_TYPE_LABELS } from '@/features/cars/lib/carConstants';
+import { CarSearchModal, type CarFilters, type CarSort } from '@/features/cars/list/CarSearchModal';
+import { CarSaveSearchSheet } from '@/features/saved-searches/components/CarSaveSearchSheet';
+import {
+  CAR_BODY_TYPE_LABELS,
+  CAR_CONDITION_LABELS,
+  CAR_FUEL_TYPE_LABELS,
+  CAR_TRANSMISSION_LABELS,
+} from '@/features/cars/lib/carConstants';
+import { SortSheet } from '@/features/properties/list/SortSheet';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { EmptyState } from '@/shared/components/ui/EmptyState';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
 import { SkeletonPropertyCard } from '@/shared/components/ui/Skeleton';
 import { useTabPressScrollToTop } from '@/shared/hooks/useTabPressScrollToTop';
-import { LISTING_TYPE_LABELS } from '@/shared/lib/constants';
+import { LISTING_TYPE_LABELS, SORT_OPTIONS } from '@/shared/lib/constants';
+import { formatPrice } from '@/shared/lib/format';
 import { shadows } from '@/shared/lib/shadows';
-import type { Car, CarBodyType, CarListingType } from '@/shared/types/car';
+import type { Car, CarBodyType, CarCondition, CarFuelType, CarListingType, CarTransmission } from '@/shared/types/car';
 
 const LIMIT = 12;
 
+/** Build the removable chips shown under the search bar from the active car filters. */
+function chipsFromFilters(f: CarFilters): { key: keyof CarFilters; label: string }[] {
+  const chips: { key: keyof CarFilters; label: string }[] = [];
+  if (f.listingType) chips.push({ key: 'listingType', label: LISTING_TYPE_LABELS[f.listingType as CarListingType] });
+  if (f.condition) chips.push({ key: 'condition', label: CAR_CONDITION_LABELS[f.condition as CarCondition] });
+  if (f.bodyType) chips.push({ key: 'bodyType', label: CAR_BODY_TYPE_LABELS[f.bodyType as CarBodyType] });
+  if (f.fuelType) chips.push({ key: 'fuelType', label: CAR_FUEL_TYPE_LABELS[f.fuelType as CarFuelType] });
+  if (f.transmission) chips.push({ key: 'transmission', label: CAR_TRANSMISSION_LABELS[f.transmission as CarTransmission] });
+  if (f.governorate) chips.push({ key: 'governorate', label: f.governorate });
+  if (f.minYear) chips.push({ key: 'minYear', label: `${S.fMinYear} ${f.minYear}` });
+  if (f.maxYear) chips.push({ key: 'maxYear', label: `${S.fMaxYear} ${f.maxYear}` });
+  if (f.minPrice) chips.push({ key: 'minPrice', label: S.chipMinPrice(formatPrice(f.minPrice)) });
+  if (f.maxPrice) chips.push({ key: 'maxPrice', label: S.chipMaxPrice(formatPrice(f.maxPrice)) });
+  if (f.maxMileage) chips.push({ key: 'maxMileage', label: `${f.maxMileage} ${S.kmUnit}` });
+  return chips;
+}
+
 /**
- * Cars list — a clean paginated search over /api/cars. Reads incoming filters
- * (bodyType / listingType from the cars home taps) and offers a simple make/model
- * text search. Kept intentionally lean; richer filters/sort are a later
- * iteration (the visual pass will build on this scaffold).
+ * Cars list — paginated search over /api/cars, with the full search + filter +
+ * sort sheet (CarSearchModal), matching the properties experience. Reads incoming
+ * filters from the cars-home taps (bodyType / listingType / make) and opens the
+ * sheet directly when navigated with `openSearch=1`.
  */
 export function CarsScreen() {
-  const params = useLocalSearchParams<{ bodyType?: string; listingType?: string; make?: string }>();
+  const params = useLocalSearchParams<{
+    bodyType?: string;
+    listingType?: string;
+    condition?: string;
+    fuelType?: string;
+    transmission?: string;
+    governorate?: string;
+    minYear?: string;
+    maxYear?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    maxMileage?: string;
+    make?: string;
+    search?: string;
+    openSearch?: string;
+  }>();
   const router = useRouter();
   const c = useThemeColors();
+  const { isAuthenticated } = useAuth();
 
   const [search, setSearch] = useState('');
-  const [bodyType, setBodyType] = useState<string | undefined>();
-  const [listingType, setListingType] = useState<string | undefined>();
+  const [filters, setFilters] = useState<CarFilters>({});
+  const [sort, setSort] = useState<CarSort>('newest');
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [showSort, setShowSort] = useState(false);
+  const [showSave, setShowSave] = useState(false);
 
   const [items, setItems] = useState<Car[]>([]);
   const [total, setTotal] = useState(0);
@@ -46,12 +92,57 @@ export function CarsScreen() {
   const listRef = useRef<FlatList<Car>>(null);
   useTabPressScrollToTop(() => listRef.current?.scrollToOffset({ offset: 0, animated: true }));
 
-  // Apply incoming filters from navigation (cars home taps).
+  // Apply incoming filters from navigation (cars home taps / applied saved search).
   useEffect(() => {
-    if (params.bodyType) setBodyType(params.bodyType);
-    if (params.listingType) setListingType(params.listingType);
-    if (params.make) setSearch(params.make);
-  }, [params.bodyType, params.listingType, params.make]);
+    const num = (v?: string) => {
+      const n = Number(v);
+      return v && Number.isFinite(n) ? n : undefined;
+    };
+    const p: CarFilters = {};
+    if (params.bodyType) p.bodyType = params.bodyType;
+    if (params.listingType) p.listingType = params.listingType;
+    if (params.condition) p.condition = params.condition;
+    if (params.fuelType) p.fuelType = params.fuelType;
+    if (params.transmission) p.transmission = params.transmission;
+    if (params.governorate) p.governorate = params.governorate;
+    const minY = num(params.minYear);
+    if (minY != null) p.minYear = minY;
+    const maxY = num(params.maxYear);
+    if (maxY != null) p.maxYear = maxY;
+    const minP = num(params.minPrice);
+    if (minP != null) p.minPrice = minP;
+    const maxP = num(params.maxPrice);
+    if (maxP != null) p.maxPrice = maxP;
+    const maxM = num(params.maxMileage);
+    if (maxM != null) p.maxMileage = maxM;
+    if (Object.keys(p).length) setFilters((f) => ({ ...f, ...p }));
+    if (params.search) setSearch(params.search);
+    else if (params.make) setSearch(params.make);
+    if (params.openSearch === '1') setSearchOpen(true);
+  }, [
+    params.bodyType,
+    params.listingType,
+    params.condition,
+    params.fuelType,
+    params.transmission,
+    params.governorate,
+    params.minYear,
+    params.maxYear,
+    params.minPrice,
+    params.maxPrice,
+    params.maxMileage,
+    params.make,
+    params.search,
+    params.openSearch,
+  ]);
+
+  const onSaveSearch = () => {
+    if (!isAuthenticated) {
+      router.push('/login');
+      return;
+    }
+    setShowSave(true);
+  };
 
   const load = useCallback(
     async (nextPage: number, replace: boolean) => {
@@ -63,9 +154,9 @@ export function CarsScreen() {
       const query: CarQuery = {
         page: nextPage,
         limit: LIMIT,
+        sort,
         search: search || undefined,
-        bodyType,
-        listingType,
+        ...filters,
       };
 
       try {
@@ -84,7 +175,7 @@ export function CarsScreen() {
         }
       }
     },
-    [search, bodyType, listingType]
+    [search, sort, filters]
   );
 
   useEffect(() => {
@@ -96,44 +187,46 @@ export function CarsScreen() {
     if (!isLoading && !isLoadingMore && canLoadMore) load(page + 1, false);
   };
 
-  const activeChips = [
-    bodyType ? { key: 'bodyType' as const, label: CAR_BODY_TYPE_LABELS[bodyType as CarBodyType] } : null,
-    listingType ? { key: 'listingType' as const, label: LISTING_TYPE_LABELS[listingType as CarListingType] } : null,
-  ].filter(Boolean) as { key: 'bodyType' | 'listingType'; label: string }[];
-
-  const clearChip = (key: 'bodyType' | 'listingType') => {
-    if (key === 'bodyType') setBodyType(undefined);
-    else setListingType(undefined);
-  };
+  const chips = useMemo(() => chipsFromFilters(filters), [filters]);
+  const activeCount = chips.length;
+  const removeFilter = (key: keyof CarFilters) => setFilters((f) => ({ ...f, [key]: undefined }));
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-      {/* Search bar (make / model) */}
-      <View className="px-5 pt-3 pb-2 gap-2.5">
-        <View
-          className="flex-row items-center gap-2.5 bg-card border border-border rounded-full px-4 h-[50px]"
-          style={shadows.sm}>
-          <TextInput
-            value={search}
-            onChangeText={setSearch}
-            onSubmitEditing={() => load(1, true)}
-            returnKeyType="search"
-            placeholder={S.carsSearchPlaceholder}
-            placeholderTextColor={c.muted}
-            className="flex-1 font-cairo-medium text-sm text-foreground text-right"
-          />
-          <Pressable onPress={() => load(1, true)} hitSlop={8}>
+      {/* Search bar (opens the unified search + filter sheet) + save */}
+      <View className="px-5 pt-3 pb-2">
+        <View className="flex-row items-center gap-2.5">
+          <Pressable
+            onPress={() => setSearchOpen(true)}
+            className="flex-1 flex-row items-center gap-2.5 bg-card border border-border rounded-full px-4 h-[50px] active:opacity-90"
+            style={shadows.sm}>
+            {activeCount > 0 ? (
+              <View className="bg-primary rounded-full min-w-5 h-5 items-center justify-center px-1">
+                <Text className="text-primary-foreground text-[11px] font-cairo-bold">{activeCount}</Text>
+              </View>
+            ) : null}
+            <Text
+              className={`flex-1 font-cairo-medium text-sm text-right ${search ? 'text-foreground' : 'text-muted-foreground'}`}
+              numberOfLines={1}>
+              {search || S.carsSearchPlaceholder}
+            </Text>
             <Search size={20} color={c.muted} strokeWidth={2} />
+          </Pressable>
+          <Pressable
+            onPress={onSaveSearch}
+            className="items-center justify-center rounded-full border border-border bg-card w-[50px] h-[50px] active:opacity-80"
+            style={shadows.sm}>
+            <Bookmark size={19} color={c.foreground} />
           </Pressable>
         </View>
 
         {/* Active filter chips */}
-        {activeChips.length > 0 && (
-          <View className="flex-row flex-wrap gap-2">
-            {activeChips.map((chip) => (
+        {chips.length > 0 && (
+          <View className="flex-row flex-wrap gap-2 mt-2.5">
+            {chips.map((chip) => (
               <Pressable
                 key={chip.key}
-                onPress={() => clearChip(chip.key)}
+                onPress={() => removeFilter(chip.key)}
                 className="flex-row items-center gap-1 rounded-full bg-primary/10 px-3 py-1.5 active:opacity-70">
                 <X size={13} color={c.primary} />
                 <Text className="text-primary font-cairo-semibold text-xs">{chip.label}</Text>
@@ -167,7 +260,19 @@ export function CarsScreen() {
           />
         }
         ListHeaderComponent={
-          <View className="flex-row items-center justify-end pt-1 pb-3.5">
+          <View className="flex-row items-center justify-between pt-1 pb-3.5">
+            {/* Sort shortcut (left) */}
+            <PressableScale
+              haptic
+              onPress={() => setShowSort(true)}
+              className="flex-row items-center gap-1.5 rounded-full border border-border bg-card h-9 pl-3.5 pr-3"
+              style={shadows.sm}>
+              <ArrowUpDown size={14} color={c.foreground} />
+              <Text className="text-[13px] font-cairo-semibold text-foreground">
+                {SORT_OPTIONS.find((o) => o.value === sort)?.label ?? S.sortLabel}
+              </Text>
+            </PressableScale>
+            {/* Result count (right) */}
             <Text className="text-sm font-cairo-semibold text-foreground">
               {isLoading ? S.loading : S.carsResultsCount(total)}
             </Text>
@@ -211,6 +316,19 @@ export function CarsScreen() {
         <Plus size={22} color={c.primaryForeground} strokeWidth={2.8} />
         <Text className="text-primary-foreground font-cairo-bold text-[15px]">{S.addCarTitle}</Text>
       </PressableScale>
+
+      <CarSearchModal
+        visible={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        initial={{ search, filters, sort }}
+        onApply={({ search: s, filters: f, sort: so }) => {
+          setSearch(s);
+          setFilters(f);
+          setSort(so);
+        }}
+      />
+      <SortSheet visible={showSort} value={sort} onSelect={setSort} onClose={() => setShowSort(false)} />
+      <CarSaveSearchSheet visible={showSave} onClose={() => setShowSave(false)} filters={filters} search={search} />
     </SafeAreaView>
   );
 }

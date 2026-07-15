@@ -43,7 +43,8 @@ function verifyAccess(req: Request, cookieName: string): AuthPayload | null {
   const token = extractToken(req, cookieName);
   if (!token) return null;
   try {
-    return jwt.verify(token, env.JWT_ACCESS_SECRET) as AuthPayload;
+    // Pin HS256 — reject any other algorithm (defends against alg-confusion).
+    return jwt.verify(token, env.JWT_ACCESS_SECRET, { algorithms: ['HS256'] }) as AuthPayload;
   } catch {
     return null;
   }

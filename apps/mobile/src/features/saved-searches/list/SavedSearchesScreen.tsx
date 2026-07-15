@@ -6,16 +6,27 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { CAR_BODY_TYPE_LABELS, CAR_CONDITION_LABELS } from '@/features/cars/lib/carConstants';
+import { useSection } from '@/features/section/hooks/useSection';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { LISTING_TYPE_LABELS, TYPE_LABELS } from '@/shared/lib/constants';
 import { formatPrice } from '@/shared/lib/format';
-import { savedSearchesApi, type SavedSearch } from '../api/savedSearches.api';
+import type { CarBodyType, CarCondition } from '@/shared/types/car';
+import { savedSearchesApi, type CarSavedSearch, type SavedSearch } from '../api/savedSearches.api';
 
-/** Compact criteria badges (governorate/type/listingType/price), like the web card. */
-function badges(s: SavedSearch): string[] {
+type AnySaved = SavedSearch | CarSavedSearch;
+const isCar = (s: AnySaved): s is CarSavedSearch => 'bodyType' in s;
+
+/** Compact criteria badges for either domain. */
+function badges(s: AnySaved): string[] {
   const b: string[] = [];
   if (s.governorate) b.push(s.governorate);
-  if (s.type) b.push(TYPE_LABELS[s.type as keyof typeof TYPE_LABELS] ?? s.type);
+  if (isCar(s)) {
+    if (s.condition) b.push(CAR_CONDITION_LABELS[s.condition as CarCondition] ?? s.condition);
+    if (s.bodyType) b.push(CAR_BODY_TYPE_LABELS[s.bodyType as CarBodyType] ?? s.bodyType);
+  } else if (s.type) {
+    b.push(TYPE_LABELS[s.type as keyof typeof TYPE_LABELS] ?? s.type);
+  }
   if (s.listingType) b.push(LISTING_TYPE_LABELS[s.listingType as 'sale' | 'rent'] ?? s.listingType);
   if (s.minPrice != null) b.push(S.chipMinPrice(formatPrice(s.minPrice)));
   if (s.maxPrice != null) b.push(S.chipMaxPrice(formatPrice(s.maxPrice)));
@@ -24,8 +35,9 @@ function badges(s: SavedSearch): string[] {
 
 export function SavedSearchesScreen() {
   const router = useRouter();
+  const { isCars } = useSection();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const [items, setItems] = useState<SavedSearch[]>([]);
+  const [items, setItems] = useState<AnySaved[]>([]);
   const [loading, setLoading] = useState(true);
   const c = useThemeColors();
 
@@ -36,13 +48,13 @@ export function SavedSearchesScreen() {
     }
     setLoading(true);
     try {
-      setItems(await savedSearchesApi.list());
+      setItems(isCars ? await savedSearchesApi.listCars() : await savedSearchesApi.list());
     } catch {
       setItems([]);
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isCars]);
 
   useFocusEffect(
     useCallback(() => {
@@ -50,7 +62,7 @@ export function SavedSearchesScreen() {
     }, [reload])
   );
 
-  const onDelete = (s: SavedSearch) => {
+  const onDelete = (s: AnySaved) => {
     Alert.alert(S.savedSearchDeleteTitle, undefined, [
       { text: S.cancel, style: 'cancel' },
       {
@@ -64,17 +76,27 @@ export function SavedSearchesScreen() {
     ]);
   };
 
-  const onApply = (s: SavedSearch) => {
+  const onApply = (s: AnySaved) => {
     const params: Record<string, string | number> = {};
     if (s.search) params.search = s.search;
-    if (s.type) params.type = s.type;
     if (s.listingType) params.listingType = s.listingType;
-    if (s.category) params.category = s.category;
     if (s.governorate) params.governorate = s.governorate;
     if (s.minPrice != null) params.minPrice = s.minPrice;
     if (s.maxPrice != null) params.maxPrice = s.maxPrice;
-    if (s.minBedrooms != null) params.minBedrooms = s.minBedrooms;
-    if (s.minArea != null) params.minArea = s.minArea;
+    if (isCar(s)) {
+      if (s.condition) params.condition = s.condition;
+      if (s.bodyType) params.bodyType = s.bodyType;
+      if (s.fuelType) params.fuelType = s.fuelType;
+      if (s.transmission) params.transmission = s.transmission;
+      if (s.minYear != null) params.minYear = s.minYear;
+      if (s.maxYear != null) params.maxYear = s.maxYear;
+      if (s.maxMileage != null) params.maxMileage = s.maxMileage;
+    } else {
+      if (s.type) params.type = s.type;
+      if (s.category) params.category = s.category;
+      if (s.minBedrooms != null) params.minBedrooms = s.minBedrooms;
+      if (s.minArea != null) params.minArea = s.minArea;
+    }
     router.push({ pathname: '/properties', params });
   };
 

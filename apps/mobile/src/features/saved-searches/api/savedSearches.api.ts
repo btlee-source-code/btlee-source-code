@@ -30,8 +30,47 @@ export interface SavedSearchInput {
   minArea?: number;
 }
 
+/** A saved CAR search — car-shaped criteria (parallel to the property shape). */
+export interface CarSavedSearch {
+  _id: string;
+  name: string;
+  search: string | null;
+  listingType: string | null;
+  governorate: string | null;
+  minPrice: number | null;
+  maxPrice: number | null;
+  condition: string | null;
+  bodyType: string | null;
+  fuelType: string | null;
+  transmission: string | null;
+  minYear: number | null;
+  maxYear: number | null;
+  maxMileage: number | null;
+  createdAt: string;
+}
+
+export interface CarSavedSearchInput {
+  name: string;
+  search?: string;
+  listingType?: string;
+  governorate?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  condition?: string;
+  bodyType?: string;
+  fuelType?: string;
+  transmission?: string;
+  minYear?: number;
+  maxYear?: number;
+  maxMileage?: number;
+}
+
 export const savedSearchesApi = {
-  list: () => get<SavedSearch[]>('/saved-searches'),
+  list: () => get<SavedSearch[]>('/saved-searches?targetType=property'),
   create: (body: SavedSearchInput) => post<SavedSearch>('/saved-searches', body),
   remove: (id: string) => del<{ message: string }>(`/saved-searches/${id}`),
+
+  // Cars
+  listCars: () => get<CarSavedSearch[]>('/saved-searches?targetType=car'),
+  createCar: (body: CarSavedSearchInput) => post<CarSavedSearch>('/saved-searches/car', body),
 };

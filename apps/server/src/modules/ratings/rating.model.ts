@@ -26,8 +26,14 @@ const ratingSchema = new Schema(
 );
 
 // One rating per user per property — makes the upsert idempotent and blocks
-// ballot-stuffing by repeated POSTs. (Property flow always sets `property`.)
-ratingSchema.index({ user: 1, property: 1 }, { unique: true });
+// ballot-stuffing by repeated POSTs. Partial (property exists) so rows for other
+// domains (cars — which omit `property`) don't all collide on a null `property`.
+// NOTE: existing DBs carry the old NON-partial version of this index; run
+// `npm run migrate:ratings` once to drop + recreate it as partial.
+ratingSchema.index(
+  { user: 1, property: 1 },
+  { unique: true, partialFilterExpression: { property: { $exists: true } } }
+);
 
 // Domain-agnostic uniqueness for any future target. Partial so it indexes ONLY
 // rows that carry a targetId — i.e. zero existing rows today, so it creates

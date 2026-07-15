@@ -74,12 +74,12 @@ export function CarsHome() {
           </Text>
         </View>
 
-        {/* Search — opens the cars list (search tab) */}
+        {/* Search — opens the unified cars search + filter sheet on the search tab */}
         <View className="px-5 mt-6">
           <PressableScale
             haptic
             scaleTo={0.98}
-            onPress={() => router.push('/properties')}
+            onPress={() => router.push({ pathname: '/properties', params: { openSearch: '1' } })}
             className="flex-row items-center gap-3 bg-card border rounded-2xl pl-3.5 pr-4 py-3.5"
             style={[shadows.sm, { borderColor: `${c.accent}4D` }]}>
             <Search size={22} color={c.muted} strokeWidth={2} />

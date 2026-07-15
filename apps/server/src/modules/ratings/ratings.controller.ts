@@ -22,3 +22,15 @@ export async function mine(req: Request, res: Response): Promise<void> {
   const myRating = await service.getMyRating(req.user.userId, param(req, 'propertyId'));
   res.json(ok({ myRating }));
 }
+
+export async function rateCar(req: Request, res: Response): Promise<void> {
+  if (!req.user) throw new UnauthorizedError();
+  const result = await service.rateCar(req.user.userId, param(req, 'carId'), req.body.value);
+  res.json(ok(result));
+}
+
+export async function mineCar(req: Request, res: Response): Promise<void> {
+  if (!req.user) throw new UnauthorizedError();
+  const myRating = await service.getMyCarRating(req.user.userId, param(req, 'carId'));
+  res.json(ok({ myRating }));
+}

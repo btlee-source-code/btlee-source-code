@@ -12,7 +12,33 @@ const propertyIdParams = z.object({
   propertyId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid property id'),
 });
 
+const carIdParams = z.object({
+  carId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid car id'),
+});
+
 export const wishlistRouter = Router();
+
+// --- Cars (parallel array) — declared before the `/:propertyId` catch-alls so
+// the literal `/cars` segment isn't captured as a property id. ---
+wishlistRouter.get('/cars', protect, asyncHandler(controller.getCars));
+wishlistRouter.post(
+  '/cars/:carId',
+  protect,
+  validate({ params: carIdParams }),
+  asyncHandler(controller.addCar)
+);
+wishlistRouter.delete(
+  '/cars/:carId',
+  protect,
+  validate({ params: carIdParams }),
+  asyncHandler(controller.removeCar)
+);
+wishlistRouter.get(
+  '/cars/:carId/check',
+  protect,
+  validate({ params: carIdParams }),
+  asyncHandler(controller.checkCar)
+);
 
 wishlistRouter.get('/', protect, asyncHandler(controller.get));
 wishlistRouter.post(

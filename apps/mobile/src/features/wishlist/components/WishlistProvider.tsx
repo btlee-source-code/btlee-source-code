@@ -2,6 +2,7 @@ import { useEffect, type ReactNode } from 'react';
 
 import { useAppDispatch, useAppSelector } from '@/shared/store/hooks';
 import { wishlistActions } from '@/features/wishlist/store/wishlist.slice';
+import { carWishlistApi } from '../api/carWishlist.api';
 import { wishlistApi } from '../api/wishlist.api';
 
 /**
@@ -19,6 +20,12 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
         .get()
         .then((props) => {
           if (active) dispatch(wishlistActions.setWishlist(props.map((p) => p._id)));
+        })
+        .catch(() => {});
+      carWishlistApi
+        .get()
+        .then((cars) => {
+          if (active) dispatch(wishlistActions.setCarWishlist(cars.map((c) => c._id)));
         })
         .catch(() => {});
     } else if (status === 'guest') {

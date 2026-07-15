@@ -15,6 +15,7 @@ import { env } from './config/env.js';
 import { apiRouter } from './routes/index.js';
 import { errorHandler, notFoundHandler } from './shared/middlewares/errorHandler.js';
 import { verifyOrigin } from './shared/middlewares/csrf.js';
+import { ForbiddenError } from './shared/errors/AppError.js';
 
 const isProd = env.NODE_ENV === 'production';
 
@@ -56,7 +57,9 @@ export function createApp(): Express {
         if (!origin || allowedOrigins.includes(origin.replace(/\/$/, ''))) {
           callback(null, true);
         } else {
-          callback(new Error(`Origin ${origin} not allowed by CORS`));
+          // A ForbiddenError (403) instead of a bare Error so a blocked origin
+          // gets a clean 403 from the error handler, not a generic 500.
+          callback(new ForbiddenError(`Origin ${origin} not allowed by CORS`));
         }
       },
       credentials: true,

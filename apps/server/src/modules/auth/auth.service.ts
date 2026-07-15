@@ -6,7 +6,13 @@
 import crypto from 'node:crypto';
 import { User } from '../users/user.model.js';
 import { hashPassword, comparePassword } from '../../shared/utils/password.js';
-import { issueTokens, verifyRefreshToken, hashToken } from '../../shared/utils/jwt.js';
+import {
+  issueTokens,
+  verifyRefreshToken,
+  hashToken,
+  pushRefreshTokenUpdate,
+  rotateRefreshTokenPipeline,
+} from '../../shared/utils/jwt.js';
 import { sendEmail } from '../../shared/utils/email.js';
 import {
   ConflictError,
@@ -82,10 +88,7 @@ export async function registerUser(input: RegisterInput): Promise<AuthResult> {
   const tokens = issueTokens({ userId: String(user._id), role: 'user' });
 
   // Whitelist the refresh token (stored hashed) so it can be invalidated on logout
-  await User.updateOne(
-    { _id: user._id },
-    { $push: { refreshTokens: hashToken(tokens.refreshToken) } }
-  );
+  await User.updateOne({ _id: user._id }, pushRefreshTokenUpdate(hashToken(tokens.refreshToken)));
 
   return { ...tokens, user: toPublicUser(user) };
 }
@@ -115,10 +118,7 @@ export async function loginUser(input: LoginInput): Promise<AuthResult> {
 
   const tokens = issueTokens({ userId: String(user._id), role: 'user' });
 
-  await User.updateOne(
-    { _id: user._id },
-    { $push: { refreshTokens: hashToken(tokens.refreshToken) } }
-  );
+  await User.updateOne({ _id: user._id }, pushRefreshTokenUpdate(hashToken(tokens.refreshToken)));
 
   return { ...tokens, user: toPublicUser(user) };
 }
@@ -140,11 +140,10 @@ export async function refreshTokens(refreshToken: string): Promise<AuthTokens> {
 
   const newTokens = issueTokens({ userId: String(user._id), role: 'user' });
 
-  // Rotate the refresh token (remove old hash, add new hash)
-  await User.updateOne({ _id: user._id }, { $pull: { refreshTokens: hashed } });
+  // Atomically rotate: drop the old hash, add the new one, cap the array — one write.
   await User.updateOne(
     { _id: user._id },
-    { $push: { refreshTokens: hashToken(newTokens.refreshToken) } }
+    rotateRefreshTokenPipeline(hashed, hashToken(newTokens.refreshToken))
   );
 
   return newTokens;

@@ -12,15 +12,20 @@ import { successHaptic } from '@/shared/lib/haptics';
 import { MAX_DESCRIPTION_LENGTH, REPORT_REASONS, REPORT_REASON_LABELS, type ReportReason } from '@/shared/lib/constants';
 import { reportsApi } from '../api/reports.api';
 
-/** Bottom-sheet report form. Caller renders the trigger only for authenticated users. */
+/**
+ * Bottom-sheet report form for a listing — pass `propertyId` OR `carId`.
+ * Caller renders the trigger only for authenticated users.
+ */
 export function ReportSheet({
   visible,
   onClose,
   propertyId,
+  carId,
 }: {
   visible: boolean;
   onClose: () => void;
-  propertyId: string;
+  propertyId?: string;
+  carId?: string;
 }) {
   const [reason, setReason] = useState<ReportReason | null>(null);
   const [details, setDetails] = useState('');
@@ -43,7 +48,12 @@ export function ReportSheet({
     setSubmitting(true);
     setError(null);
     try {
-      await reportsApi.create({ propertyId, reason, details: details.trim() || undefined });
+      const trimmed = details.trim() || undefined;
+      if (carId) {
+        await reportsApi.createCar({ carId, reason, details: trimmed });
+      } else if (propertyId) {
+        await reportsApi.create({ propertyId, reason, details: trimmed });
+      }
       close();
       successHaptic();
       toast.success(S.reportSuccess);

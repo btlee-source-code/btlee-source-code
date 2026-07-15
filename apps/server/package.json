@@ -13,7 +13,8 @@
     "type-check": "tsc --noEmit",
     "seed": "tsx src/seeds/index.ts",
     "seed:cars": "tsx src/scripts/seedCars.ts",
-    "backfill:seq": "tsx src/scripts/backfillListingSeq.ts"
+    "backfill:seq": "tsx src/scripts/backfillListingSeq.ts",
+    "migrate:ratings": "tsx src/scripts/migrateRatingIndexes.ts"
   },
   "keywords": [
     "real-estate",

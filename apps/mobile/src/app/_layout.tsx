@@ -7,7 +7,7 @@ import {
   Cairo_700Bold,
   useFonts,
 } from '@expo-google-fonts/cairo';
-import { Stack } from 'expo-router';
+import { Stack, type ErrorBoundaryProps } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
@@ -15,10 +15,20 @@ import { View } from 'react-native';
 
 import { THEME_COLORS } from '@/config/theme';
 import { AnimatedSplash } from '@/shared/components/layout/AnimatedSplash';
+import { ErrorScreen } from '@/shared/components/layout/ErrorScreen';
 import { AppProviders } from '@/shared/components/providers/AppProviders';
 import { useAppSelector } from '@/shared/store/hooks';
 
 SplashScreen.preventAutoHideAsync();
+
+/**
+ * Expo Router picks up a named `ErrorBoundary` export from the root layout and
+ * uses it to catch render errors anywhere in the route tree — turning an
+ * uncaught crash into a recoverable screen instead of a white screen.
+ */
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  return <ErrorScreen error={error} retry={retry} />;
+}
 
 /**
  * Root navigator — registers the three route groups ((tabs), (auth), (main)),

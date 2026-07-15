@@ -1,16 +1,19 @@
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { Car as CarIcon, Star } from 'lucide-react-native';
-import { Text, View } from 'react-native';
+import { Car as CarIcon, Heart, Star } from 'lucide-react-native';
+import { Pressable, Text, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring } from 'react-native-reanimated';
 
 import { S } from '@/config/strings';
 import { CAR_TRANSMISSION_LABELS } from '@/features/cars/lib/carConstants';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { useCarWishlist } from '@/features/wishlist/hooks/useCarWishlist';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
 import { LISTING_TYPE_LABELS } from '@/shared/lib/constants';
 import { formatPrice } from '@/shared/lib/format';
 import { blurPlaceholder } from '@/shared/lib/images';
 import { shadows } from '@/shared/lib/shadows';
+import { useAppSelector } from '@/shared/store/hooks';
 import type { Car } from '@/shared/types/car';
 
 /**
@@ -22,7 +25,20 @@ export function CarCard({ car }: { car: Car }) {
   const router = useRouter();
   const cover = car.images?.[0]?.url;
   const hasRating = car.ratingCount > 0;
+  const saved = useAppSelector((s) => s.wishlist.carIds.includes(car._id));
+  const { toggle } = useCarWishlist();
   const c = useThemeColors();
+
+  // Heart pop — overshoots then settles (matches PropertyCard).
+  const heartScale = useSharedValue(1);
+  const heartStyle = useAnimatedStyle(() => ({ transform: [{ scale: heartScale.value }] }));
+  const onHeart = () => {
+    heartScale.value = withSequence(
+      withSpring(saved ? 0.75 : 1.45, { damping: 9, stiffness: 400 }),
+      withSpring(1, { damping: 11, stiffness: 300 })
+    );
+    toggle(car._id, saved);
+  };
 
   const specs = [
     String(car.year),
@@ -71,6 +87,21 @@ export function CarCard({ car }: { car: Car }) {
             </View>
           )}
         </View>
+
+        {/* Wishlist heart — floats free (no chrome), pops on toggle */}
+        <Pressable
+          onPress={onHeart}
+          hitSlop={10}
+          className="absolute top-2.5 left-2.5 h-9 w-9 items-center justify-center">
+          <Animated.View style={heartStyle}>
+            <Heart
+              size={24}
+              color="#FFFFFF"
+              strokeWidth={2.2}
+              fill={saved ? '#E11D48' : 'rgba(28,28,28,0.45)'}
+            />
+          </Animated.View>
+        </Pressable>
       </View>
 
       {/* Text block */}

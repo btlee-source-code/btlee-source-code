@@ -55,6 +55,9 @@ const userSchema = new Schema(
 
     // Wishlist as array of property references (denormalized for fast reads)
     wishlist: [{ type: Schema.Types.ObjectId, ref: 'Property', default: [] }],
+    // Parallel car wishlist — same pattern, separate domain (kept distinct from
+    // `wishlist` so each populates its own model cleanly; no data migration).
+    carWishlist: [{ type: Schema.Types.ObjectId, ref: 'Car', default: [] }],
 
     // Refresh token whitelist (allows logout/invalidation)
     refreshTokens: { type: [String], default: [], select: false },

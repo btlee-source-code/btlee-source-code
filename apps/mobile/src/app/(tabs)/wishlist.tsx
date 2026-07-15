@@ -6,36 +6,54 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { CarCard } from '@/features/cars/components/CarCard';
 import { PropertyCard } from '@/features/properties/components/PropertyCard';
+import { useSection } from '@/features/section/hooks/useSection';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { carWishlistApi } from '@/features/wishlist/api/carWishlist.api';
 import { wishlistApi } from '@/features/wishlist/api/wishlist.api';
 import { EmptyState } from '@/shared/components/ui/EmptyState';
 import { SkeletonPropertyCard } from '@/shared/components/ui/Skeleton';
 import { useFetch } from '@/shared/hooks/useFetch';
 import { useTabPressScrollToTop } from '@/shared/hooks/useTabPressScrollToTop';
 import { useAppSelector } from '@/shared/store/hooks';
+import type { Car } from '@/shared/types/car';
 import type { Property } from '@/shared/types/property';
 
+/**
+ * Saved listings — section-aware: shows the saved cars when the cars section is
+ * active, otherwise the saved properties. Each domain has its own id set + API.
+ */
 export default function WishlistTab() {
   const router = useRouter();
+  const { isCars } = useSection();
   const { isAuthenticated, isLoading } = useAuth();
-  const ids = useAppSelector((s) => s.wishlist.ids);
+  const ids = useAppSelector((s) => (isCars ? s.wishlist.carIds : s.wishlist.ids));
   const [refreshing, setRefreshing] = useState(false);
 
-  // Re-fetch whenever the saved set changes; skip the call entirely for guests.
+  // Re-fetch whenever the saved set (or section) changes; skip entirely for guests.
   const { data, isLoading: loading, refetch } = useFetch(
-    () => (isAuthenticated ? wishlistApi.get() : Promise.resolve([])),
-    isAuthenticated ? ids.join(',') : 'guest'
+    () =>
+      isAuthenticated
+        ? isCars
+          ? carWishlistApi.get()
+          : wishlistApi.get()
+        : Promise.resolve<(Property | Car)[]>([]),
+    `${isCars ? 'cars' : 'props'}:${isAuthenticated ? ids.join(',') : 'guest'}`
   );
   const c = useThemeColors();
 
-  const listRef = useRef<FlatList<Property>>(null);
+  const listRef = useRef<FlatList<Property | Car>>(null);
   useTabPressScrollToTop(() => listRef.current?.scrollToOffset({ offset: 0, animated: true }));
+
+  const Header = (
+    <Text className="text-[22px] font-cairo-bold text-foreground text-right px-5 pt-4 pb-3">{S.tabWishlist}</Text>
+  );
 
   if (isLoading) {
     return (
       <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-        <Text className="text-[22px] font-cairo-bold text-foreground text-right px-5 pt-4 pb-3">{S.tabWishlist}</Text>
+        {Header}
         <View className="px-5 gap-6">
           <SkeletonPropertyCard />
           <SkeletonPropertyCard />
@@ -47,7 +65,7 @@ export default function WishlistTab() {
   if (!isAuthenticated) {
     return (
       <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-        <Text className="text-[22px] font-cairo-bold text-foreground text-right px-5 pt-4 pb-3">{S.tabWishlist}</Text>
+        {Header}
         <View className="flex-1 justify-center pb-16">
           <EmptyState
             icon={Heart}
@@ -62,16 +80,18 @@ export default function WishlistTab() {
   }
 
   // Filter by the live id set so removals disappear instantly (optimistic).
-  const items = (data ?? []).filter((p) => ids.includes(p._id));
+  const items = ((data ?? []) as (Property | Car)[]).filter((x) => ids.includes(x._id));
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-      <Text className="text-[22px] font-cairo-bold text-foreground text-right px-5 pt-4 pb-3">{S.tabWishlist}</Text>
+      {Header}
       <FlatList
         ref={listRef}
         data={items}
-        keyExtractor={(p) => p._id}
-        renderItem={({ item }) => <PropertyCard property={item} />}
+        keyExtractor={(x) => x._id}
+        renderItem={({ item }) =>
+          isCars ? <CarCard car={item as Car} /> : <PropertyCard property={item as Property} />
+        }
         contentContainerClassName="px-5 pb-8 gap-6"
         showsVerticalScrollIndicator={false}
         refreshControl={

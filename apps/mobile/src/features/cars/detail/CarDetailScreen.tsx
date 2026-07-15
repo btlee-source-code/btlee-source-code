@@ -5,6 +5,8 @@ import {
   BadgeCheck,
   Calendar,
   Car as CarIcon,
+  ChevronLeft,
+  Flag,
   Fuel,
   Gauge,
   Palette,
@@ -17,6 +19,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { S } from '@/config/strings';
 import { carsApi } from '@/features/cars/api/cars.api';
+import { CarRating } from '@/features/cars/detail/components/CarRating';
 import { ShareCarButton } from '@/features/cars/detail/components/ShareCarButton';
 import { SimilarCars } from '@/features/cars/detail/components/SimilarCars';
 import {
@@ -28,6 +31,8 @@ import {
 // Reuse the property detail's generic gallery viewer + map.
 import { ImageViewer } from '@/features/properties/detail/components/ImageViewer';
 import { PropertyMap } from '@/features/properties/detail/components/PropertyMap';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { ReportSheet } from '@/features/reports/components/ReportSheet';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { WhatsAppIcon } from '@/shared/components/icons/WhatsAppIcon';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
@@ -49,6 +54,8 @@ export function CarDetailScreen() {
   );
   const [imgIndex, setImgIndex] = useState(0);
   const [viewerOpen, setViewerOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
   const c = useThemeColors();
 
   const galleryHeight = Math.round(width * 0.78);
@@ -84,7 +91,7 @@ export function CarDetailScreen() {
   const title = `${car.make} ${car.model} ${car.year}`;
   const openWhatsApp = () => {
     const msg = `مرحباً، مهتم بالعربية ${car.make} ${car.model} رقم ${car.seq ?? ''} على Bt Lee`;
-    Linking.openURL(whatsappLink(car.whatsappNumber, msg)).catch(() => {});
+    Linking.openURL(whatsappLink(car.whatsappNumber, msg)).catch(() => { });
   };
 
   // Spec rows — built once so separators can skip the last row.
@@ -92,6 +99,7 @@ export function CarDetailScreen() {
     { key: 'year', icon: <Calendar size={19} color={c.muted} />, label: S.carYearLabel, value: String(car.year) },
     { key: 'condition', icon: <BadgeCheck size={19} color={c.muted} />, label: S.carConditionLabel, value: CAR_CONDITION_LABELS[car.condition] },
   ];
+
   if (car.mileage != null)
     specRows.push({
       key: 'mileage',
@@ -99,9 +107,11 @@ export function CarDetailScreen() {
       label: S.carMileageLabel,
       value: `${formatPrice(car.mileage)} ${S.kmUnit}`,
     });
+
   specRows.push({ key: 'transmission', icon: <Settings2 size={19} color={c.muted} />, label: S.carTransmissionLabel, value: CAR_TRANSMISSION_LABELS[car.transmission] });
   specRows.push({ key: 'fuel', icon: <Fuel size={19} color={c.muted} />, label: S.carFuelLabel, value: CAR_FUEL_TYPE_LABELS[car.fuelType] });
   specRows.push({ key: 'body', icon: <CarIcon size={19} color={c.muted} />, label: S.carBodyTypeLabel, value: CAR_BODY_TYPE_LABELS[car.bodyType] });
+
   if (car.color)
     specRows.push({ key: 'color', icon: <Palette size={19} color={c.muted} />, label: S.carColorLabel, value: car.color });
 
@@ -215,9 +225,8 @@ export function CarDetailScreen() {
             {specRows.map((row, i) => (
               <View
                 key={row.key}
-                className={`flex-row items-center justify-between py-3 ${
-                  i === specRows.length - 1 ? '' : 'border-b border-border'
-                }`}>
+                className={`flex-row items-center justify-between py-3 ${i === specRows.length - 1 ? '' : 'border-b border-border'
+                  }`}>
                 <Text className="text-sm font-cairo-semibold text-foreground">{row.value}</Text>
                 <View className="flex-row items-center gap-2.5">
                   <Text className="text-sm text-muted-foreground font-cairo">{row.label}</Text>
@@ -235,10 +244,20 @@ export function CarDetailScreen() {
             <Text className="text-[15px] text-foreground/90 font-cairo leading-7 text-right">{car.description}</Text>
           </View>
 
-          {/* Owner */}
-          <View className="flex-row items-center gap-3 pt-4 border-t border-border">
+          {/* Ratings — average + interactive stars */}
+          <CarRating car={car} />
+
+          {/* Owner — tappable → seller profile (when the owner still exists) */}
+          <Pressable
+            onPress={() => car.owner?._id && router.push(`/car-owners/${car.owner._id}`)}
+            disabled={!car.owner?._id}
+            className="flex-row items-center gap-3 pt-4 border-t border-border active:opacity-70">
+            {car.owner?._id ? <ChevronLeft size={18} color={c.muted} /> : null}
             <View className="flex-1">
               <Text className="font-cairo-semibold text-foreground text-right">{car.owner?.name ?? 'البائع'}</Text>
+              {car.owner?._id ? (
+                <Text className="text-xs text-muted-foreground font-cairo text-right">{S.ownerProfile}</Text>
+              ) : null}
             </View>
             {car.owner?.avatar ? (
               <Image source={{ uri: car.owner.avatar }} style={{ width: 44, height: 44, borderRadius: 22 }} contentFit="cover" />
@@ -247,11 +266,21 @@ export function CarDetailScreen() {
                 <Text className="text-primary font-cairo-bold">{car.owner?.name?.charAt(0) ?? '؟'}</Text>
               </View>
             )}
-          </View>
+          </Pressable>
 
           {/* Location map (only when a pin was set) */}
           {car.location?.coordinates && (
             <PropertyMap lng={car.location.coordinates[0]} lat={car.location.coordinates[1]} />
+          )}
+
+          {/* Report this listing (authenticated only) */}
+          {isAuthenticated && (
+            <Pressable
+              onPress={() => setReportOpen(true)}
+              className="flex-row items-center justify-center gap-2 pt-2 active:opacity-70">
+              <Flag size={15} color={c.muted} />
+              <Text className="text-sm text-muted-foreground font-cairo">{S.reportListing}</Text>
+            </Pressable>
           )}
 
           {/* Similar cars */}
@@ -304,6 +333,8 @@ export function CarDetailScreen() {
         visible={viewerOpen}
         onClose={() => setViewerOpen(false)}
       />
+
+      <ReportSheet visible={reportOpen} onClose={() => setReportOpen(false)} carId={car._id} />
     </SafeAreaView>
   );
 }

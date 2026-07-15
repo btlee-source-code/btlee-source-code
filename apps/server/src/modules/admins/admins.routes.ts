@@ -112,7 +112,14 @@ adminsRouter.post(
 );
 
 // Reports
-adminsRouter.get('/reports', adminProtect, asyncHandler(controller.listReports));
+adminsRouter.get(
+  '/reports',
+  adminProtect,
+  // Validate `status` to an enum so a crafted `?status[$ne]=open` can't reach the
+  // Mongo filter as an operator object (NoSQL-injection defense).
+  validate({ query: z.object({ status: z.enum(['open', 'reviewed', 'dismissed']).optional() }) }),
+  asyncHandler(controller.listReports)
+);
 adminsRouter.patch(
   '/reports/:id',
   adminProtect,

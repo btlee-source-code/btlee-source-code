@@ -6,6 +6,7 @@ import * as controller from './properties.controller.js';
 import { protect, optionalAuth } from '../../shared/middlewares/authMiddleware.js';
 import { validate } from '../../shared/middlewares/validate.js';
 import { asyncHandler } from '../../shared/middlewares/asyncHandler.js';
+import { createListingLimiter } from '../../shared/middlewares/rateLimiters.js';
 import {
   createPropertySchema,
   updatePropertySchema,
@@ -58,6 +59,7 @@ propertiesRouter.get(
 propertiesRouter.post(
   '/',
   protect,
+  createListingLimiter,
   validate({ body: createPropertySchema }),
   asyncHandler(controller.create)
 );

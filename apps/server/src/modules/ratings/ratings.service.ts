@@ -7,6 +7,7 @@
 import { Types } from 'mongoose';
 import { Rating } from './rating.model.js';
 import { Property } from '../properties/property.model.js';
+import { Car } from '../cars/car.model.js';
 import {
   NotFoundError,
   ForbiddenError,
@@ -60,6 +61,61 @@ export async function getMyRating(userId: string, propertyId: string): Promise<n
   const rating = await Rating.findOne({
     user: new Types.ObjectId(userId),
     property: new Types.ObjectId(propertyId),
+  })
+    .select('value')
+    .lean();
+  return rating ? rating.value : null;
+}
+
+// ---------------------------------------------------------------------------
+// Cars — same collection, addressed via the domain-agnostic {targetType,targetId}
+// keys (no `property` field), so a user has one updatable rating per car.
+// ---------------------------------------------------------------------------
+
+/** Recompute + persist a car's rating aggregates from the Rating collection. */
+async function recomputeCarAggregates(
+  carId: string
+): Promise<{ ratingAvg: number; ratingCount: number }> {
+  const [agg] = await Rating.aggregate<{ avg: number; count: number }>([
+    { $match: { targetType: 'car', targetId: new Types.ObjectId(carId) } },
+    { $group: { _id: null, avg: { $avg: '$value' }, count: { $sum: 1 } } },
+  ]);
+
+  const ratingAvg = agg ? Math.round(agg.avg * 10) / 10 : 0;
+  const ratingCount = agg ? agg.count : 0;
+
+  await Car.updateOne({ _id: carId }, { ratingAvg, ratingCount });
+  return { ratingAvg, ratingCount };
+}
+
+export async function rateCar(userId: string, carId: string, value: number) {
+  const car = await Car.findById(carId).select('owner status');
+  if (!car) throw new NotFoundError('Car not found');
+  if (String(car.owner) === userId) {
+    throw new ForbiddenError('You cannot rate your own car');
+  }
+  if (car.status !== 'approved') {
+    throw new BadRequestError('Only approved cars can be rated');
+  }
+
+  const carOid = new Types.ObjectId(carId);
+  await Rating.findOneAndUpdate(
+    // targetType/targetId come from the filter (applied to the upserted doc);
+    // `property` is intentionally omitted so the partial legacy index skips it.
+    { user: new Types.ObjectId(userId), targetType: 'car', targetId: carOid },
+    { $set: { value } },
+    { upsert: true, setDefaultsOnInsert: true }
+  );
+
+  const stats = await recomputeCarAggregates(carId);
+  return { ...stats, myRating: value };
+}
+
+export async function getMyCarRating(userId: string, carId: string): Promise<number | null> {
+  const rating = await Rating.findOne({
+    user: new Types.ObjectId(userId),
+    targetType: 'car',
+    targetId: new Types.ObjectId(carId),
   })
     .select('value')
     .lean();

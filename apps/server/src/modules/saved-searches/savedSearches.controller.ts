@@ -9,13 +9,21 @@ import { UnauthorizedError } from '../../shared/errors/AppError.js';
 
 export async function list(req: Request, res: Response): Promise<void> {
   if (!req.user) throw new UnauthorizedError();
-  const items = await service.getMySavedSearches(req.user.userId);
+  const t = req.query.targetType;
+  const targetType = t === 'car' || t === 'property' ? t : undefined;
+  const items = await service.getMySavedSearches(req.user.userId, targetType);
   res.json(ok(items));
 }
 
 export async function create(req: Request, res: Response): Promise<void> {
   if (!req.user) throw new UnauthorizedError();
   const item = await service.createSavedSearch(req.user.userId, req.body);
+  res.status(201).json(ok(item));
+}
+
+export async function createCar(req: Request, res: Response): Promise<void> {
+  if (!req.user) throw new UnauthorizedError();
+  const item = await service.createCarSavedSearch(req.user.userId, req.body);
   res.status(201).json(ok(item));
 }
 

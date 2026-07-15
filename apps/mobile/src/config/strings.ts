@@ -321,6 +321,10 @@ const ar = {
   carsSearchPlaceholder: 'ابحث بالماركة أو الموديل...',
   carsResultsCount: (n: number) => `${n} عربية`,
   carsErrorDesc: 'تعذّر تحميل العربيات، حاول تاني',
+  // Cars — filter sheet
+  fMinYear: 'من سنة',
+  fMaxYear: 'إلى سنة',
+  fMaxMileage: 'أقصى كيلومترات',
 
   // Cars — spec labels
   kmUnit: 'كم',
@@ -647,6 +651,10 @@ const en: Partial<Strings> = {
   carsSearchPlaceholder: 'Search by make or model...',
   carsResultsCount: (n: number) => `${n} car${n === 1 ? '' : 's'}`,
   carsErrorDesc: 'Could not load cars, please try again',
+  // Cars — filter sheet
+  fMinYear: 'From year',
+  fMaxYear: 'To year',
+  fMaxMileage: 'Max mileage (km)',
 
   kmUnit: 'km',
   carYearLabel: 'Year',

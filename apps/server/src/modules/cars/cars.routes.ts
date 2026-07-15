@@ -8,6 +8,7 @@ import * as controller from './cars.controller.js';
 import { protect, optionalAuth } from '../../shared/middlewares/authMiddleware.js';
 import { validate } from '../../shared/middlewares/validate.js';
 import { asyncHandler } from '../../shared/middlewares/asyncHandler.js';
+import { createListingLimiter } from '../../shared/middlewares/rateLimiters.js';
 import {
   createCarSchema,
   updateCarSchema,
@@ -51,7 +52,7 @@ carsRouter.get(
 );
 
 // Create + manage listing (owner only)
-carsRouter.post('/', protect, validate({ body: createCarSchema }), asyncHandler(controller.create));
+carsRouter.post('/', protect, createListingLimiter, validate({ body: createCarSchema }), asyncHandler(controller.create));
 carsRouter.patch(
   '/:id',
   protect,

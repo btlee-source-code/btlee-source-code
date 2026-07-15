@@ -4,7 +4,13 @@
  */
 import { Admin } from '../admins/admin.model.js';
 import { comparePassword } from '../../shared/utils/password.js';
-import { issueTokens, verifyRefreshToken, hashToken } from '../../shared/utils/jwt.js';
+import {
+  issueTokens,
+  verifyRefreshToken,
+  hashToken,
+  pushRefreshTokenUpdate,
+  rotateRefreshTokenPipeline,
+} from '../../shared/utils/jwt.js';
 import { UnauthorizedError } from '../../shared/errors/AppError.js';
 
 export async function loginAdmin(email: string, password: string) {
@@ -15,10 +21,7 @@ export async function loginAdmin(email: string, password: string) {
   if (!ok) throw new UnauthorizedError('Invalid credentials');
 
   const tokens = issueTokens({ userId: String(admin._id), role: 'admin' });
-  await Admin.updateOne(
-    { _id: admin._id },
-    { $push: { refreshTokens: hashToken(tokens.refreshToken) } }
-  );
+  await Admin.updateOne({ _id: admin._id }, pushRefreshTokenUpdate(hashToken(tokens.refreshToken)));
 
   return {
     ...tokens,
@@ -46,10 +49,9 @@ export async function refreshAdminTokens(refreshToken: string) {
   }
 
   const newTokens = issueTokens({ userId: String(admin._id), role: 'admin' });
-  await Admin.updateOne({ _id: admin._id }, { $pull: { refreshTokens: hashed } });
   await Admin.updateOne(
     { _id: admin._id },
-    { $push: { refreshTokens: hashToken(newTokens.refreshToken) } }
+    rotateRefreshTokenPipeline(hashed, hashToken(newTokens.refreshToken))
   );
 
   return newTokens;

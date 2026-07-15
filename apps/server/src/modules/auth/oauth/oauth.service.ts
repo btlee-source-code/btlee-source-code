@@ -8,7 +8,7 @@
  * an unverified provider email.
  */
 import { User } from '../../users/user.model.js';
-import { issueTokens, hashToken } from '../../../shared/utils/jwt.js';
+import { issueTokens, hashToken, pushRefreshTokenUpdate } from '../../../shared/utils/jwt.js';
 import { ForbiddenError, UnauthorizedError } from '../../../shared/errors/AppError.js';
 import type { OAuthProfile } from './oauth.types.js';
 
@@ -101,10 +101,7 @@ export async function loginWithOAuth(profile: OAuthProfile): Promise<OAuthResult
   }
 
   const tokens = issueTokens({ userId: String(user._id), role: 'user' });
-  await User.updateOne(
-    { _id: user._id },
-    { $push: { refreshTokens: hashToken(tokens.refreshToken) } }
-  );
+  await User.updateOne({ _id: user._id }, pushRefreshTokenUpdate(hashToken(tokens.refreshToken)));
 
   return { ...tokens, isNewUser, user: toPublicUser(user) };
 }

@@ -16,3 +16,14 @@ export async function create(req: Request, res: Response): Promise<void> {
   );
   res.status(201).json(ok(report));
 }
+
+export async function createCar(req: Request, res: Response): Promise<void> {
+  if (!req.user) throw new UnauthorizedError();
+  const report = await service.createCarReport(
+    req.user.userId,
+    req.body.carId,
+    req.body.reason,
+    req.body.details
+  );
+  res.status(201).json(ok(report));
+}
