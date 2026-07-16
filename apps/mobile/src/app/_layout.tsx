@@ -18,6 +18,10 @@ import { AnimatedSplash } from '@/shared/components/layout/AnimatedSplash';
 import { ErrorScreen } from '@/shared/components/layout/ErrorScreen';
 import { AppProviders } from '@/shared/components/providers/AppProviders';
 import { useAppSelector } from '@/shared/store/hooks';
+import { initSentry, Sentry } from '@/shared/lib/sentry';
+
+// Initialize crash reporting before anything renders (no-op without a DSN).
+initSentry();
 
 SplashScreen.preventAutoHideAsync();
 
@@ -63,7 +67,7 @@ function ThemedRoot() {
   );
 }
 
-export default function RootLayout() {
+function RootLayout() {
   // Load the brand font (Cairo) in the weights the UI uses.
   const [fontsLoaded] = useFonts({
     Cairo_400Regular,
@@ -88,3 +92,6 @@ export default function RootLayout() {
     </AppProviders>
   );
 }
+
+// Wrap the root so Sentry captures render errors + navigation/touch context.
+export default Sentry.wrap(RootLayout);

@@ -4,21 +4,34 @@
     "appVersionSource": "local"
   },
   "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "channel": "development",
+      "environment": "development",
+      "android": {
+        "buildType": "apk"
+      }
+    },
     "preview": {
       "distribution": "internal",
       "channel": "preview",
+      "environment": "preview",
       "android": {
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://btlee-api.up.railway.app/api"
+        "EXPO_PUBLIC_API_URL": "https://btlee-api.up.railway.app/api",
+        "EXPO_PUBLIC_SENTRY_DSN": "https://386e6b076a0607dd723cd4f59159b07f@o4511744070909952.ingest.us.sentry.io/4511744147718144"
       }
     },
     "production": {
       "autoIncrement": true,
       "channel": "production",
+      "environment": "production",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://btlee-api.up.railway.app/api"
+        "EXPO_PUBLIC_API_URL": "https://btlee-api.up.railway.app/api",
+        "EXPO_PUBLIC_SENTRY_DSN": "https://386e6b076a0607dd723cd4f59159b07f@o4511744070909952.ingest.us.sentry.io/4511744147718144"
       }
     }
   },

@@ -33,3 +33,15 @@ export async function markAllRead(req: Request, res: Response): Promise<void> {
   await service.markAllAsRead(req.user.userId);
   res.json(ok({ message: 'All marked as read' }));
 }
+
+export async function registerPushToken(req: Request, res: Response): Promise<void> {
+  if (!req.user) throw new UnauthorizedError();
+  await service.registerPushToken(req.user.userId, req.body.token);
+  res.json(ok({ message: 'Push token registered' }));
+}
+
+export async function unregisterPushToken(req: Request, res: Response): Promise<void> {
+  if (!req.user) throw new UnauthorizedError();
+  await service.unregisterPushToken(req.user.userId, req.body.token);
+  res.json(ok({ message: 'Push token removed' }));
+}

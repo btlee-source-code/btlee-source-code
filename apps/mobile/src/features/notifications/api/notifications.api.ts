@@ -1,4 +1,4 @@
-import { get, getWithMeta, post } from '@/shared/api/httpClient';
+import { del, get, getWithMeta, post } from '@/shared/api/httpClient';
 import type { Notification } from '@/shared/types/notification';
 
 /**
@@ -12,4 +12,8 @@ export const notificationsApi = {
   unreadCount: () => get<{ unreadCount: number }>('/notifications/unread-count'),
   markRead: (id: string) => post<{ message: string }>(`/notifications/${id}/read`),
   markAllRead: () => post<{ message: string }>('/notifications/read-all'),
+  registerPushToken: (token: string) =>
+    post<{ message: string }>('/notifications/push-token', { token }),
+  unregisterPushToken: (token: string) =>
+    del<{ message: string }>('/notifications/push-token', { data: { token } }),
 };

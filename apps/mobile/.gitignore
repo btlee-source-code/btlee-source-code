@@ -18,6 +18,15 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
+# Firebase — contains a real API key, never commit. Supplied per-environment
+# (EAS Secrets or local placement) at build time.
+google-services.json
+GoogleService-Info.plist
+
+# Firebase Admin SDK service account key — full admin credential, never commit.
+# Used once to upload FCM V1 push credentials to EAS, then can be deleted.
+firebase-adminsdk.json
+
 # Metro
 .metro-health-check*
 

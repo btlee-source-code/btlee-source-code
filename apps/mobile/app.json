@@ -18,6 +18,7 @@
     },
     "android": {
       "package": "com.btlee.app",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -40,7 +41,24 @@
           "imageWidth": 76
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-image",
+      "expo-status-bar",
+      "expo-web-browser",
+      [
+        "@sentry/react-native",
+        {
+          "organization": "btlee",
+          "project": "react-native"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/android-icon-monochrome.png",
+          "color": "#1A3C34"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": false,

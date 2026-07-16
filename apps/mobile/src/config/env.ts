@@ -36,4 +36,11 @@ export const API_URL = process.env.EXPO_PUBLIC_API_URL ?? FALLBACK;
  */
 export const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? 'https://www.btlee-eg.com';
 
+/**
+ * Sentry DSN (crash + error reporting). A client DSN is not secret — it only
+ * accepts events, it can't read them — so it's safe to inline via EXPO_PUBLIC_*.
+ * Empty in local dev → reporting stays off until set for release builds.
+ */
+export const SENTRY_DSN = process.env.EXPO_PUBLIC_SENTRY_DSN ?? '';
+
 export const IS_DEV = __DEV__;

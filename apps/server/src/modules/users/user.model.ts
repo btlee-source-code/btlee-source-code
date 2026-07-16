@@ -62,6 +62,10 @@ const userSchema = new Schema(
     // Refresh token whitelist (allows logout/invalidation)
     refreshTokens: { type: [String], default: [], select: false },
 
+    // Expo push tokens (one per device). Pushed on register, pulled on logout or
+    // when Expo reports the token is no longer valid. select:false — internal only.
+    expoPushTokens: { type: [String], default: [], select: false },
+
     // Password reset
     resetPasswordToken: { type: String, default: null, select: false },
     resetPasswordExpires: { type: Date, default: null, select: false },
