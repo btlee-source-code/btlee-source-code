@@ -12,9 +12,12 @@ import { useTheme } from '@/features/theme/hooks/useTheme';
 // `scale` normalizes the VISIBLE size across the two artworks: the properties
 // PNG has more internal padding, so at the same height it looks smaller than the
 // cars one — bump it up so both read the same size.
+// Logo artwork is the single source of truth in `@btlee/shared/logos` (shared
+// with the web). Aspect ratios track each PNG's real pixel dimensions so the
+// wordmark never distorts; `scale` normalizes visible size across the two.
 const LOGOS = {
-  properties: { source: require('@/assets/brand/btlee-properties-logo.png'), aspect: 690 / 287, scale: 1.22 },
-  cars: { source: require('@/assets/brand/btlee-cars-logo.png'), aspect: 681 / 246, scale: 1 },
+  properties: { source: require('@btlee/shared/logos/btlee-properties-logo.png'), aspect: 489 / 259, scale: 1.22 },
+  cars: { source: require('@btlee/shared/logos/btlee-cars-logo.png'), aspect: 1748 / 899, scale: 1 },
 } as const;
 
 export function Logo({ height = 30 }: { height?: number }) {

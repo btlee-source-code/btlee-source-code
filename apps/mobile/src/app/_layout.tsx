@@ -18,7 +18,7 @@ import { AnimatedSplash } from '@/shared/components/layout/AnimatedSplash';
 import { ErrorScreen } from '@/shared/components/layout/ErrorScreen';
 import { AppProviders } from '@/shared/components/providers/AppProviders';
 import { useAppSelector } from '@/shared/store/hooks';
-import { initSentry, Sentry } from '@/shared/lib/sentry';
+import { initSentry, isSentryEnabled, Sentry } from '@/shared/lib/sentry';
 
 // Initialize crash reporting before anything renders (no-op without a DSN).
 initSentry();
@@ -93,5 +93,7 @@ function RootLayout() {
   );
 }
 
-// Wrap the root so Sentry captures render errors + navigation/touch context.
-export default Sentry.wrap(RootLayout);
+// Wrap the root so Sentry captures render errors + navigation/touch context —
+// but only when Sentry is actually enabled (release + DSN), so dev/Expo Go
+// stays wrap-free and warning-free.
+export default isSentryEnabled ? Sentry.wrap(RootLayout) : RootLayout;

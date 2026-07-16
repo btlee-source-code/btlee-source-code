@@ -4,6 +4,8 @@
  * real production domain (e.g. https://btlee.com). Falls back to localhost in
  * development so links still resolve.
  */
+import ogLogo from '@btlee/shared/logos/btlee-logo.png';
+
 export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 ).replace(/\/$/, '');
@@ -16,8 +18,9 @@ export const SITE_DESCRIPTION =
 export const SITE_DESCRIPTION_EN =
   'A real-estate platform that connects you directly with property owners — apartments, villas and shops for sale and rent in Egypt, with no middleman.';
 
-/** Default social-share image (file lives at /public/btlee-logo.png). */
-export const OG_IMAGE = '/btlee-logo.png';
+/** Default social-share image — bundled from the shared logo package; Next
+ * serves it at a hashed /_next/static path, resolved absolute via metadataBase. */
+export const OG_IMAGE = ogLogo.src;
 
 /** Optional social links used in Organization structured data. */
 export const SITE_SOCIALS = ['https://www.facebook.com/share/1CuGDB45iY/'];

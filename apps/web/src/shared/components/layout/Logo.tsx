@@ -1,14 +1,18 @@
 'use client';
 /**
- * Btlee brand logo — renders the brand image (wordmark included) from /public.
+ * Btlee brand logo — renders the brand image (wordmark included).
  *
- * Two artworks are shipped and swapped purely with CSS based on the active
- * theme (the `.dark` class on <html>), so there's no flash or JS state:
+ * Artwork is the single source of truth in `@btlee/shared/logos` (shared with
+ * the mobile app), so a logo edit there updates web + mobile together. Two
+ * variants are swapped purely with CSS based on the active theme (the `.dark`
+ * class on <html>), so there's no flash or JS state:
  *   - light/white mode → the default (dark-coloured) logo.
  *   - dark mode        → the light-green logo, which stays legible on the
  *                        warm near-black background.
  */
 import Image from 'next/image';
+import logoLight from '@btlee/shared/logos/btlee-logo.png';
+import logoDark from '@btlee/shared/logos/btlee-logo-dark.png';
 import { Link } from '@/config/navigation';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
@@ -42,7 +46,7 @@ export function Logo({ size = 'md' }: LogoProps) {
     >
       {/* Default logo — shown in light mode, hidden in dark. */}
       <Image
-        src="/btlee-logo.png"
+        src={logoLight}
         alt={t('appName')}
         width={697}
         height={151}
@@ -53,7 +57,7 @@ export function Logo({ size = 'md' }: LogoProps) {
           the exact same canvas (697×151) and content placement as the default,
           so both render at pixel-identical size. */}
       <Image
-        src="/btlee-logo-dark.png"
+        src={logoDark}
         alt={t('appName')}
         width={697}
         height={151}

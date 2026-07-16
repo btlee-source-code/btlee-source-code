@@ -1,11 +1,15 @@
 import { useRouter } from 'expo-router';
-import * as Notifications from 'expo-notifications';
 import { useEffect, type ReactNode } from 'react';
 
 import { notificationsActions } from '@/features/notifications/store/notifications.slice';
 import { useAppDispatch, useAppSelector } from '@/shared/store/hooks';
 import { notificationsApi } from '../api/notifications.api';
-import { registerPushTokenAsync, unregisterPushTokenAsync } from '../lib/push';
+import {
+  isPushSupported,
+  loadNotifications,
+  registerPushTokenAsync,
+  unregisterPushTokenAsync,
+} from '../lib/push';
 
 /**
  * Keeps the header bell badge in sync and wires device push:
@@ -14,6 +18,9 @@ import { registerPushTokenAsync, unregisterPushTokenAsync } from '../lib/push';
  *  - registers this device's Expo push token on login, unregisters on logout;
  *  - on tapping a push, deep-links to the linked screen (or the notifications
  *    list). Mounted once, app-wide.
+ *
+ * Push is unavailable in Expo Go (see lib/push), so the token registration and
+ * the notification listeners are skipped there — the badge sync still works.
  */
 export function NotificationsProvider({ children }: { children: ReactNode }) {
   const dispatch = useAppDispatch();
@@ -39,17 +46,32 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, dispatch]);
 
-  // Foreground receipt bumps the badge; tapping a push deep-links.
+  // Foreground receipt bumps the badge; tapping a push deep-links. expo-notifications
+  // is loaded lazily and only where push is supported, so in Expo Go these
+  // listeners are simply never attached (no crash).
   useEffect(() => {
-    const received = Notifications.addNotificationReceivedListener(() => refreshUnread());
-    const response = Notifications.addNotificationResponseReceivedListener((r) => {
-      const data = r.notification.request.content.data as { link?: unknown } | undefined;
-      const link = typeof data?.link === 'string' && data.link.startsWith('/') ? data.link : null;
-      router.push(link ?? '/notifications');
+    if (!isPushSupported) return;
+    let cleanup: (() => void) | undefined;
+    let cancelled = false;
+
+    loadNotifications().then((Notifications) => {
+      if (cancelled) return;
+      const received = Notifications.addNotificationReceivedListener(() => refreshUnread());
+      const response = Notifications.addNotificationResponseReceivedListener((r) => {
+        const data = r.notification.request.content.data as { link?: unknown } | undefined;
+        const link =
+          typeof data?.link === 'string' && data.link.startsWith('/') ? data.link : null;
+        router.push(link ?? '/notifications');
+      });
+      cleanup = () => {
+        received.remove();
+        response.remove();
+      };
     });
+
     return () => {
-      received.remove();
-      response.remove();
+      cancelled = true;
+      cleanup?.();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);

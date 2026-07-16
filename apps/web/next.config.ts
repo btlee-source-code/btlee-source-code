@@ -15,6 +15,10 @@ const proxyTarget = process.env.API_PROXY_TARGET?.replace(/\/$/, '');
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Brand logo artwork is the single source of truth in the shared package
+  // (@btlee/shared/logos), shared with the mobile app. Transpiling it lets Next
+  // resolve the PNG imports from that workspace package.
+  transpilePackages: ['@btlee/shared'],
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'res.cloudinary.com' },
