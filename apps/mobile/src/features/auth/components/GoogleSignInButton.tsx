@@ -30,14 +30,30 @@ function GoogleGlyph() {
   );
 }
 
-/** Google sign-in button. Calls the OAuth flow and reports the result to the caller. */
-export function GoogleSignInButton({ onSuccess }: { onSuccess: (isNewUser: boolean) => void }) {
+/**
+ * Google sign-in button. Calls the OAuth flow and reports the result to the
+ * caller. When `blocked` (e.g. terms not yet accepted on the register screen),
+ * a tap is intercepted and `onBlockedPress` fires instead of the OAuth flow.
+ */
+export function GoogleSignInButton({
+  onSuccess,
+  blocked = false,
+  onBlockedPress,
+}: {
+  onSuccess: (isNewUser: boolean) => void;
+  blocked?: boolean;
+  onBlockedPress?: () => void;
+}) {
   const { loginWithGoogle } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const c = useThemeColors();
 
   const onPress = async () => {
+    if (blocked) {
+      onBlockedPress?.();
+      return;
+    }
     setLoading(true);
     setError(null);
     try {

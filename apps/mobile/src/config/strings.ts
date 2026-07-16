@@ -149,6 +149,10 @@ const ar = {
   or: 'أو',
   googleSignIn: 'المتابعة بحساب جوجل',
   googleSignInFailed: 'تعذّر تسجيل الدخول عبر جوجل',
+  agreePrefix: 'أوافق على ',
+  termsLink: 'الشروط والأحكام',
+  andWord: 'و',
+  mustAcceptTerms: 'لازم توافق على الشروط والأحكام الأول',
 
   // Add / edit property
   addPropertyTitle: 'أضف إعلانك',
@@ -507,6 +511,10 @@ const en: Partial<Strings> = {
   or: 'or',
   googleSignIn: 'Continue with Google',
   googleSignInFailed: 'Google sign-in failed',
+  agreePrefix: 'I agree to ',
+  termsLink: 'the Terms & Conditions',
+  andWord: 'and',
+  mustAcceptTerms: 'Please accept the Terms & Conditions first',
 
   addPropertyTitle: 'Add your listing',
   editPropertyTitle: 'Edit listing',

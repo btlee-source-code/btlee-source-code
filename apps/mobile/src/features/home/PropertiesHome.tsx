@@ -73,7 +73,11 @@ export function PropertiesHome() {
 
         {/* Hero — centered, with the value phrase picked out in the accent */}
         <View className="px-6 pt-7 items-center">
-          <Text className="text-[26px] leading-[38px] font-cairo-bold text-foreground text-center">
+          <Text
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.6}
+            className="text-[26px] leading-[38px] font-cairo-bold text-foreground text-center">
             {S.heroTitleLead} <Text className="text-accent">{S.heroTitleEmphasis}</Text>
           </Text>
           <Text className="text-sm leading-6 text-muted-foreground font-cairo text-center mt-1.5">

@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { ArrowRight } from 'lucide-react-native';
+import { ArrowRight, Check } from 'lucide-react-native';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -39,6 +39,7 @@ export function RegisterScreen() {
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [agreed, setAgreed] = useState(false);
 
   const validate = (): boolean => {
     const e: Errors = {};
@@ -51,6 +52,10 @@ export function RegisterScreen() {
   };
 
   const onSubmit = async () => {
+    if (!agreed) {
+      setErrors({ form: S.mustAcceptTerms });
+      return;
+    }
     if (!validate()) return;
     setSubmitting(true);
     setErrors({});
@@ -88,7 +93,11 @@ export function RegisterScreen() {
           <Text className="text-[24px] font-cairo-bold text-foreground text-right">{S.registerTitle}</Text>
           <Text className="text-sm text-muted-foreground font-cairo text-right mb-6">{S.registerSubtitle}</Text>
 
-          <GoogleSignInButton onSuccess={(isNewUser) => (isNewUser ? setShowOnboarding(true) : router.back())} />
+          <GoogleSignInButton
+            onSuccess={(isNewUser) => (isNewUser ? setShowOnboarding(true) : router.back())}
+            blocked={!agreed}
+            onBlockedPress={() => setErrors({ form: S.mustAcceptTerms })}
+          />
 
           <View className="gap-4">
             <TextField label={S.nameLabel} value={name} onChangeText={setName} error={errors.name} />
@@ -117,6 +126,32 @@ export function RegisterScreen() {
               autoCapitalize="none"
             />
 
+            {/* Terms & conditions agreement — required to create an account. */}
+            <View className="flex-row items-start gap-2.5 mt-1">
+              <Text className="flex-1 text-[13px] font-cairo text-muted-foreground text-right leading-5">
+                {S.agreePrefix}
+                <Text
+                  className="text-primary font-cairo-semibold"
+                  onPress={() => router.push('/legal/disclaimer')}>
+                  {S.termsLink}
+                </Text>
+                {` ${S.andWord} `}
+                <Text
+                  className="text-primary font-cairo-semibold"
+                  onPress={() => router.push('/legal/privacy')}>
+                  {S.privacyTitle}
+                </Text>
+              </Text>
+              <Pressable onPress={() => setAgreed((v) => !v)} hitSlop={10} className="mt-0.5">
+                <View
+                  className={`h-5 w-5 rounded-md border-2 items-center justify-center ${
+                    agreed ? 'bg-primary border-primary' : 'border-border bg-card'
+                  }`}>
+                  {agreed ? <Check size={13} color={c.primaryForeground} strokeWidth={3} /> : null}
+                </View>
+              </Pressable>
+            </View>
+
             {errors.form ? (
               <View className="bg-destructive/10 rounded-xl px-3 py-2.5">
                 <Text className="text-destructive text-sm font-cairo text-right">{errors.form}</Text>
@@ -128,7 +163,7 @@ export function RegisterScreen() {
               onPress={onSubmit}
               disabled={submitting}
               containerClassName="mt-1"
-              className="bg-primary rounded-full h-14 items-center justify-center">
+              className={`bg-primary rounded-full h-14 items-center justify-center ${agreed ? '' : 'opacity-60'}`}>
               {submitting ? (
                 <ActivityIndicator color="#FFFFFF" />
               ) : (
