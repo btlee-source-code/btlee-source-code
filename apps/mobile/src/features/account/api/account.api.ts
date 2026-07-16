@@ -1,4 +1,4 @@
-import { patch, post } from '@/shared/api/httpClient';
+import { del, patch, post } from '@/shared/api/httpClient';
 import type { User, UserGoal } from '@/shared/types/user';
 
 /**
@@ -13,4 +13,6 @@ export const accountApi = {
   changePassword: (currentPassword: string, newPassword: string) =>
     post<{ message: string }>('/users/me/change-password', { currentPassword, newPassword }),
   completeOnboarding: (goal: UserGoal) => post<User>('/users/me/onboarding', { goal }),
+  /** Permanently delete the account and all associated data. Irreversible. */
+  deleteAccount: () => del<{ message: string }>('/users/me'),
 };

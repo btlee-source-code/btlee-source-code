@@ -136,6 +136,10 @@ const ar = {
   noAccount: 'ليس لديك حساب؟',
   hasAccount: 'لديك حساب؟',
   logout: 'تسجيل الخروج',
+  deleteAccount: 'حذف الحساب',
+  deleteAccountConfirm:
+    'سيتم حذف حسابك وكل بياناتك وإعلاناتك نهائياً، ولا يمكن التراجع عن ذلك. هل أنت متأكد أنك تريد المتابعة؟',
+  deleteAccountCta: 'حذف الحساب نهائياً',
   // Validation
   required: 'هذا الحقل مطلوب',
   invalidEmail: 'البريد الإلكتروني غير صحيح',
@@ -484,6 +488,10 @@ const en: Partial<Strings> = {
   noAccount: "Don't have an account?",
   hasAccount: 'Already have an account?',
   logout: 'Sign out',
+  deleteAccount: 'Delete account',
+  deleteAccountConfirm:
+    'Your account and all your data and listings will be permanently deleted. This cannot be undone. Are you sure you want to continue?',
+  deleteAccountCta: 'Delete permanently',
   required: 'This field is required',
   invalidEmail: 'Invalid email address',
   invalidPhone: 'Enter a valid Egyptian phone number (e.g. 01012345678)',

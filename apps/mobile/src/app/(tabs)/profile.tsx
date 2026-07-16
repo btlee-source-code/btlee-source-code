@@ -16,7 +16,8 @@ import {
   Trash2,
   User,
 } from 'lucide-react-native';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { useState } from 'react';
+import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
@@ -30,9 +31,32 @@ import { useAppSelector } from '@/shared/store/hooks';
 export default function ProfileTab() {
   const router = useRouter();
   const c = useThemeColors();
-  const { user, isAuthenticated, isLoading, logout } = useAuth();
+  const { user, isAuthenticated, isLoading, logout, deleteAccount } = useAuth();
   const { isCars } = useSection();
   const unreadCount = useAppSelector((s) => s.notifications.unreadCount);
+  const [deleting, setDeleting] = useState(false);
+
+  // Two-step confirm before the irreversible account wipe, then drop to home
+  // as a guest. Errors surface without leaving the user in a broken state.
+  const confirmDeleteAccount = () => {
+    Alert.alert(S.deleteAccount, S.deleteAccountConfirm, [
+      { text: S.cancel, style: 'cancel' },
+      {
+        text: S.deleteAccountCta,
+        style: 'destructive',
+        onPress: async () => {
+          setDeleting(true);
+          try {
+            await deleteAccount();
+            router.replace('/');
+          } catch {
+            setDeleting(false);
+            Alert.alert(S.errorTitle, S.genericError);
+          }
+        },
+      },
+    ]);
+  };
 
   if (isLoading) {
     return (
@@ -146,6 +170,21 @@ export default function ProfileTab() {
           className="flex-row items-center justify-center gap-2 border border-destructive/30 rounded-full h-[50px] active:opacity-80">
           <LogOut size={18} color={c.destructive} />
           <Text className="text-destructive font-cairo-semibold">{S.logout}</Text>
+        </Pressable>
+
+        {/* Delete account (app-store requirement — matches the data-deletion page) */}
+        <Pressable
+          onPress={confirmDeleteAccount}
+          disabled={deleting}
+          className="flex-row items-center justify-center gap-2 h-11 -mt-2 active:opacity-70">
+          {deleting ? (
+            <ActivityIndicator size="small" color={c.destructive} />
+          ) : (
+            <>
+              <Trash2 size={16} color={c.destructive} />
+              <Text className="text-destructive/90 font-cairo-medium text-sm">{S.deleteAccount}</Text>
+            </>
+          )}
         </Pressable>
       </ScrollView>
     </SafeAreaView>

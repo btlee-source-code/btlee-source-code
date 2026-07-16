@@ -3,6 +3,12 @@
  * Profile management, onboarding completion, account updates.
  */
 import { User } from './user.model.js';
+import { Property } from '../properties/property.model.js';
+import { Car } from '../cars/car.model.js';
+import { Rating } from '../ratings/rating.model.js';
+import { Report } from '../reports/report.model.js';
+import { SavedSearch } from '../saved-searches/savedSearch.model.js';
+import { Notification } from '../notifications/notification.model.js';
 import { hashPassword, comparePassword } from '../../shared/utils/password.js';
 import { issueTokens, hashToken } from '../../shared/utils/jwt.js';
 import { NotFoundError, BadRequestError } from '../../shared/errors/AppError.js';
@@ -74,6 +80,35 @@ export async function completeOnboarding(userId: string, goal: UserGoal) {
   );
   if (!user) throw new NotFoundError('User not found');
   return getProfile(userId);
+}
+
+/**
+ * Permanently delete a user's account and everything tied to it.
+ *
+ * Required by the app stores (Google Play / Apple) for any app with accounts,
+ * and matches the promise in the in-app "data deletion" page. Wipes the user's
+ * listings, ratings, reports, saved searches and notifications, detaches their
+ * id from other users' wishlists, then removes the account itself (which also
+ * drops their refresh tokens and push tokens). Irreversible.
+ */
+export async function deleteAccount(userId: string): Promise<void> {
+  const user = await User.findById(userId).select('_id');
+  if (!user) throw new NotFoundError('User not found');
+
+  // Independent collections keyed by this user — order doesn't matter. Any refs
+  // to this user's now-deleted listings left in other users' wishlists are
+  // harmless: wishlist reads populate with `match:{status:'approved'}`, so a
+  // missing listing simply drops out.
+  await Promise.all([
+    Property.deleteMany({ owner: userId }),
+    Car.deleteMany({ owner: userId }),
+    Rating.deleteMany({ user: userId }),
+    Report.deleteMany({ reporter: userId }),
+    SavedSearch.deleteMany({ user: userId }),
+    Notification.deleteMany({ user: userId }),
+  ]);
+
+  await User.deleteOne({ _id: userId });
 }
 
 /**

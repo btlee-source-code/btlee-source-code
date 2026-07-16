@@ -6,7 +6,7 @@ import * as service from './users.service.js';
 import { ok } from '../../shared/utils/apiResponse.js';
 import { param } from '../../shared/utils/getParam.js';
 import { UnauthorizedError } from '../../shared/errors/AppError.js';
-import { setAuthCookies, USER_COOKIES } from '../../shared/utils/cookies.js';
+import { setAuthCookies, clearAuthCookies, USER_COOKIES } from '../../shared/utils/cookies.js';
 
 export async function getMe(req: Request, res: Response): Promise<void> {
   if (!req.user) throw new UnauthorizedError();
@@ -36,6 +36,15 @@ export async function completeOnboarding(req: Request, res: Response): Promise<v
   if (!req.user) throw new UnauthorizedError();
   const profile = await service.completeOnboarding(req.user.userId, req.body.goal);
   res.json(ok(profile));
+}
+
+export async function deleteMe(req: Request, res: Response): Promise<void> {
+  if (!req.user) throw new UnauthorizedError();
+  await service.deleteAccount(req.user.userId);
+  // Clear the web session cookies too (mobile uses Bearer tokens, which the
+  // account wipe already invalidated). The client must force a re-login.
+  clearAuthCookies(res, USER_COOKIES);
+  res.json(ok({ message: 'Account deleted' }));
 }
 
 export async function getPublicOwner(req: Request, res: Response): Promise<void> {

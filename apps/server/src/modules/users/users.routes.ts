@@ -35,6 +35,8 @@ usersRouter.post(
   validate({ body: onboardingSchema }),
   asyncHandler(controller.completeOnboarding)
 );
+// Permanent account + data deletion (app-store requirement).
+usersRouter.delete('/me', protect, asyncHandler(controller.deleteMe));
 
 // Public — owner profile page
 usersRouter.get(

@@ -8,6 +8,7 @@ import { clearTokens, getRefreshToken, setTokens } from '@/shared/api/authStorag
 import { authActions } from '@/features/auth/store/auth.slice';
 import { useAppDispatch, useAppSelector } from '@/shared/store/hooks';
 import type { User } from '@/shared/types/user';
+import { accountApi } from '@/features/account/api/account.api';
 import { authApi, type RegisterInput } from '../api/auth.api';
 
 /**
@@ -69,6 +70,17 @@ export function useAuth() {
     dispatch(authActions.clearAuth());
   }, [dispatch]);
 
+  /**
+   * Permanently delete the account and all its data, then drop the local
+   * session. The server wipes everything and invalidates the tokens, so we
+   * just clear local storage + Redux afterwards (same teardown as logout).
+   */
+  const deleteAccount = useCallback(async (): Promise<void> => {
+    await accountApi.deleteAccount();
+    await clearTokens();
+    dispatch(authActions.clearAuth());
+  }, [dispatch]);
+
   const setUser = useCallback((u: User) => dispatch(authActions.setUser(u)), [dispatch]);
 
   return {
@@ -80,6 +92,7 @@ export function useAuth() {
     register,
     loginWithGoogle,
     logout,
+    deleteAccount,
     setUser,
   };
 }
