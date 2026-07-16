@@ -135,7 +135,7 @@ export function CarSearchModal({
         </View>
 
         <ScrollView
-          contentContainerClassName="px-4 py-4 gap-5"
+          contentContainerClassName="px-4 py-4 gap-6"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
           <Section title={S.sortTitle}>
@@ -175,8 +175,8 @@ export function CarSearchModal({
           </Section>
 
           {/* Year range */}
-          <View className="gap-2.5">
-            <Text className="text-sm font-cairo-semibold text-foreground text-right">{S.fYear}</Text>
+          <View className="gap-3">
+            <Heading title={S.fYear} />
             <View className="flex-row gap-3">
               <TextInput
                 value={f.minYear != null ? String(f.minYear) : ''}
@@ -200,8 +200,8 @@ export function CarSearchModal({
           </View>
 
           {/* Price range */}
-          <View className="gap-2.5">
-            <Text className="text-sm font-cairo-semibold text-foreground text-right">{S.fPrice}</Text>
+          <View className="gap-3">
+            <Heading title={S.fPrice} />
             <View className="flex-row gap-3">
               <TextInput
                 value={f.minPrice != null ? String(f.minPrice) : ''}
@@ -225,8 +225,8 @@ export function CarSearchModal({
           </View>
 
           {/* Max mileage */}
-          <View className="gap-2.5">
-            <Text className="text-sm font-cairo-semibold text-foreground text-right">{S.fMaxMileage}</Text>
+          <View className="gap-3">
+            <Heading title={S.fMaxMileage} />
             <TextInput
               value={f.maxMileage != null ? String(f.maxMileage) : ''}
               onChangeText={(t) => setF((p) => ({ ...p, maxMileage: toNum(t) }))}
@@ -263,16 +263,28 @@ function Chip({ label, active, onPress }: { label: string; active: boolean; onPr
   return (
     <Pressable
       onPress={onPress}
-      className={`rounded-full px-4 py-2 border ${active ? 'bg-primary border-primary' : 'bg-card border-border'} active:opacity-80`}>
-      <Text className={`font-cairo-medium text-sm ${active ? 'text-primary-foreground' : 'text-foreground'}`}>{label}</Text>
+      className={`rounded-full px-4 py-2.5 border ${active ? 'bg-primary border-primary' : 'bg-card border-border'} active:opacity-80`}>
+      <Text className={`text-sm ${active ? 'font-cairo-bold text-primary-foreground' : 'font-cairo-medium text-foreground'}`}>
+        {label}
+      </Text>
     </Pressable>
+  );
+}
+
+/** Bold, clearly-marked filter heading with a brand accent bar (RTL-leading). */
+export function Heading({ title }: { title: string }) {
+  return (
+    <View className="flex-row items-center justify-end gap-2">
+      <Text className="text-[15px] font-cairo-bold text-foreground text-right">{title}</Text>
+      <View className="w-1.5 h-[18px] rounded-full bg-primary" />
+    </View>
   );
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <View className="gap-2.5">
-      <Text className="text-sm font-cairo-semibold text-foreground text-right">{title}</Text>
+    <View className="gap-3">
+      <Heading title={title} />
       <View className="flex-row flex-wrap gap-2 justify-end">{children}</View>
     </View>
   );

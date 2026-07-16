@@ -41,7 +41,7 @@ export function CarRating({ car }: { car: Car }) {
 
   const onRate = async (value: number) => {
     if (!isAuthenticated) {
-      Alert.alert(S.loginToRate, undefined, [
+      Alert.alert(S.loginToRateCar, undefined, [
         { text: S.signInTitle, onPress: () => router.push('/login') },
         { text: S.cancel, style: 'cancel' },
       ]);
@@ -79,7 +79,7 @@ export function CarRating({ car }: { car: Car }) {
       {!isOwner && (
         <View className="gap-2 items-end pt-1">
           <Text className="text-sm font-cairo-medium text-foreground text-right">
-            {myRating > 0 ? S.yourRating : S.rateThis}
+            {myRating > 0 ? S.yourRating : S.rateThisCar}
           </Text>
           <StarRating value={myRating} onChange={onRate} disabled={submitting} size={28} />
         </View>

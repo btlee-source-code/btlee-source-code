@@ -32,6 +32,7 @@ export function CarsHome() {
 
   const railRef = useRef<ScrollView>(null);
   const railX = useRef(0);
+  const railInit = useRef(false);
   const stepRail = (dir: 1 | -1) =>
     railRef.current?.scrollTo({ x: Math.max(0, railX.current + dir * 200), animated: true });
 
@@ -108,8 +109,15 @@ export function CarsHome() {
               showsHorizontalScrollIndicator={false}
               onScroll={(e) => (railX.current = e.nativeEvent.contentOffset.x)}
               scrollEventThrottle={32}
+              // RTL rail: render body types reversed and start at the right edge,
+              // so the list reads right-to-left (first category on the right).
+              onContentSizeChange={() => {
+                if (railInit.current) return;
+                railInit.current = true;
+                railRef.current?.scrollToEnd({ animated: false });
+              }}
               contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 4, gap: 10 }}>
-              {CATEGORIES.map((type, i) => (
+              {[...CATEGORIES].reverse().map((type, i) => (
                 <CategoryChip
                   key={type}
                   label={CAR_BODY_TYPE_LABELS[type]}

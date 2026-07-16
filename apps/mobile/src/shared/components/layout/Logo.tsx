@@ -17,7 +17,7 @@ import { useTheme } from '@/features/theme/hooks/useTheme';
 // wordmark never distorts; `scale` normalizes visible size across the two.
 const LOGOS = {
   properties: { source: require('@btlee/shared/logos/btlee-properties-logo.png'), aspect: 489 / 259, scale: 1.22 },
-  cars: { source: require('@btlee/shared/logos/btlee-cars-logo.png'), aspect: 1748 / 899, scale: 1 },
+  cars: { source: require('@btlee/shared/logos/btlee-cars-logo.png'), aspect: 1748 / 899, scale: 1.22 },
 } as const;
 
 export function Logo({ height = 30 }: { height?: number }) {

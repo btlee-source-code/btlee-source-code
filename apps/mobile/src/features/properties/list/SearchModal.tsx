@@ -152,7 +152,7 @@ export function SearchModal({
         </View>
 
         <ScrollView
-          contentContainerClassName="px-4 py-4 gap-5"
+          contentContainerClassName="px-4 py-4 gap-6"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           onScrollBeginDrag={() => setFocused(false)}>
@@ -267,16 +267,25 @@ function Chip({ label, active, onPress }: { label: string; active: boolean; onPr
   return (
     <Pressable
       onPress={onPress}
-      className={`rounded-full px-4 py-2 border ${active ? 'bg-primary border-primary' : 'bg-card border-border'} active:opacity-80`}>
-      <Text className={`font-cairo-medium text-sm ${active ? 'text-primary-foreground' : 'text-foreground'}`}>{label}</Text>
+      className={`rounded-full px-4 py-2.5 border ${active ? 'bg-primary border-primary' : 'bg-card border-border'} active:opacity-80`}>
+      <Text className={`text-sm ${active ? 'font-cairo-bold text-primary-foreground' : 'font-cairo-medium text-foreground'}`}>
+        {label}
+      </Text>
     </Pressable>
   );
 }
 
+/**
+ * Filter section: a bold, clearly-marked heading (with a brand accent bar on the
+ * RTL-leading side) over its controls, generously spaced from its neighbours.
+ */
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <View className="gap-2.5">
-      <Text className="text-sm font-cairo-semibold text-foreground text-right">{title}</Text>
+    <View className="gap-3">
+      <View className="flex-row items-center justify-end gap-2">
+        <Text className="text-[15px] font-cairo-bold text-foreground text-right">{title}</Text>
+        <View className="w-1.5 h-[18px] rounded-full bg-primary" />
+      </View>
       {children}
     </View>
   );

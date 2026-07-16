@@ -25,12 +25,15 @@ export const PROPERTY_ICONS: Record<PropertyType, Icon3D> = {
   factory: { emoji: '🏭' },
 };
 
+// Real 3D car icons (Microsoft Fluent Emoji 3D — MIT licensed). The emoji stays
+// as a safe fallback if an image ever fails to load. `crossover` reuses the SUV
+// art (closest match); every other body type has its own.
 export const CAR_ICONS: Record<CarBodyType, Icon3D> = {
-  sedan: { emoji: '🚗' },
-  suv: { emoji: '🚙' },
-  hatchback: { emoji: '🚗' },
-  coupe: { emoji: '🏎️' },
-  pickup: { emoji: '🛻' },
-  minivan: { emoji: '🚐' },
-  crossover: { emoji: '🚙' },
+  sedan: { emoji: '🚗', image: require('./car/sedan.png') },
+  suv: { emoji: '🚙', image: require('./car/suv.png') },
+  hatchback: { emoji: '🚗', image: require('./car/hatchback.png') },
+  coupe: { emoji: '🏎️', image: require('./car/coupe.png') },
+  pickup: { emoji: '🛻', image: require('./car/pickup.png') },
+  minivan: { emoji: '🚐', image: require('./car/minivan.png') },
+  crossover: { emoji: '🚙', image: require('./car/suv.png') },
 };

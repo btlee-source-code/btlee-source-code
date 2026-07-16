@@ -27,7 +27,7 @@ type Props = {
   onPress: () => void;
 };
 
-const ICON = 42; // 3D icons read best a touch larger than the old line icon
+const ICON = 46; // 3D icons read best a touch larger than the old line icon
 
 /**
  * Category chip with an Airbnb-style 3D icon — but livelier: the icon breathes
@@ -75,13 +75,13 @@ export function CategoryChip({ label, icon, accent, index = 0, onPress }: Props)
   return (
     <Pressable
       onPress={onTap}
-      className="items-center justify-center gap-2 min-w-[86px] h-[84px] rounded-2xl border bg-card px-4 active:bg-secondary"
+      className="items-center justify-center gap-2 min-w-[86px] h-[88px] rounded-2xl border bg-card px-4 active:bg-secondary"
       style={[shadows.sm, { borderColor: `${accent}4D` }]}>
       <Animated.View style={[{ width: ICON, height: ICON, alignItems: 'center', justifyContent: 'center' }, iconStyle]}>
         {icon.image != null ? (
           <Image source={icon.image} style={{ width: ICON, height: ICON }} contentFit="contain" />
         ) : (
-          <Text style={{ fontSize: ICON - 6, lineHeight: ICON + 2 }}>{icon.emoji}</Text>
+          <Text style={{ fontSize: ICON - 8, lineHeight: ICON + 2 }}>{icon.emoji}</Text>
         )}
       </Animated.View>
       <Text className="text-xs font-cairo-semibold text-foreground">{label}</Text>

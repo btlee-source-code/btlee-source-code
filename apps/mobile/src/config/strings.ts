@@ -32,7 +32,7 @@ const ar = {
   // Home
   heroTitle: 'اعلن عقارك من غير عمولة',
   heroTitleLead: 'اعلن عقارك',
-  heroTitleEmphasis: 'من غير عمولة',
+  heroTitleEmphasis: "من غير عمولة بكل سهولة",
   heroTitleAccent: 'بيع واشترى من غير سمسار',
   heroSubtitle: 'آلاف العقارات للبيع والإيجار في كل محافظات مصر',
   trustVerified: 'إعلانات موثقة',
@@ -209,8 +209,10 @@ const ar = {
   ratingsCount: (n: number) => `${n} تقييم`,
   noRatings: 'لا توجد تقييمات بعد',
   rateThis: 'قيّم هذا العقار',
+  rateThisCar: 'قيّم هذه العربية',
   yourRating: 'تقييمك',
   loginToRate: 'سجّل دخولك أولاً لتقييم العقار',
+  loginToRateCar: 'سجّل دخولك أولاً لتقييم العربية',
 
   // Report
   reportListing: 'الإبلاغ عن الإعلان',
@@ -295,10 +297,15 @@ const ar = {
   appearance: 'المظهر',
   light: 'فاتح',
   dark: 'داكن',
+  menuTitle: 'القائمة',
+  viewProfile: 'عرض الملف الشخصي',
+  contactUs: 'تواصل معنا',
 
   // Placeholders
   wishlistEmptyTitle: 'مفيش عقارات محفوظة',
   wishlistEmptyDesc: 'احفظ العقارات اللي عجباك وهتلاقيها هنا',
+  wishlistEmptyTitleCar: 'مفيش عربيات محفوظة',
+  wishlistEmptyDescCar: 'احفظ العربيات اللي عجباك وهتلاقيها هنا',
   profileGuestTitle: 'أهلاً بيك في Bt Lee',
   profileGuestDesc: 'سجّل دخولك عشان تحفظ عقارات وتضيف إعلانك',
   comingSoon: 'قريباً',
@@ -311,7 +318,7 @@ const ar = {
 
   // Cars — home
   carsHeroLead: 'اعلن عربيتك',
-  carsHeroEmphasis: 'من غير عمولة',
+  carsHeroEmphasis: 'من غير عمولة بكل سهولة',
   carsHeroSubtitle: 'آلاف العربيات للبيع والإيجار في كل محافظات مصر',
   carsSearchPillTitle: 'دوّر على عربيتك',
   carsSearchExamples: ['تويوتا كورولا', 'هيونداي إلنترا', 'كيا سبورتاج', 'مرسيدس C180', 'BMW 320i'],
@@ -556,8 +563,10 @@ const en: Partial<Strings> = {
   ratingsCount: (n: number) => `${n} rating${n === 1 ? '' : 's'}`,
   noRatings: 'No ratings yet',
   rateThis: 'Rate this property',
+  rateThisCar: 'Rate this car',
   yourRating: 'Your rating',
   loginToRate: 'Sign in first to rate this property',
+  loginToRateCar: 'Sign in first to rate this car',
 
   reportListing: 'Report listing',
   reportTitle: 'Report this listing',
@@ -633,9 +642,14 @@ const en: Partial<Strings> = {
   appearance: 'Appearance',
   light: 'Light',
   dark: 'Dark',
+  menuTitle: 'Menu',
+  viewProfile: 'View profile',
+  contactUs: 'Contact us',
 
   wishlistEmptyTitle: 'No saved properties',
   wishlistEmptyDesc: 'Save the properties you like and find them here',
+  wishlistEmptyTitleCar: 'No saved cars',
+  wishlistEmptyDescCar: 'Save the cars you like and find them here',
   profileGuestTitle: 'Welcome to Bt Lee',
   profileGuestDesc: 'Sign in to save properties and post your listing',
   comingSoon: 'Coming soon',

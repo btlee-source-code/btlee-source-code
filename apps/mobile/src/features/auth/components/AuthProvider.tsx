@@ -29,6 +29,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (active) dispatch(authActions.setGuest());
       }
     })();
+
+
     return () => {
       active = false;
     };

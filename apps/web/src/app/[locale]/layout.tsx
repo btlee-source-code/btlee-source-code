@@ -128,25 +128,9 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* Google Tag Manager — injected in <head> as high as possible. */}
-        <Script id="gtm-base" strategy="afterInteractive">
-          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-N7KWNX86');`}
-        </Script>
+
       </head>
       <body className="font-cairo min-h-screen bg-background text-foreground antialiased">
-        {/* Google Tag Manager (noscript) — must be immediately after <body>. */}
-        <noscript>
-          <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-N7KWNX86"
-            height="0"
-            width="0"
-            style={{ display: 'none', visibility: 'hidden' }}
-          />
-        </noscript>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ReduxProvider>
             <ZodI18nSetup />

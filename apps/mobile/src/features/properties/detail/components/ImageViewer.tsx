@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { FlatList, Modal, Pressable, Text, View, useWindowDimensions } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, {
+  FadeIn,
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
@@ -12,12 +13,18 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { blurPlaceholder } from '@/shared/lib/images';
 import type { PropertyImage } from '@/shared/types/property';
 
+const THUMB = 54; // thumbnail square
+const THUMB_GAP = 8;
+
 /**
  * Full-screen gallery viewer: swipe horizontally between photos, pinch or
- * double-tap to zoom, swipe down (when not zoomed) to dismiss.
+ * double-tap to zoom, swipe down (when not zoomed) to dismiss. A thumbnail
+ * filmstrip at the bottom jumps to any photo, prominent side arrows step through
+ * them, and a pill counter tracks position.
  */
 export function ImageViewer({
   images,
@@ -32,12 +39,24 @@ export function ImageViewer({
 }) {
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
+  const c = useThemeColors();
   const [index, setIndex] = useState(initialIndex);
   const listRef = useRef<FlatList<PropertyImage>>(null);
+  const thumbRef = useRef<FlatList<PropertyImage>>(null);
 
   useEffect(() => {
     if (visible) setIndex(initialIndex);
   }, [visible, initialIndex]);
+
+  // Keep the active thumbnail centered in the filmstrip.
+  useEffect(() => {
+    if (visible && images.length > 1) {
+      const t = setTimeout(() => {
+        thumbRef.current?.scrollToIndex({ index, animated: true, viewPosition: 0.5 });
+      }, 60);
+      return () => clearTimeout(t);
+    }
+  }, [index, visible, images.length]);
 
   if (!visible) return null;
 
@@ -46,6 +65,8 @@ export function ImageViewer({
     setIndex(next);
     listRef.current?.scrollToIndex({ index: next, animated: true });
   };
+
+  const multi = images.length > 1;
 
   return (
     <Modal visible transparent statusBarTranslucent animationType="fade" onRequestClose={onClose}>
@@ -63,46 +84,109 @@ export function ImageViewer({
           renderItem={({ item }) => <ZoomablePage uri={item.url} onDismiss={onClose} />}
         />
 
-        {/* Prev/next arrows — the "this is a slider" affordance. Hidden at the
-            edges; vertically centered. */}
-        {images.length > 1 && index > 0 && (
-          <Pressable
-            onPress={() => goTo(index - 1)}
-            hitSlop={8}
-            className="absolute h-10 w-10 rounded-full items-center justify-center active:opacity-70"
-            style={{ left: 14, top: '50%', marginTop: -20, backgroundColor: 'rgba(255,255,255,0.16)' }}>
-            <ChevronLeft size={22} color="#FFFFFF" />
-          </Pressable>
+        {/* Prev/next arrows — prominent, high-contrast, vertically centered.
+            Hidden at the edges. */}
+        {multi && index > 0 && (
+          <Arrow side="left" onPress={() => goTo(index - 1)}>
+            <ChevronLeft size={30} color="#FFFFFF" strokeWidth={2.4} />
+          </Arrow>
         )}
-        {images.length > 1 && index < images.length - 1 && (
-          <Pressable
-            onPress={() => goTo(index + 1)}
-            hitSlop={8}
-            className="absolute h-10 w-10 rounded-full items-center justify-center active:opacity-70"
-            style={{ right: 14, top: '50%', marginTop: -20, backgroundColor: 'rgba(255,255,255,0.16)' }}>
-            <ChevronRight size={22} color="#FFFFFF" />
-          </Pressable>
+        {multi && index < images.length - 1 && (
+          <Arrow side="right" onPress={() => goTo(index + 1)}>
+            <ChevronRight size={30} color="#FFFFFF" strokeWidth={2.4} />
+          </Arrow>
         )}
 
-        {/* Top bar: close (RTL start = right) + counter */}
+        {/* Top bar: counter (RTL start = right) + close */}
         <View
           className="absolute left-0 right-0 flex-row items-center justify-between px-4"
           style={{ top: insets.top + 8 }}>
-          <View className="rounded-full px-3 py-1.5" style={{ backgroundColor: 'rgba(0,0,0,0.55)' }}>
-            <Text className="text-white text-xs font-cairo-semibold">
+          <View className="rounded-full px-3.5 py-1.5" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
+            <Text className="text-white text-[13px] font-cairo-semibold">
               {index + 1} / {images.length}
             </Text>
           </View>
           <Pressable
             onPress={onClose}
             hitSlop={8}
-            className="h-10 w-10 rounded-full items-center justify-center"
-            style={{ backgroundColor: 'rgba(255,255,255,0.16)' }}>
-            <X size={20} color="#FFFFFF" />
+            className="h-11 w-11 rounded-full items-center justify-center active:opacity-60"
+            style={{ backgroundColor: 'rgba(0,0,0,0.5)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.28)' }}>
+            <X size={22} color="#FFFFFF" strokeWidth={2.4} />
           </Pressable>
         </View>
+
+        {/* Bottom thumbnail filmstrip */}
+        {multi && (
+          <Animated.View
+            entering={FadeIn.duration(220)}
+            className="absolute left-0 right-0"
+            style={{ bottom: insets.bottom + 14 }}>
+            <FlatList
+              ref={thumbRef}
+              horizontal
+              data={images}
+              keyExtractor={(img) => `t-${img.publicId}`}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 16, gap: THUMB_GAP }}
+              getItemLayout={(_, i) => ({ length: THUMB + THUMB_GAP, offset: (THUMB + THUMB_GAP) * i, index: i })}
+              onScrollToIndexFailed={() => {}}
+              renderItem={({ item, index: i }) => {
+                const active = i === index;
+                return (
+                  <Pressable onPress={() => goTo(i)} className="active:opacity-80">
+                    <View
+                      style={{
+                        width: THUMB,
+                        height: THUMB,
+                        borderRadius: 12,
+                        overflow: 'hidden',
+                        borderWidth: active ? 2.5 : 1,
+                        borderColor: active ? c.accent : 'rgba(255,255,255,0.22)',
+                        opacity: active ? 1 : 0.55,
+                      }}>
+                      <Image
+                        source={{ uri: item.url }}
+                        style={{ width: '100%', height: '100%' }}
+                        contentFit="cover"
+                        transition={120}
+                      />
+                    </View>
+                  </Pressable>
+                );
+              }}
+            />
+          </Animated.View>
+        )}
       </GestureHandlerRootView>
     </Modal>
+  );
+}
+
+/** A prominent, high-contrast circular arrow control at the screen edge. */
+function Arrow({
+  side,
+  onPress,
+  children,
+}: {
+  side: 'left' | 'right';
+  onPress: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      hitSlop={10}
+      className="absolute h-12 w-12 rounded-full items-center justify-center active:opacity-60"
+      style={{
+        [side]: 12,
+        top: '50%',
+        marginTop: -24,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.3)',
+      }}>
+      {children}
+    </Pressable>
   );
 }
 

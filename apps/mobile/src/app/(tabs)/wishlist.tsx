@@ -114,7 +114,11 @@ export default function WishlistTab() {
               <SkeletonPropertyCard />
             </View>
           ) : (
-            <EmptyState icon={Heart} title={S.wishlistEmptyTitle} description={S.wishlistEmptyDesc} />
+            <EmptyState
+              icon={Heart}
+              title={isCars ? S.wishlistEmptyTitleCar : S.wishlistEmptyTitle}
+              description={isCars ? S.wishlistEmptyDescCar : S.wishlistEmptyDesc}
+            />
           )
         }
       />
