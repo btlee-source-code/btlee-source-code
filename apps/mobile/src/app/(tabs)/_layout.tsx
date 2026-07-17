@@ -4,6 +4,7 @@ import { StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
+import { AddTabButton } from '@/features/home/components/AddTabButton';
 import { useSection } from '@/features/section/hooks/useSection';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { tapHaptic } from '@/shared/lib/haptics';
@@ -39,6 +40,11 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="properties"
         options={{ title: isCars ? S.sectionCars : S.tabProperties, tabBarIcon: ({ color }) => <Search color={color} size={23} /> }}
+      />
+      <Tabs.Screen
+        name="add"
+        options={{ title: '', tabBarButton: () => <AddTabButton /> }}
+        listeners={{ tabPress: (e) => e.preventDefault() }}
       />
       <Tabs.Screen
         name="wishlist"

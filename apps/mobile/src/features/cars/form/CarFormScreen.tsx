@@ -33,7 +33,8 @@ import { uploadsApi, type LocalImage } from '@/features/properties/api/uploads.a
 import { ImagePickerRow } from '@/features/properties/form/ImagePickerRow';
 import { LocationPicker } from '@/features/properties/form/LocationPicker';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
-import { GOVERNORATES, LISTING_TYPES, LISTING_TYPE_LABELS } from '@/shared/lib/constants';
+import { LISTING_TYPES, LISTING_TYPE_LABELS } from '@/shared/lib/constants';
+import { GovernoratePicker } from '@/shared/components/ui/GovernoratePicker';
 
 const DURATIONS = [30, 60, 90, 180, 365];
 const CURRENT_YEAR = new Date().getFullYear();
@@ -42,16 +43,23 @@ function Chip({ label, active, onPress }: { label: string; active: boolean; onPr
   return (
     <Pressable
       onPress={onPress}
-      className={`rounded-full px-4 py-2 border ${active ? 'bg-primary border-primary' : 'bg-card border-border'} active:opacity-80`}>
-      <Text className={`font-cairo-medium text-sm ${active ? 'text-primary-foreground' : 'text-foreground'}`}>{label}</Text>
+      className={`rounded-full px-4 py-2.5 border ${active ? 'bg-accent border-accent' : 'bg-card border-border'} active:opacity-80`}>
+      <Text className={`text-sm ${active ? 'font-cairo-bold text-white' : 'font-cairo-medium text-foreground'}`}>{label}</Text>
     </Pressable>
   );
 }
 
+/**
+ * Form field: a bold, clearly-marked heading with a brand-accent (gold) bar on
+ * the RTL-leading side — matching the search filter sheet — over its control.
+ */
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <View className="gap-2.5">
-      <Text className="text-sm font-cairo-semibold text-foreground text-right">{label}</Text>
+      <View className="flex-row items-center justify-end gap-2">
+        <Text className="text-[15px] font-cairo-bold text-foreground text-right">{label}</Text>
+        <View className="w-1.5 h-[18px] rounded-full bg-accent" />
+      </View>
       {children}
       {hint ? <Text className="text-xs text-muted-foreground font-cairo text-right">{hint}</Text> : null}
     </View>
@@ -272,11 +280,7 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
           </View>
 
           <Field label={S.fGovernorate}>
-            <View className="flex-row flex-wrap gap-2 justify-end">
-              {GOVERNORATES.map((g) => (
-                <Chip key={g} label={g} active={governorate === g} onPress={() => setGovernorate(g)} />
-              ))}
-            </View>
+            <GovernoratePicker value={governorate || undefined} onChange={setGovernorate} />
           </Field>
 
           <Field label={S.fAreaName}>
@@ -325,18 +329,18 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
       </KeyboardAvoidingView>
 
       <View className="px-5 py-3 border-t border-border">
-        <Pressable onPress={onSubmit} disabled={submitting} className="bg-primary rounded-xl h-12 flex-row items-center justify-center gap-2 active:opacity-90">
+        <Pressable onPress={onSubmit} disabled={submitting} className="bg-accent rounded-xl h-12 flex-row items-center justify-center gap-2 active:opacity-90">
           {submitting ? (
             <>
-              <ActivityIndicator color={c.primaryForeground} />
-              <Text className="text-primary-foreground font-cairo-semibold">
+              <ActivityIndicator color="#FFFFFF" />
+              <Text className="text-white font-cairo-semibold">
                 {phase === 'uploading' ? S.uploadingImages : S.publishing}
               </Text>
             </>
           ) : (
             <>
-              <Check size={20} color={c.primaryForeground} />
-              <Text className="text-primary-foreground font-cairo-bold text-base">{isEdit ? S.submitEdit : S.submitAdd}</Text>
+              <Check size={20} color="#FFFFFF" />
+              <Text className="text-white font-cairo-bold text-base">{isEdit ? S.submitEdit : S.submitAdd}</Text>
             </>
           )}
         </Pressable>

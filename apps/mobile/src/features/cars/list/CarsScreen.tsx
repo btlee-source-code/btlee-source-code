@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowUpDown, Bookmark, CircleAlert, Plus, Search, SearchX, X } from 'lucide-react-native';
+import { ArrowUpDown, Bookmark, CircleAlert, Search, SearchX, X } from 'lucide-react-native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -305,17 +305,6 @@ export function CarsScreen() {
           ) : null
         }
       />
-
-      {/* Add-car FAB — extended (icon + label), mirrors the properties list */}
-      <PressableScale
-        haptic
-        onPress={() => router.push('/add-car')}
-        containerClassName="absolute bottom-5 left-5"
-        className="flex-row items-center gap-2 h-14 rounded-full bg-accent pl-4 pr-5"
-        style={shadows.lg}>
-        <Plus size={22} color="#FFFFFF" strokeWidth={2.8} />
-        <Text className="text-white font-cairo-bold text-[15px]">{S.addCarTitle}</Text>
-      </PressableScale>
 
       <CarSearchModal
         visible={searchOpen}

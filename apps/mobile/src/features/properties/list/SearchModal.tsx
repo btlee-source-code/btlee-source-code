@@ -6,11 +6,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { AmountPicker, AREA_OPTIONS, PRICE_OPTIONS } from '@/shared/components/ui/AmountPicker';
+import { GovernoratePicker } from '@/shared/components/ui/GovernoratePicker';
 import {
   CATEGORY_LABELS,
   FINISHING_LABELS,
   FINISHING_TYPES,
-  GOVERNORATES,
   LISTING_TYPE_LABELS,
   LISTING_TYPES,
   PROPERTY_CATEGORIES,
@@ -24,10 +25,6 @@ import type { Filters } from './PropertyFilters';
 import type { SortValue } from './SortSheet';
 
 const BEDROOM_OPTIONS = [1, 2, 3, 4, 5];
-const toNum = (t: string): number | undefined => {
-  const n = parseInt(t.replace(/[^\d]/g, ''), 10);
-  return Number.isNaN(n) ? undefined : n;
-};
 
 export interface SearchState {
   search: string;
@@ -206,46 +203,48 @@ export function SearchModal({
           </Section>
 
           <Section title={S.fPrice}>
-            <View className="flex-row gap-3">
-              <TextInput
-                value={f.minPrice != null ? String(f.minPrice) : ''}
-                onChangeText={(t) => setF((p) => ({ ...p, minPrice: toNum(t) }))}
-                keyboardType="numeric"
-                placeholder={S.fMinPrice}
-                placeholderTextColor={c.muted}
-                className="flex-1 bg-secondary rounded-xl px-4 h-12 text-foreground font-cairo text-right"
-                textAlign="right"
-              />
-              <TextInput
-                value={f.maxPrice != null ? String(f.maxPrice) : ''}
-                onChangeText={(t) => setF((p) => ({ ...p, maxPrice: toNum(t) }))}
-                keyboardType="numeric"
-                placeholder={S.fMaxPrice}
-                placeholderTextColor={c.muted}
-                className="flex-1 bg-secondary rounded-xl px-4 h-12 text-foreground font-cairo text-right"
-                textAlign="right"
-              />
+            <View className="flex-row-reverse gap-3">
+              <View className="flex-1">
+                <AmountPicker
+                  value={f.minPrice}
+                  onChange={(n) => setF((p) => ({ ...p, minPrice: n }))}
+                  options={PRICE_OPTIONS}
+                  placeholder={S.fMinPrice}
+                  title={S.pricePickerTitle}
+                  suffix="ج.م"
+                  maxBound={f.maxPrice}
+                />
+              </View>
+              <View className="flex-1">
+                <AmountPicker
+                  value={f.maxPrice}
+                  onChange={(n) => setF((p) => ({ ...p, maxPrice: n }))}
+                  options={PRICE_OPTIONS}
+                  placeholder={S.fMaxPrice}
+                  title={S.pricePickerTitle}
+                  suffix="ج.م"
+                  minBound={f.minPrice}
+                />
+              </View>
             </View>
           </Section>
 
           <Section title={S.fMinArea}>
-            <TextInput
-              value={f.minArea != null ? String(f.minArea) : ''}
-              onChangeText={(t) => setF((p) => ({ ...p, minArea: toNum(t) }))}
-              keyboardType="numeric"
-              placeholder={S.fMinArea}
-              placeholderTextColor={c.muted}
-              className="bg-secondary rounded-xl px-4 h-12 text-foreground font-cairo text-right"
-              textAlign="right"
+            <AmountPicker
+              value={f.minArea}
+              onChange={(n) => setF((p) => ({ ...p, minArea: n }))}
+              options={AREA_OPTIONS}
+              placeholder={S.areaPickerPlaceholder}
+              title={S.areaPickerTitle}
+              suffix="م²"
             />
           </Section>
 
           <Section title={S.fGovernorate}>
-            <View className="flex-row flex-wrap gap-2 justify-end">
-              {GOVERNORATES.map((g) => (
-                <Chip key={g} label={g} active={f.governorate === g} onPress={() => set('governorate', g)} />
-              ))}
-            </View>
+            <GovernoratePicker
+              value={f.governorate}
+              onChange={(g) => setF((prev) => ({ ...prev, governorate: g }))}
+            />
           </Section>
         </ScrollView>
 

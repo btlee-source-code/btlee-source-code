@@ -16,7 +16,8 @@ import {
   CAR_TRANSMISSIONS,
 } from '@/features/cars/lib/carConstants';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
-import { GOVERNORATES, LISTING_TYPE_LABELS, LISTING_TYPES, SORT_OPTIONS } from '@/shared/lib/constants';
+import { LISTING_TYPE_LABELS, LISTING_TYPES, SORT_OPTIONS } from '@/shared/lib/constants';
+import { GovernoratePicker } from '@/shared/components/ui/GovernoratePicker';
 
 export type CarSort = 'newest' | 'oldest' | 'price_asc' | 'price_desc';
 
@@ -177,7 +178,7 @@ export function CarSearchModal({
           {/* Year range */}
           <View className="gap-3">
             <Heading title={S.fYear} />
-            <View className="flex-row gap-3">
+            <View className="flex-row-reverse gap-3">
               <TextInput
                 value={f.minYear != null ? String(f.minYear) : ''}
                 onChangeText={(t) => setF((p) => ({ ...p, minYear: toNum(t) }))}
@@ -202,7 +203,7 @@ export function CarSearchModal({
           {/* Price range */}
           <View className="gap-3">
             <Heading title={S.fPrice} />
-            <View className="flex-row gap-3">
+            <View className="flex-row-reverse gap-3">
               <TextInput
                 value={f.minPrice != null ? String(f.minPrice) : ''}
                 onChangeText={(t) => setF((p) => ({ ...p, minPrice: toNum(t) }))}
@@ -239,9 +240,10 @@ export function CarSearchModal({
           </View>
 
           <Section title={S.fGovernorate}>
-            {GOVERNORATES.map((g) => (
-              <Chip key={g} label={g} active={f.governorate === g} onPress={() => set('governorate', g)} />
-            ))}
+            <GovernoratePicker
+              value={f.governorate}
+              onChange={(g) => setF((prev) => ({ ...prev, governorate: g }))}
+            />
           </Section>
         </ScrollView>
 
