@@ -1,18 +1,14 @@
 'use client';
 /**
- * Btlee brand logo — renders the brand image (wordmark included).
+ * Btlee brand logo — renders the brand wordmark.
  *
- * Artwork is the single source of truth in `@btlee/shared/logos` (shared with
- * the mobile app), so a logo edit there updates web + mobile together. Two
- * variants are swapped purely with CSS based on the active theme (the `.dark`
- * class on <html>), so there's no flash or JS state:
- *   - light/white mode → the default (dark-coloured) logo.
- *   - dark mode        → the light-green logo, which stays legible on the
- *                        warm near-black background.
+ * The single source of truth is the properties-section artwork in
+ * `@btlee/shared/logos` (shared with the mobile app), so one edit updates web +
+ * mobile together. One logo serves both light and dark themes (it reads on
+ * either background), so there's no theme swap.
  */
 import Image from 'next/image';
-import logoLight from '@btlee/shared/logos/btlee-logo.png';
-import logoDark from '@btlee/shared/logos/btlee-logo-dark.png';
+import logo from '@btlee/shared/logos/btlee-properties-logo.png';
 import { Link } from '@/config/navigation';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
@@ -22,7 +18,7 @@ interface LogoProps {
 }
 
 // Control the logo by height only; width stays `auto` so it keeps the source
-// image's aspect ratio (697×151). Setting both axes (height via class, width
+// image's aspect ratio (489×259). Setting both axes (height via class, width
 // via `w-auto`) also avoids next/image's "width or height modified but not the
 // other" warning caused by Tailwind's global `img { height: auto }` preflight.
 //
@@ -31,7 +27,7 @@ interface LogoProps {
 // and caps at 32px on larger screens.
 const heightClass: Record<NonNullable<LogoProps['size']>, string> = {
   sm: 'h-6',
-  md: 'h-[clamp(1.5rem,7vw,2rem)]',
+  md: 'h-[clamp(1.75rem,8vw,2.5rem)]',
   lg: 'h-9 sm:h-10',
 };
 
@@ -44,25 +40,13 @@ export function Logo({ size = 'md' }: LogoProps) {
       className="inline-flex shrink-0 items-center transition-opacity hover:opacity-85"
       aria-label={t('appName')}
     >
-      {/* Default logo — shown in light mode, hidden in dark. */}
       <Image
-        src={logoLight}
+        src={logo}
         alt={t('appName')}
-        width={697}
-        height={151}
+        width={489}
+        height={259}
         priority
-        className={cn('w-auto dark:hidden', heightClass[size])}
-      />
-      {/* Light-green logo — shown only in dark mode. The asset is normalised to
-          the exact same canvas (697×151) and content placement as the default,
-          so both render at pixel-identical size. */}
-      <Image
-        src={logoDark}
-        alt={t('appName')}
-        width={697}
-        height={151}
-        priority
-        className={cn('hidden w-auto dark:block', heightClass[size])}
+        className={cn('w-auto', heightClass[size])}
       />
     </Link>
   );

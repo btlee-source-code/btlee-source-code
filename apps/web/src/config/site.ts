@@ -4,7 +4,7 @@
  * real production domain (e.g. https://btlee.com). Falls back to localhost in
  * development so links still resolve.
  */
-import ogLogo from '@btlee/shared/logos/btlee-logo.png';
+import ogLogo from '@btlee/shared/logos/btlee-properties-logo.png';
 
 export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
