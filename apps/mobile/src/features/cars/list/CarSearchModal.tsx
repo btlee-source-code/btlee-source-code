@@ -250,8 +250,8 @@ export function CarSearchModal({
           <Pressable
             onPress={apply}
             className="bg-accent rounded-xl h-12 flex-row items-center justify-center gap-2 active:opacity-90">
-            <Search size={18} color={c.accentForeground} />
-            <Text className="text-accent-foreground font-cairo-bold text-base">{S.showResults}</Text>
+            <Search size={18} color="#FFFFFF" />
+            <Text className="text-white font-cairo-bold text-base">{S.showResults}</Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -264,7 +264,7 @@ function Chip({ label, active, onPress }: { label: string; active: boolean; onPr
     <Pressable
       onPress={onPress}
       className={`rounded-full px-4 py-2.5 border ${active ? 'bg-accent border-accent' : 'bg-card border-border'} active:opacity-80`}>
-      <Text className={`text-sm ${active ? 'font-cairo-bold text-accent-foreground' : 'font-cairo-medium text-foreground'}`}>
+      <Text className={`text-sm ${active ? 'font-cairo-bold text-white' : 'font-cairo-medium text-foreground'}`}>
         {label}
       </Text>
     </Pressable>

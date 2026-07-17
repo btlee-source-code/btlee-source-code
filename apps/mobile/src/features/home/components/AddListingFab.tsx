@@ -32,8 +32,8 @@ export function AddListingFab() {
         { bottom: 18, left: 18, height: 52, paddingHorizontal: 20, backgroundColor: c.accent },
         shadows.lg,
       ]}>
-      <Plus size={22} color={c.accentForeground} strokeWidth={2.6} />
-      <Text className="font-cairo-bold text-[15px]" style={{ color: c.accentForeground }}>
+      <Plus size={22} color="#FFFFFF" strokeWidth={2.6} />
+      <Text className="font-cairo-bold text-[15px]" style={{ color: '#FFFFFF' }}>
         {S.addNew}
       </Text>
     </AnimatedPressable>
