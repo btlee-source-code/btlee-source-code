@@ -289,10 +289,10 @@ export function PropertiesScreen() {
         haptic
         onPress={() => router.push('/add-property')}
         containerClassName="absolute bottom-5 left-5"
-        className="flex-row items-center gap-2 h-14 rounded-full bg-primary pl-4 pr-5"
+        className="flex-row items-center gap-2 h-14 rounded-full bg-accent pl-4 pr-5"
         style={shadows.lg}>
-        <Plus size={22} color={c.primaryForeground} strokeWidth={2.8} />
-        <Text className="text-primary-foreground font-cairo-bold text-[15px]">{S.addPropertyTitle}</Text>
+        <Plus size={22} color={c.accentForeground} strokeWidth={2.8} />
+        <Text className="text-accent-foreground font-cairo-bold text-[15px]">{S.addPropertyTitle}</Text>
       </PressableScale>
 
       <SearchModal

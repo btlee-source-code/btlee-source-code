@@ -249,9 +249,9 @@ export function CarSearchModal({
         <View className="px-4 py-3 border-t border-border">
           <Pressable
             onPress={apply}
-            className="bg-primary rounded-xl h-12 flex-row items-center justify-center gap-2 active:opacity-90">
-            <Search size={18} color={c.primaryForeground} />
-            <Text className="text-primary-foreground font-cairo-bold text-base">{S.showResults}</Text>
+            className="bg-accent rounded-xl h-12 flex-row items-center justify-center gap-2 active:opacity-90">
+            <Search size={18} color={c.accentForeground} />
+            <Text className="text-accent-foreground font-cairo-bold text-base">{S.showResults}</Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -263,8 +263,8 @@ function Chip({ label, active, onPress }: { label: string; active: boolean; onPr
   return (
     <Pressable
       onPress={onPress}
-      className={`rounded-full px-4 py-2.5 border ${active ? 'bg-primary border-primary' : 'bg-card border-border'} active:opacity-80`}>
-      <Text className={`text-sm ${active ? 'font-cairo-bold text-primary-foreground' : 'font-cairo-medium text-foreground'}`}>
+      className={`rounded-full px-4 py-2.5 border ${active ? 'bg-accent border-accent' : 'bg-card border-border'} active:opacity-80`}>
+      <Text className={`text-sm ${active ? 'font-cairo-bold text-accent-foreground' : 'font-cairo-medium text-foreground'}`}>
         {label}
       </Text>
     </Pressable>
@@ -276,7 +276,7 @@ export function Heading({ title }: { title: string }) {
   return (
     <View className="flex-row items-center justify-end gap-2">
       <Text className="text-[15px] font-cairo-bold text-foreground text-right">{title}</Text>
-      <View className="w-1.5 h-[18px] rounded-full bg-primary" />
+      <View className="w-1.5 h-[18px] rounded-full bg-accent" />
     </View>
   );
 }

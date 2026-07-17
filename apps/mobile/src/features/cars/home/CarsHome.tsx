@@ -14,7 +14,6 @@ import { CategoryChip } from '@/features/home/components/CategoryChip';
 import { HomeTopBar } from '@/features/home/components/HomeTopBar';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
-import { RailArrows } from '@/shared/components/ui/RailArrows';
 import { SectionHeader } from '@/shared/components/ui/SectionHeader';
 import { useTabPressScrollToTop } from '@/shared/hooks/useTabPressScrollToTop';
 import { shadows } from '@/shared/lib/shadows';
@@ -29,12 +28,6 @@ const saleFetcher = () => carsApi.list({ listingType: 'sale', limit: 10 }).then(
 export function CarsHome() {
   const router = useRouter();
   const c = useThemeColors();
-
-  const railRef = useRef<ScrollView>(null);
-  const railX = useRef(0);
-  const railInit = useRef(false);
-  const stepRail = (dir: 1 | -1) =>
-    railRef.current?.scrollTo({ x: Math.max(0, railX.current + dir * 200), animated: true });
 
   const scrollRef = useRef<ScrollView>(null);
   useTabPressScrollToTop(() => scrollRef.current?.scrollTo({ y: 0, animated: true }));
@@ -80,12 +73,12 @@ export function CarsHome() {
         </View>
 
         {/* Search — opens the unified cars search + filter sheet on the search tab */}
-        <View className="px-5 mt-6">
+        <View className="mt-6">
           <PressableScale
             haptic
             scaleTo={0.98}
             onPress={() => router.push({ pathname: '/properties', params: { openSearch: '1' } })}
-            className="flex-row items-center gap-3 bg-card border rounded-2xl pl-3.5 pr-4 py-3.5"
+            className="flex-row items-center gap-3 bg-card border-y px-5 py-2.5"
             style={[shadows.sm, { borderColor: `${c.accent}4D` }]}>
             <Search size={22} color={c.muted} strokeWidth={2} />
             <View className="flex-1">
@@ -103,36 +96,21 @@ export function CarsHome() {
           </PressableScale>
         </View>
 
-        {/* Body-type rail */}
+        {/* Body-type grid — 3 across, stacked, RTL (first type reads top-right) */}
         <View className="mt-8 gap-4">
           <SectionHeader title={S.carsExploreByType} onViewAll={() => router.push('/properties')} />
-          <View>
-            <ScrollView
-              ref={railRef}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              onScroll={(e) => (railX.current = e.nativeEvent.contentOffset.x)}
-              scrollEventThrottle={32}
-              // RTL rail: render body types reversed and start at the right edge,
-              // so the list reads right-to-left (first category on the right).
-              onContentSizeChange={() => {
-                if (railInit.current) return;
-                railInit.current = true;
-                railRef.current?.scrollToEnd({ animated: false });
-              }}
-              contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 4, gap: 10 }}>
-              {[...CATEGORIES].reverse().map((type, i) => (
+          <View className="flex-row-reverse flex-wrap justify-between gap-y-3 px-5">
+            {CATEGORIES.map((type, i) => (
+              <View key={type} className="w-[31%]">
                 <CategoryChip
-                  key={type}
                   label={CAR_BODY_TYPE_LABELS[type]}
                   icon={CAR_ICONS[type]}
                   accent={c.accent}
                   index={i}
                   onPress={() => router.push({ pathname: '/properties', params: { bodyType: type } })}
                 />
-              ))}
-            </ScrollView>
-            <RailArrows top={4 + (84 - 36) / 2} onStep={stepRail} />
+              </View>
+            ))}
           </View>
         </View>
 

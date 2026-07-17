@@ -10,7 +10,7 @@
  * literals that the server validates against and every client agrees on.
  */
 
-export const PROPERTY_TYPES = ['apartment', 'villa', 'chalet', 'shop', 'building', 'factory'] as const;
+export const PROPERTY_TYPES = ['apartment', 'villa', 'chalet', 'shop', 'building', 'factory', 'land'] as const;
 export type PropertyType = (typeof PROPERTY_TYPES)[number];
 
 export const LISTING_TYPES = ['sale', 'rent'] as const;

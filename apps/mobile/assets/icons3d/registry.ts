@@ -23,6 +23,7 @@ export const PROPERTY_ICONS: Record<PropertyType, Icon3D> = {
   shop: { emoji: '🏪' },
   building: { emoji: '🏬' },
   factory: { emoji: '🏭' },
+  land: { emoji: '🏞️' },
 };
 
 // Real 3D car icons (Microsoft Fluent Emoji 3D — MIT licensed). The emoji stays

@@ -13,14 +13,13 @@ import { PropertySection } from '@/features/home/components/PropertySection';
 import { propertiesApi } from '@/features/properties/api/properties.api';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
-import { RailArrows } from '@/shared/components/ui/RailArrows';
 import { SectionHeader } from '@/shared/components/ui/SectionHeader';
 import { useTabPressScrollToTop } from '@/shared/hooks/useTabPressScrollToTop';
 import { TYPE_LABELS } from '@/shared/lib/constants';
 import { shadows } from '@/shared/lib/shadows';
 import type { PropertyType } from '@/shared/types/property';
 
-const CATEGORIES: PropertyType[] = ['apartment', 'villa', 'chalet', 'shop', 'building', 'factory'];
+const CATEGORIES: PropertyType[] = ['apartment', 'villa', 'chalet', 'shop', 'factory', 'land'];
 
 // Curated home carousels beyond featured/latest — each is a distinct, logical
 // slice (listing type / city). An empty slice hides its own section, so these
@@ -32,13 +31,6 @@ const cityFetcher = () => propertiesApi.list({ governorate: 'القاهرة', li
 export function PropertiesHome() {
   const router = useRouter();
   const c = useThemeColors();
-
-  // Category rail scroll position — drives the arrow buttons.
-  const railRef = useRef<ScrollView>(null);
-  const railX = useRef(0);
-  const railInit = useRef(false);
-  const stepRail = (dir: 1 | -1) =>
-    railRef.current?.scrollTo({ x: Math.max(0, railX.current + dir * 200), animated: true });
 
   // Re-pressing the home tab scrolls back to the top.
   const scrollRef = useRef<ScrollView>(null);
@@ -85,13 +77,13 @@ export function PropertiesHome() {
           </Text>
         </View>
 
-        {/* Search — opens the unified search + filter sheet */}
-        <View className="px-5 mt-6">
+        {/* Search — opens the unified search + filter sheet. Full-bleed width. */}
+        <View className="mt-6">
           <PressableScale
             haptic
             scaleTo={0.98}
             onPress={() => router.push({ pathname: '/properties', params: { openSearch: '1' } })}
-            className="flex-row items-center gap-3 bg-card border rounded-2xl pl-3.5 pr-4 py-3.5"
+            className="flex-row items-center gap-3 bg-card border-y px-5 py-2.5"
             style={[shadows.sm, { borderColor: `${c.accent}4D` }]}>
             <Search size={22} color={c.muted} strokeWidth={2} />
             <View className="flex-1">
@@ -107,37 +99,21 @@ export function PropertiesHome() {
           </PressableScale>
         </View>
 
-        {/* Category rail */}
+        {/* Category grid — 3 across, stacked, RTL (first type reads top-right) */}
         <View className="mt-8 gap-4">
           <SectionHeader title={S.exploreByType} onViewAll={() => router.push('/properties')} />
-          <View>
-            <ScrollView
-              ref={railRef}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              onScroll={(e) => (railX.current = e.nativeEvent.contentOffset.x)}
-              scrollEventThrottle={32}
-              // RTL rail: render categories reversed and start at the right edge,
-              // so the list reads right-to-left (first category on the right).
-              onContentSizeChange={() => {
-                if (railInit.current) return;
-                railInit.current = true;
-                railRef.current?.scrollToEnd({ animated: false });
-              }}
-              contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 4, gap: 10 }}>
-              {[...CATEGORIES].reverse().map((type, i) => (
+          <View className="flex-row-reverse flex-wrap justify-between gap-y-3 px-5">
+            {CATEGORIES.map((type, i) => (
+              <View key={type} className="w-[31%]">
                 <CategoryChip
-                  key={type}
                   label={TYPE_LABELS[type]}
                   icon={PROPERTY_ICONS[type]}
                   accent={c.accent}
                   index={i}
                   onPress={() => router.push({ pathname: '/properties', params: { type } })}
                 />
-              ))}
-            </ScrollView>
-            {/* 4px rail padding + centers the 36px button on the 84px chips */}
-            <RailArrows top={4 + (84 - 36) / 2} onStep={stepRail} />
+              </View>
+            ))}
           </View>
         </View>
 

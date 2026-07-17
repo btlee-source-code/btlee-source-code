@@ -81,6 +81,7 @@ const TYPE_SYNONYMS: Record<PropertyType, string[]> = {
   shop: ['محل', 'محلات', 'shop', 'shops', 'store'],
   building: ['مبني', 'مباني', 'عماره', 'عمارات', 'building', 'buildings'],
   factory: ['مصنع', 'مصانع', 'factory', 'factories'],
+  land: ['ارض', 'اراضي', 'قطعه', 'قطعة ارض', 'land', 'plot', 'lands'],
 };
 
 const LISTING_SYNONYMS: Record<ListingType, string[]> = {

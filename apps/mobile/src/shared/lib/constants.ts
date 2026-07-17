@@ -32,8 +32,8 @@ export {
 export type { ReportReason };
 
 export const TYPE_LABELS = localeMap<PropertyType>(
-  { apartment: 'شقة', villa: 'فيلا', chalet: 'شاليه', shop: 'محل', building: 'مبنى', factory: 'مصنع' },
-  { apartment: 'Apartment', villa: 'Villa', chalet: 'Chalet', shop: 'Shop', building: 'Building', factory: 'Factory' }
+  { apartment: 'شقة', villa: 'فيلا', chalet: 'شاليه', shop: 'محل', building: 'مبنى', factory: 'مصنع', land: 'أرض' },
+  { apartment: 'Apartment', villa: 'Villa', chalet: 'Chalet', shop: 'Shop', building: 'Building', factory: 'Factory', land: 'Land' }
 );
 
 export const LISTING_TYPE_LABELS = localeMap<ListingType>(
