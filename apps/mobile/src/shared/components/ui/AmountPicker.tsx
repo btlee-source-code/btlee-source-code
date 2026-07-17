@@ -27,6 +27,8 @@ export function AmountPicker({
   suffix,
   minBound,
   maxBound,
+  clearLabel,
+  clearable = true,
 }: {
   value?: number;
   onChange: (n?: number) => void;
@@ -36,6 +38,12 @@ export function AmountPicker({
   suffix?: string;
   minBound?: number;
   maxBound?: number;
+  /** Label for the top "clear selection" row. Defaults to "all" (filter
+   *  context); forms pass "not specified" since the value is optional there. */
+  clearLabel?: string;
+  /** Whether the value can be cleared. Off for required fields (e.g. bedroom
+   *  count) so there's no "clear" row. */
+  clearable?: boolean;
 }) {
   const c = useThemeColors();
   const [open, setOpen] = useState(false);
@@ -109,15 +117,17 @@ export function AmountPicker({
             contentContainerStyle={{ paddingBottom: 24 }}
             ItemSeparatorComponent={() => <View className="h-px bg-border/60 mx-5" />}
             ListHeaderComponent={
-              <Pressable
-                onPress={() => pick(undefined)}
-                className="flex-row items-center justify-between px-5 py-3.5 active:bg-secondary">
-                {value == null ? <Check size={20} color={c.accent} /> : <View style={{ width: 20 }} />}
-                <Text
-                  className={`text-[15px] text-right ${value == null ? 'font-cairo-bold text-accent' : 'font-cairo-medium text-foreground'}`}>
-                  {S.all}
-                </Text>
-              </Pressable>
+              clearable ? (
+                <Pressable
+                  onPress={() => pick(undefined)}
+                  className="flex-row items-center justify-between px-5 py-3.5 active:bg-secondary">
+                  {value == null ? <Check size={20} color={c.accent} /> : <View style={{ width: 20 }} />}
+                  <Text
+                    className={`text-[15px] text-right ${value == null ? 'font-cairo-bold text-accent' : 'font-cairo-medium text-foreground'}`}>
+                    {clearLabel ?? S.all}
+                  </Text>
+                </Pressable>
+              ) : null
             }
             renderItem={({ item }) => {
               const active = item === value;
@@ -151,3 +161,6 @@ export const PRICE_OPTIONS = [
 export const AREA_OPTIONS = [
   50, 60, 70, 80, 90, 100, 120, 150, 180, 200, 250, 300, 350, 400, 500, 600, 800, 1000, 1500, 2000,
 ];
+
+/** Preset small counts (bedrooms, bathrooms, …). */
+export const COUNT_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];

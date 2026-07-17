@@ -32,6 +32,7 @@ import {
   CATEGORY_LABELS,
   TYPE_LABELS,
 } from '@/shared/lib/constants';
+import { AmountPicker, AREA_OPTIONS, COUNT_OPTIONS, PRICE_OPTIONS } from '@/shared/components/ui/AmountPicker';
 import { GovernoratePicker } from '@/shared/components/ui/GovernoratePicker';
 import type { Property, PropertyImage } from '@/shared/types/property';
 import { propertiesApi, type PropertyInput } from '../api/properties.api';
@@ -240,12 +241,26 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
           <View className="flex-row gap-3">
             <View className="flex-1">
               <Field label={S.fBedrooms}>
-                <TextInput keyboardType="numeric" value={bedrooms != null ? String(bedrooms) : ''} onChangeText={(t) => setBedrooms(toNum(t))} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+                <AmountPicker
+                  value={bedrooms}
+                  onChange={setBedrooms}
+                  options={COUNT_OPTIONS}
+                  placeholder={S.countPickerPlaceholder}
+                  title={S.fBedrooms}
+                  clearable={false}
+                />
               </Field>
             </View>
             <View className="flex-1">
               <Field label={S.fBathrooms}>
-                <TextInput keyboardType="numeric" value={bathrooms != null ? String(bathrooms) : ''} onChangeText={(t) => setBathrooms(toNum(t))} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+                <AmountPicker
+                  value={bathrooms}
+                  onChange={setBathrooms}
+                  options={COUNT_OPTIONS}
+                  placeholder={S.countPickerPlaceholder}
+                  title={S.fBathrooms}
+                  clearable={false}
+                />
               </Field>
             </View>
           </View>
@@ -260,13 +275,29 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
             )}
             <View className="flex-1">
               <Field label={`${S.fAreaM} ${S.optional}`}>
-                <TextInput keyboardType="numeric" value={area != null ? String(area) : ''} onChangeText={(t) => setArea(toNum(t))} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+                <AmountPicker
+                  value={area}
+                  onChange={setArea}
+                  options={AREA_OPTIONS}
+                  placeholder={S.areaPickerPlaceholder}
+                  title={S.areaPickerTitle}
+                  suffix="م²"
+                  clearLabel={S.amountPickerNone}
+                />
               </Field>
             </View>
           </View>
 
           <Field label={`${S.fPriceOne} ${S.optional}`}>
-            <TextInput keyboardType="numeric" value={price != null ? String(price) : ''} onChangeText={(t) => setPrice(toNum(t))} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+            <AmountPicker
+              value={price}
+              onChange={setPrice}
+              options={PRICE_OPTIONS}
+              placeholder={S.pricePickerPlaceholder}
+              title={S.pricePickerTitle}
+              suffix="ج.م"
+              clearLabel={S.amountPickerNone}
+            />
           </Field>
 
           <Field label={S.fFinishing}>
