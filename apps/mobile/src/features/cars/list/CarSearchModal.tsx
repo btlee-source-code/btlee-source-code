@@ -17,6 +17,12 @@ import {
 } from '@/features/cars/lib/carConstants';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { LISTING_TYPE_LABELS, LISTING_TYPES, SORT_OPTIONS } from '@/shared/lib/constants';
+import {
+  AmountPicker,
+  MILEAGE_OPTIONS,
+  PRICE_OPTIONS,
+  YEAR_OPTIONS,
+} from '@/shared/components/ui/AmountPicker';
 import { GovernoratePicker } from '@/shared/components/ui/GovernoratePicker';
 
 export type CarSort = 'newest' | 'oldest' | 'price_asc' | 'price_desc';
@@ -42,11 +48,6 @@ export interface CarSearchState {
   filters: CarFilters;
   sort: CarSort;
 }
-
-const toNum = (t: string): number | undefined => {
-  const n = parseInt(t.replace(/[^\d]/g, ''), 10);
-  return Number.isNaN(n) ? undefined : n;
-};
 
 /**
  * Unified cars search + filter + sort sheet — the car counterpart of the
@@ -96,8 +97,6 @@ export function CarSearchModal({
     onClose();
   };
 
-  const numInput = 'flex-1 bg-secondary rounded-xl px-4 h-12 text-foreground font-cairo text-right';
-
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
       <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
@@ -114,7 +113,7 @@ export function CarSearchModal({
 
         {/* Search bar (make / model, bilingual) */}
         <View className="px-4 pt-3">
-          <View className="flex-row items-center bg-secondary rounded-xl px-3 h-12">
+          <View className="flex-row items-center bg-secondary border border-border rounded-xl px-3 h-12">
             <Search size={20} color={c.muted} />
             <TextInput
               value={search}
@@ -179,24 +178,28 @@ export function CarSearchModal({
           <View className="gap-3">
             <Heading title={S.fYear} />
             <View className="flex-row-reverse gap-3">
-              <TextInput
-                value={f.minYear != null ? String(f.minYear) : ''}
-                onChangeText={(t) => setF((p) => ({ ...p, minYear: toNum(t) }))}
-                keyboardType="numeric"
-                placeholder={S.fMinYear}
-                placeholderTextColor={c.muted}
-                className={numInput}
-                textAlign="right"
-              />
-              <TextInput
-                value={f.maxYear != null ? String(f.maxYear) : ''}
-                onChangeText={(t) => setF((p) => ({ ...p, maxYear: toNum(t) }))}
-                keyboardType="numeric"
-                placeholder={S.fMaxYear}
-                placeholderTextColor={c.muted}
-                className={numInput}
-                textAlign="right"
-              />
+              <View className="flex-1">
+                <AmountPicker
+                  value={f.minYear}
+                  onChange={(n) => setF((p) => ({ ...p, minYear: n }))}
+                  options={YEAR_OPTIONS}
+                  placeholder={S.fMinYear}
+                  title={S.yearPickerTitle}
+                  plain
+                  maxBound={f.maxYear}
+                />
+              </View>
+              <View className="flex-1">
+                <AmountPicker
+                  value={f.maxYear}
+                  onChange={(n) => setF((p) => ({ ...p, maxYear: n }))}
+                  options={YEAR_OPTIONS}
+                  placeholder={S.fMaxYear}
+                  title={S.yearPickerTitle}
+                  plain
+                  minBound={f.minYear}
+                />
+              </View>
             </View>
           </View>
 
@@ -204,38 +207,41 @@ export function CarSearchModal({
           <View className="gap-3">
             <Heading title={S.fPrice} />
             <View className="flex-row-reverse gap-3">
-              <TextInput
-                value={f.minPrice != null ? String(f.minPrice) : ''}
-                onChangeText={(t) => setF((p) => ({ ...p, minPrice: toNum(t) }))}
-                keyboardType="numeric"
-                placeholder={S.fMinPrice}
-                placeholderTextColor={c.muted}
-                className={numInput}
-                textAlign="right"
-              />
-              <TextInput
-                value={f.maxPrice != null ? String(f.maxPrice) : ''}
-                onChangeText={(t) => setF((p) => ({ ...p, maxPrice: toNum(t) }))}
-                keyboardType="numeric"
-                placeholder={S.fMaxPrice}
-                placeholderTextColor={c.muted}
-                className={numInput}
-                textAlign="right"
-              />
+              <View className="flex-1">
+                <AmountPicker
+                  value={f.minPrice}
+                  onChange={(n) => setF((p) => ({ ...p, minPrice: n }))}
+                  options={PRICE_OPTIONS}
+                  placeholder={S.fMinPrice}
+                  title={S.pricePickerTitle}
+                  suffix="ج.م"
+                  maxBound={f.maxPrice}
+                />
+              </View>
+              <View className="flex-1">
+                <AmountPicker
+                  value={f.maxPrice}
+                  onChange={(n) => setF((p) => ({ ...p, maxPrice: n }))}
+                  options={PRICE_OPTIONS}
+                  placeholder={S.fMaxPrice}
+                  title={S.pricePickerTitle}
+                  suffix="ج.م"
+                  minBound={f.minPrice}
+                />
+              </View>
             </View>
           </View>
 
           {/* Max mileage */}
           <View className="gap-3">
             <Heading title={S.fMaxMileage} />
-            <TextInput
-              value={f.maxMileage != null ? String(f.maxMileage) : ''}
-              onChangeText={(t) => setF((p) => ({ ...p, maxMileage: toNum(t) }))}
-              keyboardType="numeric"
+            <AmountPicker
+              value={f.maxMileage}
+              onChange={(n) => setF((p) => ({ ...p, maxMileage: n }))}
+              options={MILEAGE_OPTIONS}
               placeholder={S.fMaxMileage}
-              placeholderTextColor={c.muted}
-              className="bg-secondary rounded-xl px-4 h-12 text-foreground font-cairo text-right"
-              textAlign="right"
+              title={S.mileagePickerTitle}
+              suffix="كم"
             />
           </View>
 

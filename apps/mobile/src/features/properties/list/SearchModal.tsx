@@ -102,7 +102,7 @@ export function SearchModal({
         {/* Search bar */}
         <View className="px-4 pt-3" style={{ zIndex: 50 }}>
           <View style={{ zIndex: 50 }}>
-            <View className="flex-row items-center bg-secondary rounded-xl px-3 h-12">
+            <View className="flex-row items-center bg-secondary border border-border rounded-xl px-3 h-12">
               <Search size={20} color={c.muted} />
               <TextInput
                 value={search}

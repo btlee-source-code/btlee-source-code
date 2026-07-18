@@ -14,6 +14,7 @@ import { clearTokens, getAccessToken, getRefreshToken, setTokens } from './authS
 export class HttpError extends Error {
   status: number;
   details?: unknown;
+
   constructor(message: string, status: number, details?: unknown) {
     super(message);
     this.name = 'HttpError';
@@ -50,6 +51,7 @@ api.interceptors.request.use(async (config) => {
 
 // De-duped refresh: concurrent 401s share a single /auth/refresh call.
 let refreshInFlight: Promise<boolean> | null = null;
+
 async function refreshSession(): Promise<boolean> {
   if (!refreshInFlight) {
     refreshInFlight = (async () => {
@@ -71,6 +73,7 @@ async function refreshSession(): Promise<boolean> {
         return false;
       }
     })();
+
     refreshInFlight.finally(() => {
       refreshInFlight = null;
     });

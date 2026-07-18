@@ -48,7 +48,7 @@ export function GovernoratePicker({
       {/* Trigger — looks like a form field, shows the current choice */}
       <Pressable
         onPress={() => setOpen(true)}
-        className="flex-row items-center bg-secondary rounded-xl px-4 h-12 active:opacity-80">
+        className="flex-row items-center bg-secondary border border-border rounded-xl px-4 h-12 active:opacity-80">
         <MapPin size={18} color={value ? c.accent : c.muted} />
         <Text
           className={`flex-1 mx-2 text-right ${value ? 'font-cairo' : 'font-cairo-medium'}`}
@@ -72,7 +72,7 @@ export function GovernoratePicker({
 
           {/* Search */}
           <View className="px-5 pt-3 pb-1">
-            <View className="flex-row items-center bg-secondary rounded-xl px-3 h-11">
+            <View className="flex-row items-center bg-secondary border border-border rounded-xl px-3 h-11">
               <Search size={18} color={c.muted} />
               <TextInput
                 value={query}

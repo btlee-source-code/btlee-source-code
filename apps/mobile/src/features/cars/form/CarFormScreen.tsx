@@ -34,6 +34,12 @@ import { ImagePickerRow } from '@/features/properties/form/ImagePickerRow';
 import { LocationPicker } from '@/features/properties/form/LocationPicker';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { LISTING_TYPES, LISTING_TYPE_LABELS } from '@/shared/lib/constants';
+import {
+  AmountPicker,
+  MILEAGE_OPTIONS,
+  PRICE_OPTIONS,
+  YEAR_OPTIONS,
+} from '@/shared/components/ui/AmountPicker';
 import { GovernoratePicker } from '@/shared/components/ui/GovernoratePicker';
 
 const DURATIONS = [30, 60, 90, 180, 365];
@@ -66,11 +72,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   );
 }
 
-const inputCls = 'bg-secondary rounded-xl px-4 h-12 text-foreground font-cairo text-right';
-const toNum = (t: string): number | undefined => {
-  const n = parseInt(t.replace(/[^\d]/g, ''), 10);
-  return Number.isNaN(n) ? undefined : n;
-};
+const inputCls = 'bg-secondary border border-border rounded-xl px-4 h-12 text-foreground font-cairo text-right';
 function normalizeWhatsapp(raw: string): string {
   const d = raw.replace(/\D/g, '');
   if (d.startsWith('20')) return d;
@@ -219,12 +221,12 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
           <View className="flex-row gap-3">
             <View className="flex-1">
               <Field label={S.fMake} hint={S.makeHint}>
-                <TextInput value={make} onChangeText={setMake} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+                <TextInput value={make} onChangeText={setMake} placeholder={S.phMake} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
               </Field>
             </View>
             <View className="flex-1">
               <Field label={S.fModel} hint={S.modelHint}>
-                <TextInput value={model} onChangeText={setModel} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+                <TextInput value={model} onChangeText={setModel} placeholder={S.phModel} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
               </Field>
             </View>
           </View>
@@ -232,12 +234,28 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
           <View className="flex-row gap-3">
             <View className="flex-1">
               <Field label={S.fYear}>
-                <TextInput keyboardType="numeric" value={year != null ? String(year) : ''} onChangeText={(t) => setYear(toNum(t))} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+                <AmountPicker
+                  value={year}
+                  onChange={setYear}
+                  options={YEAR_OPTIONS}
+                  placeholder={S.yearPickerPlaceholder}
+                  title={S.yearPickerTitle}
+                  plain
+                  clearable={false}
+                />
               </Field>
             </View>
             <View className="flex-1">
               <Field label={`${S.fMileage} ${S.optional}`}>
-                <TextInput keyboardType="numeric" value={mileage != null ? String(mileage) : ''} onChangeText={(t) => setMileage(toNum(t))} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+                <AmountPicker
+                  value={mileage}
+                  onChange={setMileage}
+                  options={MILEAGE_OPTIONS}
+                  placeholder={S.mileagePickerPlaceholder}
+                  title={S.mileagePickerTitle}
+                  suffix="كم"
+                  clearLabel={S.amountPickerNone}
+                />
               </Field>
             </View>
           </View>
@@ -269,12 +287,20 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
           <View className="flex-row gap-3">
             <View className="flex-1">
               <Field label={`${S.fColor} ${S.optional}`}>
-                <TextInput value={color} onChangeText={setColor} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+                <TextInput value={color} onChangeText={setColor} placeholder={S.phColor} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
               </Field>
             </View>
             <View className="flex-1">
               <Field label={`${S.fPriceOne} ${S.optional}`}>
-                <TextInput keyboardType="numeric" value={price != null ? String(price) : ''} onChangeText={(t) => setPrice(toNum(t))} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+                <AmountPicker
+                  value={price}
+                  onChange={setPrice}
+                  options={PRICE_OPTIONS}
+                  placeholder={S.pricePickerPlaceholder}
+                  title={S.pricePickerTitle}
+                  suffix="ج.م"
+                  clearLabel={S.amountPickerNone}
+                />
               </Field>
             </View>
           </View>
@@ -284,7 +310,7 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
           </Field>
 
           <Field label={S.fAreaName}>
-            <TextInput value={areaName} onChangeText={setAreaName} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+            <TextInput value={areaName} onChangeText={setAreaName} placeholder={S.phAreaName} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
           </Field>
 
           <Field label={`${S.fLocation} ${S.optional}`}>
@@ -298,7 +324,8 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
               multiline
               numberOfLines={4}
               maxLength={500}
-              className="bg-secondary rounded-xl px-4 py-3 text-foreground font-cairo text-right"
+              placeholder={S.phDescription}
+              className="bg-secondary border border-border rounded-xl px-4 py-3 text-foreground font-cairo text-right"
               style={{ minHeight: 100, textAlignVertical: 'top' }}
               textAlign="right"
               placeholderTextColor={c.muted}

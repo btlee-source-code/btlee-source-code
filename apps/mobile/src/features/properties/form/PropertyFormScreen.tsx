@@ -69,7 +69,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   );
 }
 
-const inputCls = 'bg-secondary rounded-xl px-4 h-12 text-foreground font-cairo text-right';
+const inputCls = 'bg-secondary border border-border rounded-xl px-4 h-12 text-foreground font-cairo text-right';
 const toNum = (t: string): number | undefined => {
   const n = parseInt(t.replace(/[^\d]/g, ''), 10);
   return Number.isNaN(n) ? undefined : n;
@@ -269,7 +269,7 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
             {type === 'apartment' && (
               <View className="flex-1">
                 <Field label={S.fFloor}>
-                  <TextInput keyboardType="numeric" value={floor != null ? String(floor) : ''} onChangeText={(t) => setFloor(toNum(t))} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+                  <TextInput keyboardType="numeric" value={floor != null ? String(floor) : ''} onChangeText={(t) => setFloor(toNum(t))} placeholder={S.phFloor} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
                 </Field>
               </View>
             )}
@@ -340,7 +340,7 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
           </Field>
 
           <Field label={S.fAreaName}>
-            <TextInput value={areaName} onChangeText={setAreaName} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+            <TextInput value={areaName} onChangeText={setAreaName} placeholder={S.phAreaName} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
           </Field>
 
           <Field label={`${S.fLocation} ${S.optional}`}>
@@ -354,7 +354,8 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
               multiline
               numberOfLines={4}
               maxLength={500}
-              className="bg-secondary rounded-xl px-4 py-3 text-foreground font-cairo text-right"
+              placeholder={S.phDescription}
+              className="bg-secondary border border-border rounded-xl px-4 py-3 text-foreground font-cairo text-right"
               style={{ minHeight: 100, textAlignVertical: 'top' }}
               textAlign="right"
               placeholderTextColor={c.muted}

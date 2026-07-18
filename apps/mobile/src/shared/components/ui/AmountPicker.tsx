@@ -29,6 +29,7 @@ export function AmountPicker({
   maxBound,
   clearLabel,
   clearable = true,
+  plain = false,
 }: {
   value?: number;
   onChange: (n?: number) => void;
@@ -44,6 +45,8 @@ export function AmountPicker({
   /** Whether the value can be cleared. Off for required fields (e.g. bedroom
    *  count) so there's no "clear" row. */
   clearable?: boolean;
+  /** Skip thousands separators — for values like years (2026, not 2,026). */
+  plain?: boolean;
 }) {
   const c = useThemeColors();
   const [open, setOpen] = useState(false);
@@ -68,20 +71,21 @@ export function AmountPicker({
     close();
   };
 
-  const label = (n: number) => (suffix ? `${fmt(n)} ${suffix}` : fmt(n));
+  const show = (n: number) => (plain ? String(n) : fmt(n));
+  const label = (n: number) => (suffix ? `${show(n)} ${suffix}` : show(n));
 
   return (
     <>
       {/* Trigger — looks like the input it replaces */}
       <Pressable
         onPress={() => setOpen(true)}
-        className="flex-row items-center justify-between bg-secondary rounded-xl px-4 h-12 active:opacity-80">
+        className="flex-row items-center justify-between bg-secondary border border-border rounded-xl px-4 h-12 active:opacity-80">
         <ChevronDown size={18} color={c.muted} />
         <Text
           className={`flex-1 mr-2 text-right ${value != null ? 'font-cairo' : 'font-cairo-medium'}`}
           style={{ color: value != null ? c.foreground : c.muted }}
           numberOfLines={1}>
-          {value != null ? fmt(value) : placeholder}
+          {value != null ? show(value) : placeholder}
         </Text>
       </Pressable>
 
@@ -104,7 +108,7 @@ export function AmountPicker({
               keyboardType="numeric"
               placeholder={S.amountPickerCustom}
               placeholderTextColor={c.muted}
-              className="bg-secondary rounded-xl px-4 h-11 text-foreground font-cairo text-right"
+              className="bg-secondary border border-border rounded-xl px-4 h-11 text-foreground font-cairo text-right"
               textAlign="right"
             />
           </View>
@@ -164,3 +168,13 @@ export const AREA_OPTIONS = [
 
 /** Preset small counts (bedrooms, bathrooms, …). */
 export const COUNT_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+/** Car model years, newest first — from next year down to 1990. */
+const NOW_YEAR = new Date().getFullYear();
+export const YEAR_OPTIONS = Array.from({ length: NOW_YEAR + 1 - 1990 + 1 }, (_, i) => NOW_YEAR + 1 - i);
+
+/** Preset mileage steps (km) offered in the mileage picker. */
+export const MILEAGE_OPTIONS = [
+  0, 5_000, 10_000, 20_000, 30_000, 40_000, 50_000, 60_000, 75_000, 100_000, 125_000, 150_000,
+  175_000, 200_000, 250_000, 300_000,
+];

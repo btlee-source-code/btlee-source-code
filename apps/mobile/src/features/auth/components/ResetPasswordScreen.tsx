@@ -88,7 +88,7 @@ export function ResetPasswordScreen() {
                 {/* New password (with show/hide) */}
                 <View className="gap-1.5">
                   <Text className="text-sm font-cairo-medium text-foreground text-right">{S.newPasswordLabel}</Text>
-                  <View className="flex-row items-center bg-secondary rounded-xl px-4 h-12">
+                  <View className="flex-row items-center bg-secondary border border-border rounded-xl px-4 h-12">
                     <Pressable onPress={() => setShow((v) => !v)} hitSlop={8}>
                       {show ? <EyeOff size={20} color={c.muted} /> : <Eye size={20} color={c.muted} />}
                     </Pressable>
@@ -112,7 +112,7 @@ export function ResetPasswordScreen() {
                     secureTextEntry={!show}
                     autoCapitalize="none"
                     textAlign="right"
-                    className="bg-secondary rounded-xl px-4 h-12 text-foreground font-cairo text-right"
+                    className="bg-secondary border border-border rounded-xl px-4 h-12 text-foreground font-cairo text-right"
                   />
                 </View>
 
