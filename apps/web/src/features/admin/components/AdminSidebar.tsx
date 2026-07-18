@@ -5,15 +5,17 @@
  * The host layout owns the drawer open/close state and passes it down,
  * so other surfaces (e.g. the top bar's menu button) can trigger it.
  */
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
+  LayoutGrid,
   Building2,
   Car,
   Users,
   Flag,
   Star,
+  ChevronDown,
   LogOut,
   X,
 } from 'lucide-react';
@@ -23,14 +25,52 @@ import { useAdminAuth } from '../hooks/useAdminAuth';
 import { AdminThemeToggle } from './AdminTheme';
 import { cn } from '@/shared/lib/utils';
 
-const links = [
-  { href: '/admin/dashboard', label: 'الرئيسية', icon: LayoutDashboard },
-  { href: '/admin/properties', label: 'العقارات', icon: Building2 },
-  { href: '/admin/cars', label: 'العربيات', icon: Car },
-  { href: '/admin/featured', label: 'المميزة', icon: Star },
+type IconType = React.ComponentType<{ className?: string }>;
+
+interface GroupChild {
+  href: string;
+  label: string;
+  icon: IconType;
+  // Match the path exactly instead of by prefix — needed when one child's path
+  // is a prefix of another (e.g. /admin/featured vs /admin/featured/cars).
+  exact?: boolean;
+}
+interface NavGroup {
+  label: string;
+  icon: IconType;
+  children: GroupChild[];
+}
+
+// Flat link at the top; the two collapsible groups; then the flat links below.
+const dashboardLink = { href: '/admin/dashboard', label: 'الرئيسية', icon: LayoutDashboard };
+const bottomLinks = [
   { href: '/admin/users', label: 'المستخدمين', icon: Users },
   { href: '/admin/reports', label: 'التقارير', icon: Flag },
 ];
+
+// Each group expands into a section picker (العقارات / العربيات).
+const groups: NavGroup[] = [
+  {
+    label: 'الأقسام',
+    icon: LayoutGrid,
+    children: [
+      { href: '/admin/properties', label: 'العقارات', icon: Building2 },
+      { href: '/admin/cars', label: 'العربيات', icon: Car },
+    ],
+  },
+  {
+    label: 'المميزة',
+    icon: Star,
+    children: [
+      { href: '/admin/featured', label: 'العقارات', icon: Building2, exact: true },
+      { href: '/admin/featured/cars', label: 'السيارات', icon: Car },
+    ],
+  },
+];
+
+function childActive(child: GroupChild, pathname: string | null): boolean {
+  return child.exact ? pathname === child.href : (pathname?.startsWith(child.href) ?? false);
+}
 
 interface AdminSidebarProps {
   mobileOpen: boolean;
@@ -123,25 +163,20 @@ function SidebarBody({ onItemClick, showCloseButton, onClose }: SidebarBodyProps
       </div>
 
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-        {links.map((link) => {
-          const isActive = pathname?.startsWith(link.href);
-          return (
-            <Link
-              key={link.href}
-              href={link.href as never}
-              onClick={onItemClick}
-              className={cn(
-                'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
-              )}
-            >
-              <link.icon className="size-4 shrink-0" />
-              <span className="truncate">{link.label}</span>
-            </Link>
-          );
-        })}
+        <NavLink link={dashboardLink} pathname={pathname} onItemClick={onItemClick} />
+
+        {groups.map((group) => (
+          <CollapsibleGroup
+            key={group.label}
+            group={group}
+            pathname={pathname}
+            onItemClick={onItemClick}
+          />
+        ))}
+
+        {bottomLinks.map((link) => (
+          <NavLink key={link.href} link={link} pathname={pathname} onItemClick={onItemClick} />
+        ))}
       </nav>
 
       <div className="p-3 border-t border-border space-y-2">
@@ -161,5 +196,112 @@ function SidebarBody({ onItemClick, showCloseButton, onClose }: SidebarBodyProps
         </button>
       </div>
     </>
+  );
+}
+
+interface NavLinkItem {
+  href: string;
+  label: string;
+  icon: IconType;
+}
+
+function NavLink({
+  link,
+  pathname,
+  onItemClick,
+}: {
+  link: NavLinkItem;
+  pathname: string | null;
+  onItemClick?: () => void;
+}) {
+  const isActive = pathname?.startsWith(link.href);
+  return (
+    <Link
+      href={link.href as never}
+      onClick={onItemClick}
+      className={cn(
+        'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
+        isActive
+          ? 'bg-primary text-primary-foreground'
+          : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
+      )}
+    >
+      <link.icon className="size-4 shrink-0" />
+      <span className="truncate">{link.label}</span>
+    </Link>
+  );
+}
+
+/**
+ * A nav entry that expands into a section picker: tapping it slides down its
+ * children (العقارات / العربيات) so the admin picks which section to manage.
+ * Opens automatically while on any of its child routes. Used for both
+ * "الأقسام" and "المميزة".
+ */
+function CollapsibleGroup({
+  group,
+  pathname,
+  onItemClick,
+}: {
+  group: NavGroup;
+  pathname: string | null;
+  onItemClick?: () => void;
+}) {
+  const anyActive = group.children.some((c) => childActive(c, pathname));
+  const [open, setOpen] = useState(anyActive);
+
+  useEffect(() => {
+    if (anyActive) setOpen(true);
+  }, [anyActive]);
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className={cn(
+          'w-full flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
+          anyActive
+            ? 'bg-primary/10 text-foreground'
+            : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
+        )}
+      >
+        <group.icon className="size-4 shrink-0" />
+        <span className="truncate flex-1 text-start">{group.label}</span>
+        <ChevronDown className={cn('size-4 shrink-0 transition-transform', open && 'rotate-180')} />
+      </button>
+
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="overflow-hidden"
+          >
+            <div className="mt-1 ms-4 ps-3 border-s border-border space-y-1">
+              {group.children.map((child) => (
+                <Link
+                  key={child.href}
+                  href={child.href as never}
+                  onClick={onItemClick}
+                  className={cn(
+                    'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                    childActive(child, pathname)
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
+                  )}
+                >
+                  <child.icon className="size-4 shrink-0" />
+                  <span className="truncate">{child.label}</span>
+                </Link>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

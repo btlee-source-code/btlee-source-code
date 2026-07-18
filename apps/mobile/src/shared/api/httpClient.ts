@@ -28,6 +28,7 @@ export interface RequestConfig extends AxiosRequestConfig {
   /** Skip Bearer header + skip refresh-on-401 (login/register/forgot/reset). */
   skipAuth?: boolean;
 }
+
 interface RetryConfig extends InternalAxiosRequestConfig {
   _retried?: boolean;
   skipAuth?: boolean;
