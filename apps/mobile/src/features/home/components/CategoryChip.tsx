@@ -13,6 +13,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import type { ReactElement } from 'react';
+
 import type { Icon3D } from '@/assets/icons3d/registry';
 import { shadows } from '@/shared/lib/shadows';
 
@@ -20,7 +22,10 @@ type Props = {
   label: string;
   /** 3D icon — a real image if provided, otherwise the emoji stand-in. */
   icon: Icon3D;
-  /** Section accent — tints the subtle border. */
+  /** Optional clean monochrome vector icon; takes priority over `icon` and is
+   *  tinted with `accent`. Used for the consistent car body-type set. */
+  Svg?: (props: { size: number; color: string }) => ReactElement;
+  /** Section accent — tints the subtle border (and the vector icon). */
   accent: string;
   /** Stagger index so the idle float of neighbouring chips is out of phase. */
   index?: number;
@@ -35,7 +40,7 @@ const ICON = 38; // 3D icons read best a touch larger than the old line icon
  * a 3D emoji until a real 3D image is dropped into the registry — both render in
  * Expo Go (no native module), so it always works while developing.
  */
-export function CategoryChip({ label, icon, accent, index = 0, onPress }: Props) {
+export function CategoryChip({ label, icon, Svg, accent, index = 0, onPress }: Props) {
   // Idle "breathing" float — subtle vertical drift, phase-offset per chip.
   const float = useSharedValue(0);
   // A second, out-of-sync loop drives a gentle rocking rotation.
@@ -78,7 +83,9 @@ export function CategoryChip({ label, icon, accent, index = 0, onPress }: Props)
       className="items-center justify-center gap-1.5 w-full h-[80px] rounded-2xl border bg-card px-2 active:bg-secondary"
       style={[shadows.sm, { borderColor: `${accent}4D` }]}>
       <Animated.View style={[{ width: ICON, height: ICON, alignItems: 'center', justifyContent: 'center' }, iconStyle]}>
-        {icon.image != null ? (
+        {Svg != null ? (
+          <Svg size={ICON} color={accent} />
+        ) : icon.image != null ? (
           <Image source={icon.image} style={{ width: ICON, height: ICON }} contentFit="contain" />
         ) : (
           <Text style={{ fontSize: ICON - 8, lineHeight: ICON + 2 }}>{icon.emoji}</Text>

@@ -147,9 +147,8 @@ export function CarDetailsDialog({
                       key={img.publicId}
                       type="button"
                       onClick={() => setActiveImage(i)}
-                      className={`relative size-16 shrink-0 rounded-lg overflow-hidden border-2 transition ${
-                        i === activeImage ? 'border-primary' : 'border-transparent opacity-70 hover:opacity-100'
-                      }`}
+                      className={`relative size-16 shrink-0 rounded-lg overflow-hidden border-2 transition ${i === activeImage ? 'border-primary' : 'border-transparent opacity-70 hover:opacity-100'
+                        }`}
                     >
                       <Image src={img.url} alt="" fill sizes="64px" className="object-cover" />
                     </button>

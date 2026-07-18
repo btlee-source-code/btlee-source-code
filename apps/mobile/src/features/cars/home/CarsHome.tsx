@@ -8,6 +8,7 @@ import { CAR_ICONS } from '@/assets/icons3d/registry';
 import { S } from '@/config/strings';
 import { carsApi } from '@/features/cars/api/cars.api';
 import { CarSection } from '@/features/cars/components/CarSection';
+import { CAR_BODY_SVG } from '@/features/cars/components/CarBodyIcons';
 import { CAR_BODY_TYPE_LABELS } from '@/features/cars/lib/carConstants';
 import { AnimatedSearchHint } from '@/features/home/components/AnimatedSearchHint';
 import { CategoryChip } from '@/features/home/components/CategoryChip';
@@ -105,6 +106,7 @@ export function CarsHome() {
                 <CategoryChip
                   label={CAR_BODY_TYPE_LABELS[type]}
                   icon={CAR_ICONS[type]}
+                  Svg={CAR_BODY_SVG[type]}
                   accent={c.accent}
                   index={i}
                   onPress={() => router.push({ pathname: '/properties', params: { bodyType: type } })}
