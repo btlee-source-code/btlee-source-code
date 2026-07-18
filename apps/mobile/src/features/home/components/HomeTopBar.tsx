@@ -23,7 +23,7 @@ export function HomeTopBar() {
 
   return (
     <View className="px-5 pt-3 gap-3">
-      <View className="flex-row items-center justify-between">
+      <View className="flex-row items-center justify-between pb-2">
         {/* Theme toggle — left */}
         <Pressable
           onPress={toggle}
@@ -34,7 +34,7 @@ export function HomeTopBar() {
 
         {/* Logo — centered */}
         <View className="flex-1 items-center">
-          <Logo height={44} />
+          <Logo height={49} />
         </View>
 
         {/* Menu — right (with an unread dot) */}

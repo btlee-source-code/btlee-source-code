@@ -64,7 +64,7 @@ export function PropertiesHome() {
         <HomeTopBar />
 
         {/* Hero — centered, with the value phrase picked out in the accent */}
-        <View className="px-6 pt-7 items-center">
+        <View className="px-6 pt-10 items-center">
           <Text
             numberOfLines={1}
             adjustsFontSizeToFit
@@ -83,7 +83,7 @@ export function PropertiesHome() {
             haptic
             scaleTo={0.98}
             onPress={() => router.push({ pathname: '/properties', params: { openSearch: '1' } })}
-            className="flex-row items-center gap-3 bg-card border-y px-5 py-2.5"
+            className="flex-row items-center gap-3 bg-card border-y px-5 py-1.5"
             style={[shadows.sm, { borderColor: `${c.accent}4D` }]}>
             <Search size={22} color={c.muted} strokeWidth={2} />
             <View className="flex-1">
@@ -102,9 +102,9 @@ export function PropertiesHome() {
         {/* Category grid — 3 across, stacked, RTL (first type reads top-right) */}
         <View className="mt-8 gap-4">
           <SectionHeader title={S.exploreByType} onViewAll={() => router.push('/properties')} />
-          <View className="flex-row-reverse flex-wrap justify-between gap-y-3 px-5">
+          <View className="flex-row-reverse flex-wrap justify-between gap-y-4 px-5">
             {CATEGORIES.map((type, i) => (
-              <View key={type} className="w-[31%]">
+              <View key={type} className="w-[30%]">
                 <CategoryChip
                   label={TYPE_LABELS[type]}
                   icon={PROPERTY_ICONS[type]}
