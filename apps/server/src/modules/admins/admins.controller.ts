@@ -78,9 +78,16 @@ export async function listUsers(req: Request, res: Response): Promise<void> {
   const page = Number(req.query.page ?? 1);
   const limit = Number(req.query.limit ?? 20);
   const search = typeof req.query.search === 'string' ? req.query.search : undefined;
-  const result = await adminsService.listUsers(page, limit, search);
+  const hasListings =
+    req.query.hasListings === 'true' ? true : req.query.hasListings === 'false' ? false : undefined;
+  const result = await adminsService.listUsers(page, limit, search, hasListings);
   const totalPages = Math.max(1, Math.ceil(result.total / limit));
   res.json(ok(result.items, { pagination: { page, limit, total: result.total, totalPages } }));
+}
+
+export async function getUserListings(req: Request, res: Response): Promise<void> {
+  const result = await adminsService.getUserListings(param(req, 'userId'));
+  res.json(ok(result));
 }
 
 export async function blockUser(req: Request, res: Response): Promise<void> {

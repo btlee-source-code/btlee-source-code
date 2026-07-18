@@ -2,6 +2,7 @@
  * Admins Service
  * Dashboard stats, user management, listing review actions.
  */
+import { Types } from 'mongoose';
 import { Property } from '../properties/property.model.js';
 import { Car } from '../cars/car.model.js';
 import { User } from '../users/user.model.js';
@@ -71,7 +72,12 @@ export async function getDashboardStats() {
   };
 }
 
-export async function listUsers(page = 1, limit = 20, search?: string) {
+export async function listUsers(
+  page = 1,
+  limit = 20,
+  search?: string,
+  hasListings?: boolean
+) {
   const skip = (page - 1) * limit;
 
   // Optional name/email/phone search. Escape regex metacharacters so a typed
@@ -87,11 +93,61 @@ export async function listUsers(page = 1, limit = 20, search?: string) {
     ];
   }
 
-  const [items, total] = await Promise.all([
+  // Optional "has posted / hasn't posted" filter — the owners that appear in
+  // either listing collection are the ones who have published something.
+  if (hasListings !== undefined) {
+    const [propOwners, carOwners] = await Promise.all([
+      Property.distinct('owner'),
+      Car.distinct('owner'),
+    ]);
+    const ownerIds = [...new Set([...propOwners, ...carOwners].map((id) => String(id)))].map(
+      (id) => new Types.ObjectId(id)
+    );
+    filter._id = hasListings ? { $in: ownerIds } : { $nin: ownerIds };
+  }
+
+  const [users, total] = await Promise.all([
     User.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
     User.countDocuments(filter),
   ]);
+
+  // Per-user listing counts for just this page (properties + cars).
+  const ids = users.map((u) => u._id);
+  const [propCounts, carCounts] = await Promise.all([
+    Property.aggregate<{ _id: Types.ObjectId; c: number }>([
+      { $match: { owner: { $in: ids } } },
+      { $group: { _id: '$owner', c: { $sum: 1 } } },
+    ]),
+    Car.aggregate<{ _id: Types.ObjectId; c: number }>([
+      { $match: { owner: { $in: ids } } },
+      { $group: { _id: '$owner', c: { $sum: 1 } } },
+    ]),
+  ]);
+  const countMap = new Map<string, number>();
+  for (const { _id, c } of [...propCounts, ...carCounts]) {
+    countMap.set(String(_id), (countMap.get(String(_id)) ?? 0) + c);
+  }
+
+  const items = users.map((u) => ({ ...u, listingCount: countMap.get(String(u._id)) ?? 0 }));
   return { items, total };
+}
+
+/**
+ * A single user's full profile plus every listing they've posted (all statuses,
+ * both domains) — powers the admin "user details" popup.
+ */
+export async function getUserListings(userId: string) {
+  const user = await User.findById(userId)
+    .select('name email phone isBlocked createdAt')
+    .lean();
+  if (!user) throw new NotFoundError('User not found');
+
+  const [properties, cars] = await Promise.all([
+    Property.find({ owner: userId }).sort({ createdAt: -1 }).lean(),
+    Car.find({ owner: userId }).sort({ createdAt: -1 }).lean(),
+  ]);
+
+  return { user, properties, cars };
 }
 
 export async function blockUser(userId: string, isBlocked: boolean) {

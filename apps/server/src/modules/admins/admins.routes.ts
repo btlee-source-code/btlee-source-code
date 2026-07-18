@@ -109,12 +109,20 @@ const userListQuery = z.object({
   // Enforce a string so a crafted `?search[$ne]=` can't reach the query as an
   // operator object (NoSQL-injection defense); the service also escapes it.
   search: z.string().max(100).optional(),
+  // 'true' → users who have posted, 'false' → users who haven't.
+  hasListings: z.enum(['true', 'false']).optional(),
 });
 adminsRouter.get(
   '/users',
   adminProtect,
   validate({ query: userListQuery }),
   asyncHandler(controller.listUsers)
+);
+adminsRouter.get(
+  '/users/:userId/listings',
+  adminProtect,
+  validate({ params: userIdParams }),
+  asyncHandler(controller.getUserListings)
 );
 adminsRouter.post(
   '/users/:userId/block',

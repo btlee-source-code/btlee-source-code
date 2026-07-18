@@ -6,6 +6,8 @@ import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import { API_URL, HttpError } from '@/shared/api/httpClient';
 import { store } from '@/shared/store';
 import { adminAuthActions } from '@/features/admin/store/admin.slice';
+import type { Property } from '@/shared/types/property';
+import type { Car } from '@/shared/types/car';
 
 // Dedicated instance for /admin/* — auth rides in the admin httpOnly cookies,
 // so we just need withCredentials; no Authorization header is set in JS.
@@ -135,10 +137,19 @@ export const adminApi = {
 
   // Paginated + searchable variant — returns the page's users plus pagination
   // meta so the admin panel can show a total count and a "load more" button.
-  listUsersPaged: async (params: { page?: number; limit?: number; search?: string }) => {
+  listUsersPaged: async (params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    hasListings?: boolean;
+  }) => {
     const res = await adminAxios.get<Envelope<UserAdmin[]>>('/admin/users', { params });
     return { items: res.data.data, meta: res.data.meta?.pagination };
   },
+
+  // A user's profile + all their listings (both domains, all statuses).
+  getUserListings: (userId: string) =>
+    unwrap<UserListingsAdmin>(adminAxios.get(`/admin/users/${userId}/listings`)),
 
   blockUser: (userId: string, isBlocked: boolean) =>
     unwrap<unknown>(adminAxios.post(`/admin/users/${userId}/block`, { isBlocked })),
@@ -182,6 +193,14 @@ export interface UserAdmin {
   phone: string | null;
   isBlocked: boolean;
   createdAt: string;
+  // Number of listings the user has posted (present on the paged list).
+  listingCount?: number;
+}
+
+export interface UserListingsAdmin {
+  user: UserAdmin;
+  properties: Property[];
+  cars: Car[];
 }
 
 export interface ReportAdmin {

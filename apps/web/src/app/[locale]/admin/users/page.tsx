@@ -1,12 +1,13 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Ban, CheckCircle2, Loader2, Search } from 'lucide-react';
+import { Ban, CheckCircle2, Loader2, Search, Eye, ClipboardList } from 'lucide-react';
 import { Card } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
 import { Input } from '@/shared/components/ui/input';
 import { Avatar, AvatarFallback } from '@/shared/components/ui/avatar';
+import { UserDetailsDialog } from '@/features/admin/components/UserDetailsDialog';
 import { adminApi, type UserAdmin } from '@/features/admin/api/admin.api';
 import { useAdminAuth } from '@/features/admin/hooks/useAdminAuth';
 import { formatDate } from '@/shared/lib/utils';
@@ -27,6 +28,8 @@ export default function AdminUsersPage() {
 
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState<'all' | 'posted' | 'none'>('all');
+  const hasListings = filter === 'all' ? undefined : filter === 'posted';
 
   // Debounce the typed query into the applied search term.
   useEffect(() => {
@@ -50,6 +53,7 @@ export default function AdminUsersPage() {
             page: p,
             limit: PAGE_SIZE,
             search: search || undefined,
+            hasListings,
           });
           all.push(...items);
           pages = meta?.totalPages ?? 1;
@@ -67,7 +71,7 @@ export default function AdminUsersPage() {
         setIsLoading(false);
       }
     },
-    [search]
+    [search, hasListings]
   );
 
   // Appends the next page without disturbing the ones already shown.
@@ -79,6 +83,7 @@ export default function AdminUsersPage() {
         page: next,
         limit: PAGE_SIZE,
         search: search || undefined,
+        hasListings,
       });
       setUsers((prev) => [...prev, ...items]);
       setPagesLoaded(next);
@@ -122,7 +127,7 @@ export default function AdminUsersPage() {
         </div>
 
         {/* Search by name / email / phone */}
-        <div className="relative mb-5 max-w-md">
+        <div className="relative mb-3 max-w-md">
           <Search className="absolute start-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
           <Input
             value={searchInput}
@@ -130,6 +135,32 @@ export default function AdminUsersPage() {
             placeholder="ابحث عن مستخدم بالاسم أو البريد أو الهاتف..."
             className="ps-9"
           />
+        </div>
+
+        {/* Filter: all / has listings / no listings */}
+        <div className="flex flex-wrap items-center gap-2 mb-5">
+          <Button
+            variant={filter === 'all' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setFilter('all')}
+          >
+            الكل
+          </Button>
+          <Button
+            variant={filter === 'posted' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setFilter('posted')}
+          >
+            <ClipboardList className="size-4" />
+            لديهم إعلانات
+          </Button>
+          <Button
+            variant={filter === 'none' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setFilter('none')}
+          >
+            بدون إعلانات
+          </Button>
         </div>
 
         {isLoading ? (
@@ -147,41 +178,45 @@ export default function AdminUsersPage() {
             <div className="space-y-3">
               {users.map((u) => (
                 <Card key={u._id} className="border-border p-3 sm:p-4 overflow-hidden">
-                  <div className="flex items-start sm:items-center gap-3 sm:gap-4">
-                    <Avatar className="size-11 sm:size-12 border border-border shrink-0">
-                      <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                        {u.name.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-semibold text-foreground truncate">{u.name}</h3>
-                        {u.isBlocked && <Badge variant="rejected">محظور</Badge>}
-                      </div>
-                      <p className="text-sm text-muted-foreground truncate">{u.email ?? u.phone}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        مسجل منذ {formatDate(u.createdAt)}
-                      </p>
-                      {/* Mobile-only action button below info */}
-                      <Button
-                        variant={u.isBlocked ? 'outline' : 'destructive'}
-                        size="sm"
-                        onClick={() => toggleBlock(u._id, u.isBlocked)}
-                        className="mt-3 sm:hidden w-full"
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    {/* Click the profile area to open the details popup */}
+                    <UserDetailsDialog user={u}>
+                      <button
+                        type="button"
+                        className="group flex items-center gap-3 sm:gap-4 flex-1 min-w-0 text-start rounded-lg -m-1 p-1 hover:bg-secondary/50 transition-colors"
                       >
-                        {u.isBlocked ? (
-                          <>
-                            <CheckCircle2 className="size-4" />
-                            فك الحظر
-                          </>
-                        ) : (
-                          <>
-                            <Ban className="size-4" />
-                            حظر
-                          </>
-                        )}
-                      </Button>
-                    </div>
+                        <Avatar className="size-11 sm:size-12 border border-border shrink-0">
+                          <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+                            {u.name.charAt(0)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                              {u.name}
+                            </h3>
+                            {u.isBlocked && <Badge variant="rejected">محظور</Badge>}
+                            <span
+                              title={`${u.listingCount ?? 0} إعلان`}
+                              className={`inline-flex items-center gap-1 rounded-full px-2 h-5 text-xs font-semibold tabular-nums ${
+                                (u.listingCount ?? 0) > 0
+                                  ? 'bg-primary/10 text-primary'
+                                  : 'bg-secondary text-muted-foreground'
+                              }`}
+                            >
+                              <ClipboardList className="size-3" />
+                              {u.listingCount ?? 0}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground truncate">{u.email ?? u.phone}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            مسجل منذ {formatDate(u.createdAt)}
+                          </p>
+                        </div>
+                        <Eye className="size-4 text-muted-foreground shrink-0 hidden sm:block opacity-50 group-hover:opacity-100 transition-opacity" />
+                      </button>
+                    </UserDetailsDialog>
+
                     {/* Desktop action button */}
                     <Button
                       variant={u.isBlocked ? 'outline' : 'destructive'}
@@ -202,6 +237,26 @@ export default function AdminUsersPage() {
                       )}
                     </Button>
                   </div>
+
+                  {/* Mobile action button */}
+                  <Button
+                    variant={u.isBlocked ? 'outline' : 'destructive'}
+                    size="sm"
+                    onClick={() => toggleBlock(u._id, u.isBlocked)}
+                    className="mt-3 sm:hidden w-full"
+                  >
+                    {u.isBlocked ? (
+                      <>
+                        <CheckCircle2 className="size-4" />
+                        فك الحظر
+                      </>
+                    ) : (
+                      <>
+                        <Ban className="size-4" />
+                        حظر
+                      </>
+                    )}
+                  </Button>
                 </Card>
               ))}
             </div>
