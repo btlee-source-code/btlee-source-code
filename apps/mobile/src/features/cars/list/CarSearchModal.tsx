@@ -23,6 +23,7 @@ import {
   PRICE_OPTIONS,
   YEAR_OPTIONS,
 } from '@/shared/components/ui/AmountPicker';
+import { DividedStack } from '@/shared/components/ui/DividedStack';
 import { GovernoratePicker } from '@/shared/components/ui/GovernoratePicker';
 
 export type CarSort = 'newest' | 'oldest' | 'price_asc' | 'price_desc';
@@ -138,6 +139,7 @@ export function CarSearchModal({
           contentContainerClassName="px-4 py-4 gap-6"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
+          <DividedStack dividerClassName="h-0.5 bg-muted-foreground/30 -mx-4">
           <Section title={S.sortTitle}>
             {SORT_OPTIONS.map((o) => (
               <Chip key={o.value} label={o.label} active={sort === o.value} onPress={() => setSort(o.value)} />
@@ -251,6 +253,7 @@ export function CarSearchModal({
               onChange={(g) => setF((prev) => ({ ...prev, governorate: g }))}
             />
           </Section>
+          </DividedStack>
         </ScrollView>
 
         {/* Apply */}

@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { S } from '@/config/strings';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { AmountPicker, AREA_OPTIONS, PRICE_OPTIONS } from '@/shared/components/ui/AmountPicker';
+import { DividedStack } from '@/shared/components/ui/DividedStack';
 import { GovernoratePicker } from '@/shared/components/ui/GovernoratePicker';
 import {
   CATEGORY_LABELS,
@@ -153,6 +154,7 @@ export function SearchModal({
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           onScrollBeginDrag={() => setFocused(false)}>
+          <DividedStack dividerClassName="h-0.5 bg-muted-foreground/30 -mx-4">
           {/* Sort */}
           <Section title={S.sortTitle}>
             <View className="flex-row flex-wrap gap-2 justify-end">
@@ -246,6 +248,7 @@ export function SearchModal({
               onChange={(g) => setF((prev) => ({ ...prev, governorate: g }))}
             />
           </Section>
+          </DividedStack>
         </ScrollView>
 
         {/* Apply */}

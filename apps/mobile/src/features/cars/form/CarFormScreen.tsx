@@ -39,6 +39,7 @@ import {
   PRICE_OPTIONS,
   YEAR_OPTIONS,
 } from '@/shared/components/ui/AmountPicker';
+import { DividedStack } from '@/shared/components/ui/DividedStack';
 import { GovernoratePicker } from '@/shared/components/ui/GovernoratePicker';
 import { toast } from '@/shared/components/ui/Toast';
 
@@ -182,6 +183,7 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
 
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerClassName="px-5 py-4 gap-5" keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          <DividedStack>
           <Field label={S.fCarImages}>
             {keptImages.length > 0 && (
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, marginBottom: 10 }}>
@@ -345,6 +347,7 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
               ))}
             </View>
           </Field>
+          </DividedStack>
 
           {error ? (
             <View className="bg-destructive/10 rounded-lg px-3 py-2">

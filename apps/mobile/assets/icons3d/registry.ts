@@ -26,6 +26,15 @@ export const PROPERTY_ICONS: Record<PropertyType, Icon3D> = {
   land: { emoji: '🏞️' },
 };
 
+/**
+ * 3D icons for the home section switcher (properties ⇄ cars) — same Fluent 3D
+ * family as the car category icons so the two pills read as one set.
+ */
+export const SECTION_ICONS = {
+  properties: require('./property/house.png') as number,
+  cars: require('./car/sedan.png') as number,
+} as const;
+
 // Real 3D car icons (Microsoft Fluent Emoji 3D — MIT licensed). The emoji stays
 // as a safe fallback if an image ever fails to load. `crossover` reuses the SUV
 // art (closest match); every other body type has its own.
