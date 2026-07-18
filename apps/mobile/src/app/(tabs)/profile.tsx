@@ -26,6 +26,7 @@ import { LanguageSwitcher } from '@/features/i18n/components/LanguageSwitcher';
 import { useSection } from '@/features/section/hooks/useSection';
 import { ThemeToggle } from '@/features/theme/components/ThemeToggle';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { toast } from '@/shared/components/ui/Toast';
 import { useAppSelector } from '@/shared/store/hooks';
 
 export default function ProfileTab() {
@@ -166,7 +167,10 @@ export default function ProfileTab() {
 
         {/* Logout */}
         <Pressable
-          onPress={logout}
+          onPress={() => {
+            logout();
+            toast.success(S.toastLogoutSuccess);
+          }}
           className="flex-row items-center justify-center gap-2 border border-destructive/30 rounded-full h-[50px] active:opacity-80">
           <LogOut size={18} color={c.destructive} />
           <Text className="text-destructive font-cairo-semibold">{S.logout}</Text>

@@ -109,7 +109,7 @@ function SidebarBody({ onItemClick, showCloseButton, onClose }: SidebarBodyProps
   return (
     <>
       <div className="flex items-center justify-between p-4 border-b border-border">
-        <Logo size="sm" />
+        <Logo size="lg" />
         {showCloseButton && (
           <button
             type="button"

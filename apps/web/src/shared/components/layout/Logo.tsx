@@ -26,7 +26,9 @@ interface LogoProps {
 // small phones (down to 24px tall) so it never collides with the action icons,
 // and caps at 32px on larger screens.
 const heightClass: Record<NonNullable<LogoProps['size']>, string> = {
-  sm: 'h-6',
+  // `sm` is used only in the admin panel (sidebar + topbar) — a touch larger so
+  // the brand reads clearly there.
+  sm: 'h-8',
   md: 'h-[clamp(1.75rem,8vw,2.5rem)]',
   lg: 'h-9 sm:h-10',
 };

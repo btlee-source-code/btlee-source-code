@@ -1,7 +1,7 @@
 import { Check, X } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
-import Animated, { FadeInUp, FadeOutDown } from 'react-native-reanimated';
+import Animated, { Easing, FadeInDown, FadeOutUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { shadows } from '@/shared/lib/shadows';
@@ -46,11 +46,11 @@ export function ToastHost() {
   return (
     <View
       pointerEvents="none"
-      style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + 84, alignItems: 'center' }}>
+      style={{ position: 'absolute', left: 0, right: 0, top: insets.top + 10, alignItems: 'center' }}>
       <Animated.View
         key={current.id}
-        entering={FadeInUp.springify().damping(13)}
-        exiting={FadeOutDown.duration(160)}>
+        entering={FadeInDown.duration(300).easing(Easing.out(Easing.cubic))}
+        exiting={FadeOutUp.duration(200).easing(Easing.in(Easing.cubic))}>
         <View className="flex-row items-center gap-2.5 bg-foreground rounded-full pl-5 pr-2.5 h-12" style={shadows.lg}>
           <Text className="text-background font-cairo-semibold text-[13px]">{current.message}</Text>
           <View

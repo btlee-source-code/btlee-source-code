@@ -4,7 +4,6 @@ import { ArrowRight, Check, X } from 'lucide-react-native';
 import { useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -33,6 +32,7 @@ import {
   TYPE_LABELS,
 } from '@/shared/lib/constants';
 import { AmountPicker, AREA_OPTIONS, COUNT_OPTIONS, PRICE_OPTIONS } from '@/shared/components/ui/AmountPicker';
+import { toast } from '@/shared/components/ui/Toast';
 import { GovernoratePicker } from '@/shared/components/ui/GovernoratePicker';
 import type { Property, PropertyImage } from '@/shared/types/property';
 import { propertiesApi, type PropertyInput } from '../api/properties.api';
@@ -169,11 +169,11 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
       if (isEdit) await propertiesApi.update(initial!._id, body);
       else await propertiesApi.create(body);
 
-      Alert.alert(S.addSuccessTitle, S.addSuccessDesc, [
-        { text: 'تمام', onPress: () => router.replace('/my-properties') },
-      ]);
+      toast.success(S.toastListingSubmitted);
+      router.replace('/my-properties');
     } catch (e) {
       setError(e instanceof Error ? e.message : S.genericError);
+      toast.error(S.toastListingFailed);
     } finally {
       setSubmitting(false);
       setPhase('idle');

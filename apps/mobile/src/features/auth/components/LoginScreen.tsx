@@ -19,6 +19,7 @@ import { HttpError } from '@/shared/api/httpClient';
 import { Logo } from '@/shared/components/layout/Logo';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
 import { TextField } from '@/shared/components/ui/TextField';
+import { toast } from '@/shared/components/ui/Toast';
 import { GoogleSignInButton } from './GoogleSignInButton';
 import { useAuth } from '../hooks/useAuth';
 
@@ -43,10 +44,13 @@ export function LoginScreen() {
     setError(null);
     try {
       await login(identifier.trim(), password);
+      toast.success(S.toastLoginSuccess);
       router.back(); // return to wherever the user came from (now authenticated)
     } catch (e) {
       const err = e as HttpError;
-      setError(err.status === 401 ? S.loginFailed : err.message || S.genericError);
+      const msg = err.status === 401 ? S.loginFailed : err.message || S.genericError;
+      setError(msg);
+      toast.error(S.toastLoginFailed);
     } finally {
       setSubmitting(false);
     }
@@ -76,7 +80,12 @@ export function LoginScreen() {
           <Text className="text-[24px] font-cairo-bold text-foreground text-right">{S.signInTitle}</Text>
           <Text className="text-sm text-muted-foreground font-cairo text-right mb-6">{S.signInSubtitle}</Text>
 
-          <GoogleSignInButton onSuccess={() => router.back()} />
+          <GoogleSignInButton
+            onSuccess={() => {
+              toast.success(S.toastLoginSuccess);
+              router.back();
+            }}
+          />
 
           <View className="gap-4">
             <TextField

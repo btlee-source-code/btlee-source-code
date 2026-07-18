@@ -19,6 +19,7 @@ import { HttpError } from '@/shared/api/httpClient';
 import { Logo } from '@/shared/components/layout/Logo';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
 import { TextField } from '@/shared/components/ui/TextField';
+import { toast } from '@/shared/components/ui/Toast';
 import { GoogleSignInButton } from './GoogleSignInButton';
 import { useAuth } from '../hooks/useAuth';
 
@@ -61,10 +62,12 @@ export function RegisterScreen() {
     setErrors({});
     try {
       await register({ name: name.trim(), email: email.trim(), phone: phone.trim(), password });
+      toast.success(S.toastRegisterSuccess);
       setShowOnboarding(true);
     } catch (err) {
       const e = err as HttpError;
       setErrors({ form: e.message || S.genericError });
+      toast.error(e.message || S.genericError);
     } finally {
       setSubmitting(false);
     }
@@ -94,7 +97,10 @@ export function RegisterScreen() {
           <Text className="text-sm text-muted-foreground font-cairo text-right mb-6">{S.registerSubtitle}</Text>
 
           <GoogleSignInButton
-            onSuccess={(isNewUser) => (isNewUser ? setShowOnboarding(true) : router.back())}
+            onSuccess={(isNewUser) => {
+              toast.success(isNewUser ? S.toastRegisterSuccess : S.toastLoginSuccess);
+              isNewUser ? setShowOnboarding(true) : router.back();
+            }}
             blocked={!agreed}
             onBlockedPress={() => setErrors({ form: S.mustAcceptTerms })}
           />

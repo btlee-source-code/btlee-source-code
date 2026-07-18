@@ -4,7 +4,6 @@ import { ArrowRight, Check, X } from 'lucide-react-native';
 import { useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -41,6 +40,7 @@ import {
   YEAR_OPTIONS,
 } from '@/shared/components/ui/AmountPicker';
 import { GovernoratePicker } from '@/shared/components/ui/GovernoratePicker';
+import { toast } from '@/shared/components/ui/Toast';
 
 const DURATIONS = [30, 60, 90, 180, 365];
 const CURRENT_YEAR = new Date().getFullYear();
@@ -159,11 +159,11 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
       if (isEdit) await carsApi.update(initial!._id, body);
       else await carsApi.create(body);
 
-      Alert.alert(S.addSuccessTitle, S.addCarSuccessDesc, [
-        { text: 'تمام', onPress: () => router.replace('/my-cars') },
-      ]);
+      toast.success(S.toastListingSubmitted);
+      router.replace('/my-cars');
     } catch (e) {
       setError(e instanceof Error ? e.message : S.genericError);
+      toast.error(S.toastListingFailed);
     } finally {
       setSubmitting(false);
       setPhase('idle');
