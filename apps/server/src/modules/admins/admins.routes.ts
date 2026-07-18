@@ -103,7 +103,19 @@ adminsRouter.delete(
 );
 
 // Users management
-adminsRouter.get('/users', adminProtect, asyncHandler(controller.listUsers));
+const userListQuery = z.object({
+  page: z.coerce.number().int().min(1).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
+  // Enforce a string so a crafted `?search[$ne]=` can't reach the query as an
+  // operator object (NoSQL-injection defense); the service also escapes it.
+  search: z.string().max(100).optional(),
+});
+adminsRouter.get(
+  '/users',
+  adminProtect,
+  validate({ query: userListQuery }),
+  asyncHandler(controller.listUsers)
+);
 adminsRouter.post(
   '/users/:userId/block',
   adminProtect,

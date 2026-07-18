@@ -133,6 +133,13 @@ export const adminApi = {
 
   listUsers: () => unwrap<UserAdmin[]>(adminAxios.get('/admin/users')),
 
+  // Paginated + searchable variant — returns the page's users plus pagination
+  // meta so the admin panel can show a total count and a "load more" button.
+  listUsersPaged: async (params: { page?: number; limit?: number; search?: string }) => {
+    const res = await adminAxios.get<Envelope<UserAdmin[]>>('/admin/users', { params });
+    return { items: res.data.data, meta: res.data.meta?.pagination };
+  },
+
   blockUser: (userId: string, isBlocked: boolean) =>
     unwrap<unknown>(adminAxios.post(`/admin/users/${userId}/block`, { isBlocked })),
 

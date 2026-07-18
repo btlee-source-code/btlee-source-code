@@ -77,8 +77,10 @@ export async function bulkDeleteCars(req: Request, res: Response): Promise<void>
 export async function listUsers(req: Request, res: Response): Promise<void> {
   const page = Number(req.query.page ?? 1);
   const limit = Number(req.query.limit ?? 20);
-  const result = await adminsService.listUsers(page, limit);
-  res.json(ok(result.items, { total: result.total }));
+  const search = typeof req.query.search === 'string' ? req.query.search : undefined;
+  const result = await adminsService.listUsers(page, limit, search);
+  const totalPages = Math.max(1, Math.ceil(result.total / limit));
+  res.json(ok(result.items, { pagination: { page, limit, total: result.total, totalPages } }));
 }
 
 export async function blockUser(req: Request, res: Response): Promise<void> {

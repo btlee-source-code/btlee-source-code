@@ -71,11 +71,25 @@ export async function getDashboardStats() {
   };
 }
 
-export async function listUsers(page = 1, limit = 20) {
+export async function listUsers(page = 1, limit = 20, search?: string) {
   const skip = (page - 1) * limit;
+
+  // Optional name/email/phone search. Escape regex metacharacters so a typed
+  // query is matched literally (and can't act as an injected pattern).
+  const q = search?.trim();
+  const filter: Record<string, unknown> = {};
+  if (q) {
+    const safe = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    filter.$or = [
+      { name: { $regex: safe, $options: 'i' } },
+      { email: { $regex: safe, $options: 'i' } },
+      { phone: { $regex: safe, $options: 'i' } },
+    ];
+  }
+
   const [items, total] = await Promise.all([
-    User.find({}).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
-    User.countDocuments({}),
+    User.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+    User.countDocuments(filter),
   ]);
   return { items, total };
 }
