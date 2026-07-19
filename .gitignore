@@ -42,5 +42,8 @@ Thumbs.db
 .expo-screenshot.png
 **/.expo-screenshot.png
 
+# Temporary test artifacts (screenshots / UI hierarchy dumps)
+/tmp/
+
 # one-off dev DB copy helper
 apps/server/_copy_db_to_local.mjs
