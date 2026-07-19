@@ -26,6 +26,7 @@ import {
 import { DividedStack } from '@/shared/components/ui/DividedStack';
 import { AppTextInput } from '@/shared/components/ui/AppTextInput';
 import { GovernoratePicker } from '@/shared/components/ui/GovernoratePicker';
+import { ResponsiveFieldRow } from '@/shared/components/ui/ResponsiveFieldRow';
 
 export type CarSort = 'newest' | 'oldest' | 'price_asc' | 'price_desc';
 
@@ -107,7 +108,13 @@ export function CarSearchModal({
           <Pressable onPress={onClose} hitSlop={8}>
             <X size={24} color={c.foreground} />
           </Pressable>
-          <Text className="text-base font-cairo-bold text-foreground">{S.searchAndFilter}</Text>
+          <Text
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.75}
+            className="flex-1 mx-2 text-center text-base font-cairo-bold text-foreground">
+            {S.searchAndFilter}
+          </Text>
           <Pressable onPress={reset} hitSlop={8}>
             <Text className="text-sm font-cairo-semibold text-primary">{S.reset}</Text>
           </Pressable>
@@ -180,59 +187,51 @@ export function CarSearchModal({
           {/* Year range */}
           <View className="gap-3">
             <Heading title={S.fYear} />
-            <View className="flex-row-reverse gap-3">
-              <View className="flex-1">
-                <AmountPicker
-                  value={f.minYear}
-                  onChange={(n) => setF((p) => ({ ...p, minYear: n }))}
-                  options={YEAR_OPTIONS}
-                  placeholder={S.fMinYear}
-                  title={S.yearPickerTitle}
-                  plain
-                  maxBound={f.maxYear}
-                />
-              </View>
-              <View className="flex-1">
-                <AmountPicker
-                  value={f.maxYear}
-                  onChange={(n) => setF((p) => ({ ...p, maxYear: n }))}
-                  options={YEAR_OPTIONS}
-                  placeholder={S.fMaxYear}
-                  title={S.yearPickerTitle}
-                  plain
-                  minBound={f.minYear}
-                />
-              </View>
-            </View>
+            <ResponsiveFieldRow reverse>
+              <AmountPicker
+                value={f.minYear}
+                onChange={(n) => setF((p) => ({ ...p, minYear: n }))}
+                options={YEAR_OPTIONS}
+                placeholder={S.fMinYear}
+                title={S.yearPickerTitle}
+                plain
+                maxBound={f.maxYear}
+              />
+              <AmountPicker
+                value={f.maxYear}
+                onChange={(n) => setF((p) => ({ ...p, maxYear: n }))}
+                options={YEAR_OPTIONS}
+                placeholder={S.fMaxYear}
+                title={S.yearPickerTitle}
+                plain
+                minBound={f.minYear}
+              />
+            </ResponsiveFieldRow>
           </View>
 
           {/* Price range */}
           <View className="gap-3">
             <Heading title={S.fPrice} />
-            <View className="flex-row-reverse gap-3">
-              <View className="flex-1">
-                <AmountPicker
-                  value={f.minPrice}
-                  onChange={(n) => setF((p) => ({ ...p, minPrice: n }))}
-                  options={PRICE_OPTIONS}
-                  placeholder={S.fMinPrice}
-                  title={S.pricePickerTitle}
-                  suffix="ج.م"
-                  maxBound={f.maxPrice}
-                />
-              </View>
-              <View className="flex-1">
-                <AmountPicker
-                  value={f.maxPrice}
-                  onChange={(n) => setF((p) => ({ ...p, maxPrice: n }))}
-                  options={PRICE_OPTIONS}
-                  placeholder={S.fMaxPrice}
-                  title={S.pricePickerTitle}
-                  suffix="ج.م"
-                  minBound={f.minPrice}
-                />
-              </View>
-            </View>
+            <ResponsiveFieldRow reverse>
+              <AmountPicker
+                value={f.minPrice}
+                onChange={(n) => setF((p) => ({ ...p, minPrice: n }))}
+                options={PRICE_OPTIONS}
+                placeholder={S.fMinPrice}
+                title={S.pricePickerTitle}
+                suffix="ج.م"
+                maxBound={f.maxPrice}
+              />
+              <AmountPicker
+                value={f.maxPrice}
+                onChange={(n) => setF((p) => ({ ...p, maxPrice: n }))}
+                options={PRICE_OPTIONS}
+                placeholder={S.fMaxPrice}
+                title={S.pricePickerTitle}
+                suffix="ج.م"
+                minBound={f.minPrice}
+              />
+            </ResponsiveFieldRow>
           </View>
 
           {/* Max mileage */}
@@ -248,7 +247,7 @@ export function CarSearchModal({
             />
           </View>
 
-          <Section title={S.fGovernorate}>
+          <Section title={S.fGovernorate} wrap={false}>
             <GovernoratePicker
               value={f.governorate}
               onChange={(g) => setF((prev) => ({ ...prev, governorate: g }))}
@@ -263,7 +262,13 @@ export function CarSearchModal({
             onPress={apply}
             className="bg-accent rounded-xl h-12 flex-row items-center justify-center gap-2 active:opacity-90">
             <Search size={18} color="#FFFFFF" />
-            <Text className="text-white font-cairo-bold text-base">{S.showResults}</Text>
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+              className="flex-shrink text-white font-cairo-bold text-base">
+              {S.showResults}
+            </Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -293,11 +298,20 @@ export function Heading({ title }: { title: string }) {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+  wrap = true,
+}: {
+  title: string;
+  children: React.ReactNode;
+  /** Filter chips wrap in a row; full-width controls mirror the property filter. */
+  wrap?: boolean;
+}) {
   return (
     <View className="gap-3">
       <Heading title={title} />
-      <View className="flex-row flex-wrap gap-2 justify-end">{children}</View>
+      {wrap ? <View className="flex-row flex-wrap gap-2 justify-end">{children}</View> : children}
     </View>
   );
 }

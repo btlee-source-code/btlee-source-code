@@ -30,7 +30,11 @@ export function ThemeToggle() {
                 active ? 'bg-primary' : 'bg-secondary'
               }`}>
               <o.Icon size={16} color={active ? c.primaryForeground : c.foreground} />
-              <Text className={`font-cairo-semibold ${active ? 'text-primary-foreground' : 'text-foreground'}`}>
+              <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.75}
+                className={`flex-shrink font-cairo-semibold ${active ? 'text-primary-foreground' : 'text-foreground'}`}>
                 {o.label()}
               </Text>
             </Pressable>

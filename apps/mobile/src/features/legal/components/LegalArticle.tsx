@@ -1,5 +1,6 @@
 import { Info, type LucideIcon } from 'lucide-react-native';
 import { ScrollView, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import type { LegalArticleData } from '../content';
@@ -8,10 +9,11 @@ import type { LegalArticleData } from '../content';
 export function LegalArticle({ data, Icon }: { data: LegalArticleData; Icon: LucideIcon }) {
   const c = useThemeColors();
   return (
-    <ScrollView
-      className="flex-1 bg-background"
-      contentContainerClassName="px-5 py-6 gap-5"
-      showsVerticalScrollIndicator={false}>
+    <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
+      <ScrollView
+        className="flex-1"
+        contentContainerClassName="px-5 py-6 gap-5"
+        showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View className="items-center gap-3">
         <View className="h-14 w-14 rounded-2xl bg-primary/10 items-center justify-center">
@@ -68,6 +70,7 @@ export function LegalArticle({ data, Icon }: { data: LegalArticleData; Icon: Luc
           <Text className="text-sm text-muted-foreground font-cairo text-right leading-6">{data.contactBody}</Text>
         </View>
       ) : null}
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }

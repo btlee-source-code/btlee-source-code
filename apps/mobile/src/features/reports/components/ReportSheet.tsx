@@ -115,7 +115,13 @@ export function ReportSheet({
           {submitting ? (
             <ActivityIndicator color="#FFFFFF" />
           ) : (
-            <Text className="text-white font-cairo-bold">{S.reportSubmit}</Text>
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+              className="text-white font-cairo-bold">
+              {S.reportSubmit}
+            </Text>
           )}
         </PressableScale>
       </View>

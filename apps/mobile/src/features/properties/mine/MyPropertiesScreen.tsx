@@ -72,20 +72,26 @@ export function MyPropertiesScreen() {
 
   if (authLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-background items-center justify-center" edges={['top']}>
+      <SafeAreaView className="flex-1 bg-background items-center justify-center" edges={['top', 'bottom']}>
         <ActivityIndicator color={c.primary} />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background" edges={['top']}>
+    <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-5 py-3 border-b border-border">
         <Pressable onPress={() => router.back()} hitSlop={8}>
           <ArrowRight size={24} color={c.primary} />
         </Pressable>
-        <Text className="text-lg font-cairo-bold text-foreground">{S.myPropertiesTitle}</Text>
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
+          className="flex-1 mx-2 text-center text-lg font-cairo-bold text-foreground">
+          {S.myPropertiesTitle}
+        </Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -144,18 +150,34 @@ export function MyPropertiesScreen() {
                 <View className="flex-row border-t border-border">
                   <Pressable onPress={() => router.push(`/my-properties/${item._id}/edit`)} className="flex-1 flex-row items-center justify-center gap-1.5 py-2.5 active:bg-secondary">
                     <Pencil size={16} color={c.primary} />
-                    <Text className="text-sm font-cairo-medium text-foreground">{S.editListing}</Text>
+                    <Text
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                      minimumFontScale={0.7}
+                      className="flex-shrink text-sm font-cairo-medium text-foreground">
+                      {S.editListing}
+                    </Text>
                   </Pressable>
                   {item.status === 'approved' && (
                     <Pressable onPress={() => onMark(item)} className="flex-1 flex-row items-center justify-center gap-1.5 py-2.5 border-r border-border active:bg-secondary">
-                      <Text className="text-sm font-cairo-medium text-foreground">
+                      <Text
+                        numberOfLines={1}
+                        adjustsFontSizeToFit
+                        minimumFontScale={0.7}
+                        className="flex-shrink text-sm font-cairo-medium text-foreground">
                         {item.listingType === 'rent' ? S.markRented : S.markSold}
                       </Text>
                     </Pressable>
                   )}
                   <Pressable onPress={() => onDelete(item)} className="flex-1 flex-row items-center justify-center gap-1.5 py-2.5 border-r border-border active:bg-secondary">
                     <Trash2 size={16} color={c.destructive} />
-                    <Text className="text-sm font-cairo-medium text-destructive">{S.deleteListing}</Text>
+                    <Text
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                      minimumFontScale={0.7}
+                      className="flex-shrink text-sm font-cairo-medium text-destructive">
+                      {S.deleteListing}
+                    </Text>
                   </Pressable>
                 </View>
               </View>

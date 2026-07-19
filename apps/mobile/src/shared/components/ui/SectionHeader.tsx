@@ -25,7 +25,12 @@ export function SectionHeader({ title, onViewAll }: { title: string; onViewAll?:
       ) : (
         <View />
       )}
-      <Text className="text-lg font-cairo-bold text-foreground text-right">{title}</Text>
+      <Text
+        numberOfLines={2}
+        maxFontSizeMultiplier={1.2}
+        className="flex-1 ml-3 text-lg font-cairo-bold text-foreground text-right">
+        {title}
+      </Text>
     </View>
   );
 }

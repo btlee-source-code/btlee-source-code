@@ -74,24 +74,36 @@ export function NotificationsScreen() {
 
   if (authLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-background items-center justify-center" edges={['top']}>
+      <SafeAreaView className="flex-1 bg-background items-center justify-center" edges={['top', 'bottom']}>
         <ActivityIndicator color={c.primary} />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background" edges={['top']}>
+    <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-5 py-3 border-b border-border">
         <Pressable onPress={() => router.back()} hitSlop={8}>
           <ArrowRight size={24} color={c.primary} />
         </Pressable>
-        <Text className="text-lg font-cairo-bold text-foreground">{S.notificationsTitle}</Text>
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.72}
+          className="flex-1 mx-2 text-center text-lg font-cairo-bold text-foreground">
+          {S.notificationsTitle}
+        </Text>
         {isAuthenticated && unreadCount > 0 ? (
           <Pressable onPress={onMarkAll} hitSlop={8} className="flex-row items-center gap-1 active:opacity-70">
             <CheckCheck size={16} color={c.primary} />
-            <Text className="text-xs font-cairo-medium text-primary">{S.markAllRead}</Text>
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.7}
+              className="flex-shrink text-xs font-cairo-medium text-primary">
+              {S.markAllRead}
+            </Text>
           </Pressable>
         ) : (
           <View style={{ width: 24 }} />

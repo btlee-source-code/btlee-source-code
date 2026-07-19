@@ -14,7 +14,12 @@ import type { CarBodyType } from '@/shared/types/car';
 import type { PropertyType } from '@/shared/types/property';
 
 /** `image` is a `require(...)`d asset id (number) once a real 3D icon is added. */
-export type Icon3D = { emoji: string; image?: number };
+export type Icon3D = {
+  emoji: string;
+  image?: number;
+  imageWidth?: number;
+  nativeImage?: boolean;
+};
 
 export const PROPERTY_ICONS: Record<PropertyType, Icon3D> = {
   apartment: { emoji: '🏢' /* image: require('./property/apartment.webp') */ },
@@ -39,11 +44,41 @@ export const SECTION_ICONS = {
 // as a safe fallback if an image ever fails to load. `crossover` reuses the SUV
 // art (closest match); every other body type has its own.
 export const CAR_ICONS: Record<CarBodyType, Icon3D> = {
-  sedan: { emoji: '🚗', image: require('./car/sedan.png') },
-  suv: { emoji: '🚙', image: require('./car/suv.png') },
-  hatchback: { emoji: '🚗', image: require('./car/hatchback.png') },
+  sedan: {
+    emoji: '🚗',
+    image: require('./car/sedan-photo-final.png'),
+    imageWidth: 52,
+    nativeImage: true,
+  },
+  suv: {
+    emoji: '🚙',
+    image: require('./car/suv-photo-final.png'),
+    imageWidth: 52,
+    nativeImage: true,
+  },
+  hatchback: {
+    emoji: '🚗',
+    image: require('./car/hatchback-photo-final.png'),
+    imageWidth: 52,
+    nativeImage: true,
+  },
   coupe: { emoji: '🏎️', image: require('./car/coupe.png') },
-  pickup: { emoji: '🛻', image: require('./car/pickup.png') },
-  minivan: { emoji: '🚐', image: require('./car/minivan.png') },
-  crossover: { emoji: '🚙', image: require('./car/suv.png') },
+  pickup: {
+    emoji: '🛻',
+    image: require('./car/pickup-photo-final.png'),
+    imageWidth: 52,
+    nativeImage: true,
+  },
+  minivan: {
+    emoji: '🚐',
+    image: require('./car/minivan-photo-final.png'),
+    imageWidth: 52,
+    nativeImage: true,
+  },
+  crossover: {
+    emoji: '🚙',
+    image: require('./car/crossover-photo-final.png'),
+    imageWidth: 52,
+    nativeImage: true,
+  },
 };

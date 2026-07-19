@@ -10,7 +10,7 @@ import { TextInput, type TextInputProps, type TextStyle } from 'react-native';
  * form gets the same vertical alignment instead of fixing each screen alone.
  */
 export const AppTextInput = forwardRef<TextInput, TextInputProps>(function AppTextInput(
-  { multiline = false, style, ...props },
+  { multiline = false, maxFontSizeMultiplier = 1.2, style, ...props },
   ref
 ) {
   const textMetrics: TextStyle = multiline
@@ -26,5 +26,13 @@ export const AppTextInput = forwardRef<TextInput, TextInputProps>(function AppTe
         paddingVertical: 0,
       };
 
-  return <TextInput ref={ref} multiline={multiline} style={[textMetrics, style]} {...props} />;
+  return (
+    <TextInput
+      ref={ref}
+      multiline={multiline}
+      maxFontSizeMultiplier={maxFontSizeMultiplier}
+      style={[textMetrics, style]}
+      {...props}
+    />
+  );
 });

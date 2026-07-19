@@ -51,8 +51,14 @@ export function EmptyState({
           haptic
           onPress={onAction}
           containerClassName="mt-4"
-          className="bg-primary rounded-full h-12 px-8 items-center justify-center">
-          <Text className="text-primary-foreground font-cairo-bold">{actionLabel}</Text>
+          className="bg-primary rounded-full min-h-12 px-8 py-2 items-center justify-center"
+          style={{ maxWidth: '100%' }}>
+          <Text
+            numberOfLines={2}
+            maxFontSizeMultiplier={1.2}
+            className="text-primary-foreground font-cairo-bold text-center">
+            {actionLabel}
+          </Text>
         </PressableScale>
       ) : null}
     </Animated.View>

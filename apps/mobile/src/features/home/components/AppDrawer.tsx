@@ -231,7 +231,13 @@ function DrawerRow({
         </View>
       ) : null}
       <View className="flex-1" />
-      <Text className="font-cairo-medium text-foreground mr-3">{label}</Text>
+      <Text
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.75}
+        className="flex-shrink font-cairo-medium text-foreground mr-3">
+        {label}
+      </Text>
       {icon}
     </Pressable>
   );

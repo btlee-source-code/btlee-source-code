@@ -198,21 +198,37 @@ export function CarDetailScreen() {
 
           {/* Price + listing meta */}
           <View className="flex-row items-center justify-between gap-3">
-            <Text className="text-xs text-muted-foreground font-cairo">
+            <Text
+              numberOfLines={2}
+              className="flex-1 text-xs text-muted-foreground font-cairo">
               {car.seq ? `${S.listingNumber} #${car.seq} · ` : ''}
               {car.viewCount} {S.views}
             </Text>
-            <View className="flex-row items-baseline gap-1.5 flex-shrink">
+            <View
+              className="flex-row items-baseline justify-end gap-1.5 flex-shrink"
+              style={{ maxWidth: '62%' }}>
               {car.price != null ? (
                 <>
                   {car.listingType === 'rent' && (
                     <Text className="text-sm text-muted-foreground font-cairo">{S.perMonth}</Text>
                   )}
                   <Text className="text-sm text-muted-foreground font-cairo">{S.currency}</Text>
-                  <Text className="text-[24px] font-cairo-bold text-foreground">{formatPrice(car.price)}</Text>
+                  <Text
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.72}
+                    className="text-[24px] font-cairo-bold text-foreground">
+                    {formatPrice(car.price)}
+                  </Text>
                 </>
               ) : (
-                <Text className="text-xl font-cairo-bold text-foreground">{S.priceOnRequest}</Text>
+                <Text
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.72}
+                  className="text-xl font-cairo-bold text-foreground">
+                  {S.priceOnRequest}
+                </Text>
               )}
             </View>
           </View>
@@ -227,9 +243,17 @@ export function CarDetailScreen() {
                 key={row.key}
                 className={`flex-row items-center justify-between py-3 ${i === specRows.length - 1 ? '' : 'border-b border-border'
                   }`}>
-                <Text className="text-sm font-cairo-semibold text-foreground">{row.value}</Text>
-                <View className="flex-row items-center gap-2.5">
-                  <Text className="text-sm text-muted-foreground font-cairo">{row.label}</Text>
+                <Text
+                  numberOfLines={2}
+                  className="flex-1 mr-3 text-sm font-cairo-semibold text-foreground">
+                  {row.value}
+                </Text>
+                <View className="flex-row items-center justify-end gap-2.5 flex-shrink">
+                  <Text
+                    numberOfLines={2}
+                    className="flex-shrink text-sm text-muted-foreground font-cairo text-right">
+                    {row.label}
+                  </Text>
                   {row.icon}
                 </View>
               </View>
@@ -308,20 +332,32 @@ export function CarDetailScreen() {
         <PressableScale
           haptic
           onPress={openWhatsApp}
-          containerClassName={car.price == null ? 'flex-1' : ''}
-          className="rounded-full h-[50px] flex-row items-center justify-center gap-2 px-6"
+          containerClassName="flex-1"
+          className="rounded-full h-[50px] flex-row items-center justify-center gap-2 px-4"
           style={[{ backgroundColor: '#25D366' }, shadows.md]}>
           <WhatsAppIcon size={20} color="#FFFFFF" />
-          <Text className="text-white font-cairo-bold text-[15px]">{S.carContactSeller}</Text>
+          <Text
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.72}
+            className="flex-shrink text-white font-cairo-bold text-[15px]">
+            {S.carContactSeller}
+          </Text>
         </PressableScale>
         {car.price != null && (
-          <View className="flex-1 items-end">
-            <View className="flex-row items-baseline gap-1">
-              <Text className="text-xs text-muted-foreground font-cairo">
+          <View className="items-end flex-shrink" style={{ maxWidth: '45%' }}>
+            <View className="flex-row items-baseline justify-end gap-1" style={{ maxWidth: '100%' }}>
+              <Text numberOfLines={1} className="text-xs text-muted-foreground font-cairo">
                 {S.currency}
                 {car.listingType === 'rent' ? ` ${S.perMonth}` : ''}
               </Text>
-              <Text className="text-lg font-cairo-bold text-foreground">{formatPrice(car.price)}</Text>
+              <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.7}
+                className="flex-shrink text-lg font-cairo-bold text-foreground">
+                {formatPrice(car.price)}
+              </Text>
             </View>
           </View>
         )}

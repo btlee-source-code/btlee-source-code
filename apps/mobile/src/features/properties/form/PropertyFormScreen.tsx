@@ -35,6 +35,7 @@ import { DividedStack } from '@/shared/components/ui/DividedStack';
 import { toast } from '@/shared/components/ui/Toast';
 import { GovernoratePicker } from '@/shared/components/ui/GovernoratePicker';
 import { AppTextInput } from '@/shared/components/ui/AppTextInput';
+import { ResponsiveFieldRow } from '@/shared/components/ui/ResponsiveFieldRow';
 import type { Property, PropertyImage } from '@/shared/types/property';
 import { propertiesApi, type PropertyInput } from '../api/properties.api';
 import { uploadsApi, type LocalImage } from '../api/uploads.api';
@@ -61,7 +62,11 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   return (
     <View className="gap-2.5">
       <View className="flex-row items-center justify-end gap-2">
-        <Text className="text-[15px] font-cairo-bold text-foreground text-right">{label}</Text>
+        <Text
+          maxFontSizeMultiplier={1.2}
+          className="flex-shrink text-[15px] font-cairo-bold text-foreground text-right">
+          {label}
+        </Text>
         <View className="w-1.5 h-[18px] rounded-full bg-accent" />
       </View>
       {children}
@@ -190,7 +195,11 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
         <Pressable onPress={() => router.back()} hitSlop={8}>
           <ArrowRight size={24} color={c.primary} />
         </Pressable>
-        <Text className="text-lg font-cairo-bold text-foreground">
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
+          className="flex-1 mx-2 text-center text-lg font-cairo-bold text-foreground">
           {isEdit ? S.editPropertyTitle : S.addPropertyTitle}
         </Text>
         <View style={{ width: 24 }} />
@@ -243,55 +252,47 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
             </View>
           </Field>
 
-          <View className="flex-row gap-3">
-            <View className="flex-1">
-              <Field label={S.fBedrooms}>
-                <AmountPicker
-                  value={bedrooms}
-                  onChange={setBedrooms}
-                  options={COUNT_OPTIONS}
-                  placeholder={S.countPickerPlaceholder}
-                  title={S.fBedrooms}
-                  clearable={false}
-                />
-              </Field>
-            </View>
-            <View className="flex-1">
-              <Field label={S.fBathrooms}>
-                <AmountPicker
-                  value={bathrooms}
-                  onChange={setBathrooms}
-                  options={COUNT_OPTIONS}
-                  placeholder={S.countPickerPlaceholder}
-                  title={S.fBathrooms}
-                  clearable={false}
-                />
-              </Field>
-            </View>
-          </View>
+          <ResponsiveFieldRow>
+            <Field label={S.fBedrooms}>
+              <AmountPicker
+                value={bedrooms}
+                onChange={setBedrooms}
+                options={COUNT_OPTIONS}
+                placeholder={S.countPickerPlaceholder}
+                title={S.fBedrooms}
+                clearable={false}
+              />
+            </Field>
+            <Field label={S.fBathrooms}>
+              <AmountPicker
+                value={bathrooms}
+                onChange={setBathrooms}
+                options={COUNT_OPTIONS}
+                placeholder={S.countPickerPlaceholder}
+                title={S.fBathrooms}
+                clearable={false}
+              />
+            </Field>
+          </ResponsiveFieldRow>
 
-          <View className="flex-row gap-3">
+          <ResponsiveFieldRow>
             {type === 'apartment' && (
-              <View className="flex-1">
-                <Field label={S.fFloor}>
-                  <AppTextInput keyboardType="numeric" value={floor != null ? String(floor) : ''} onChangeText={(t) => setFloor(toNum(t))} placeholder={S.phFloor} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
-                </Field>
-              </View>
-            )}
-            <View className="flex-1">
-              <Field label={`${S.fAreaM} ${S.optional}`}>
-                <AmountPicker
-                  value={area}
-                  onChange={setArea}
-                  options={AREA_OPTIONS}
-                  placeholder={S.areaPickerPlaceholder}
-                  title={S.areaPickerTitle}
-                  suffix="م²"
-                  clearLabel={S.amountPickerNone}
-                />
+              <Field label={S.fFloor}>
+                <AppTextInput keyboardType="numeric" value={floor != null ? String(floor) : ''} onChangeText={(t) => setFloor(toNum(t))} placeholder={S.phFloor} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
               </Field>
-            </View>
-          </View>
+            )}
+            <Field label={`${S.fAreaM} ${S.optional}`}>
+              <AmountPicker
+                value={area}
+                onChange={setArea}
+                options={AREA_OPTIONS}
+                placeholder={S.areaPickerPlaceholder}
+                title={S.areaPickerTitle}
+                suffix="م²"
+                clearLabel={S.amountPickerNone}
+              />
+            </Field>
+          </ResponsiveFieldRow>
 
           <Field label={`${S.fPriceOne} ${S.optional}`}>
             <AppTextInput
@@ -396,14 +397,22 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
           {submitting ? (
             <>
               <ActivityIndicator color="#FFFFFF" />
-              <Text className="text-white font-cairo-semibold">
+              <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.75}
+                className="flex-shrink text-white font-cairo-semibold">
                 {phase === 'uploading' ? S.uploadingImages : S.publishing}
               </Text>
             </>
           ) : (
             <>
               <Check size={20} color="#FFFFFF" />
-              <Text className="text-white font-cairo-bold text-base">
+              <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.75}
+                className="flex-shrink text-white font-cairo-bold text-base">
                 {isEdit ? S.submitEdit : S.submitAdd}
               </Text>
             </>

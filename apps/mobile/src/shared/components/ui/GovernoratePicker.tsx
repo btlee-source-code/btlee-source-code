@@ -67,7 +67,13 @@ export function GovernoratePicker({
             <Pressable onPress={close} hitSlop={8}>
               <X size={22} color={c.foreground} />
             </Pressable>
-            <Text className="text-base font-cairo-bold text-foreground">{S.govPickerTitle}</Text>
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+              className="flex-1 mx-2 text-center text-base font-cairo-bold text-foreground">
+              {S.govPickerTitle}
+            </Text>
             <View style={{ width: 22 }} />
           </View>
 

@@ -40,7 +40,9 @@ import {
 import { DividedStack } from '@/shared/components/ui/DividedStack';
 import { GovernoratePicker } from '@/shared/components/ui/GovernoratePicker';
 import { AppTextInput } from '@/shared/components/ui/AppTextInput';
+import { ResponsiveFieldRow } from '@/shared/components/ui/ResponsiveFieldRow';
 import { toast } from '@/shared/components/ui/Toast';
+import { CarMakePicker } from './CarMakePicker';
 
 const DURATIONS = [30, 60, 90, 180, 365];
 const CURRENT_YEAR = new Date().getFullYear();
@@ -63,7 +65,11 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   return (
     <View className="gap-2.5">
       <View className="flex-row items-center justify-end gap-2">
-        <Text className="text-[15px] font-cairo-bold text-foreground text-right">{label}</Text>
+        <Text
+          maxFontSizeMultiplier={1.2}
+          className="flex-shrink text-[15px] font-cairo-bold text-foreground text-right">
+          {label}
+        </Text>
         <View className="w-1.5 h-[18px] rounded-full bg-accent" />
       </View>
       {children}
@@ -183,7 +189,13 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
         <Pressable onPress={() => router.back()} hitSlop={8}>
           <ArrowRight size={24} color={c.primary} />
         </Pressable>
-        <Text className="text-lg font-cairo-bold text-foreground">{isEdit ? S.editCarTitle : S.addCarTitle}</Text>
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
+          className="flex-1 mx-2 text-center text-lg font-cairo-bold text-foreground">
+          {isEdit ? S.editCarTitle : S.addCarTitle}
+        </Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -226,47 +238,39 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
             </View>
           </Field>
 
-          <View className="flex-row gap-3">
-            <View className="flex-1">
-              <Field label={S.fMake} hint={S.makeHint}>
-                <AppTextInput value={make} onChangeText={setMake} placeholder={S.phMake} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
-              </Field>
-            </View>
-            <View className="flex-1">
-              <Field label={S.fModel} hint={S.modelHint}>
-                <AppTextInput value={model} onChangeText={setModel} placeholder={S.phModel} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
-              </Field>
-            </View>
-          </View>
+          <ResponsiveFieldRow>
+            <Field label={S.fMake} hint={S.makeHint}>
+              <CarMakePicker value={make || undefined} onChange={setMake} />
+            </Field>
+            <Field label={S.fModel} hint={S.modelHint}>
+              <AppTextInput value={model} onChangeText={setModel} placeholder={S.phModel} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+            </Field>
+          </ResponsiveFieldRow>
 
-          <View className="flex-row gap-3">
-            <View className="flex-1">
-              <Field label={S.fYear}>
-                <AmountPicker
-                  value={year}
-                  onChange={setYear}
-                  options={YEAR_OPTIONS}
-                  placeholder={S.yearPickerPlaceholder}
-                  title={S.yearPickerTitle}
-                  plain
-                  clearable={false}
-                />
-              </Field>
-            </View>
-            <View className="flex-1">
-              <Field label={`${S.fMileage} ${S.optional}`}>
-                <AmountPicker
-                  value={mileage}
-                  onChange={setMileage}
-                  options={MILEAGE_OPTIONS}
-                  placeholder={S.mileagePickerPlaceholder}
-                  title={S.mileagePickerTitle}
-                  suffix="كم"
-                  clearLabel={S.amountPickerNone}
-                />
-              </Field>
-            </View>
-          </View>
+          <ResponsiveFieldRow>
+            <Field label={S.fYear}>
+              <AmountPicker
+                value={year}
+                onChange={setYear}
+                options={YEAR_OPTIONS}
+                placeholder={S.yearPickerPlaceholder}
+                title={S.yearPickerTitle}
+                plain
+                clearable={false}
+              />
+            </Field>
+            <Field label={`${S.fMileage} ${S.optional}`}>
+              <AmountPicker
+                value={mileage}
+                onChange={setMileage}
+                options={MILEAGE_OPTIONS}
+                placeholder={S.mileagePickerPlaceholder}
+                title={S.mileagePickerTitle}
+                suffix="كم"
+                clearLabel={S.amountPickerNone}
+              />
+            </Field>
+          </ResponsiveFieldRow>
 
           <Field label={S.fTransmission}>
             <View className="flex-row flex-wrap gap-2 justify-end">
@@ -292,26 +296,22 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
             </View>
           </Field>
 
-          <View className="flex-row gap-3">
-            <View className="flex-1">
-              <Field label={`${S.fColor} ${S.optional}`}>
-                <AppTextInput value={color} onChangeText={setColor} placeholder={S.phColor} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
-              </Field>
-            </View>
-            <View className="flex-1">
-              <Field label={`${S.fPriceOne} ${S.optional}`}>
-                <AppTextInput
-                  value={price != null ? String(price) : ''}
-                  onChangeText={(t) => setPrice(toNum(t))}
-                  keyboardType="numeric"
-                  placeholder={S.priceInputPlaceholder}
-                  className={inputCls}
-                  textAlign="right"
-                  placeholderTextColor={c.muted}
-                />
-              </Field>
-            </View>
-          </View>
+          <ResponsiveFieldRow>
+            <Field label={`${S.fColor} ${S.optional}`}>
+              <AppTextInput value={color} onChangeText={setColor} placeholder={S.phColor} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+            </Field>
+            <Field label={`${S.fPriceOne} ${S.optional}`}>
+              <AppTextInput
+                value={price != null ? String(price) : ''}
+                onChangeText={(t) => setPrice(toNum(t))}
+                keyboardType="numeric"
+                placeholder={S.priceInputPlaceholder}
+                className={inputCls}
+                textAlign="right"
+                placeholderTextColor={c.muted}
+              />
+            </Field>
+          </ResponsiveFieldRow>
 
           <Field label={S.fGovernorate}>
             <GovernoratePicker value={governorate || undefined} onChange={setGovernorate} />
@@ -369,14 +369,24 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
           {submitting ? (
             <>
               <ActivityIndicator color="#FFFFFF" />
-              <Text className="text-white font-cairo-semibold">
+              <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.75}
+                className="flex-shrink text-white font-cairo-semibold">
                 {phase === 'uploading' ? S.uploadingImages : S.publishing}
               </Text>
             </>
           ) : (
             <>
               <Check size={20} color="#FFFFFF" />
-              <Text className="text-white font-cairo-bold text-base">{isEdit ? S.submitEdit : S.submitAdd}</Text>
+              <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.75}
+                className="flex-shrink text-white font-cairo-bold text-base">
+                {isEdit ? S.submitEdit : S.submitAdd}
+              </Text>
             </>
           )}
         </Pressable>

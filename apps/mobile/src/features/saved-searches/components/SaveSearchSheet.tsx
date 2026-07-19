@@ -97,7 +97,13 @@ export function SaveSearchSheet({
           {saving ? (
             <ActivityIndicator color={c.primaryForeground} />
           ) : (
-            <Text className="text-primary-foreground font-cairo-bold">{S.saveSearch}</Text>
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+              className="text-primary-foreground font-cairo-bold">
+              {S.saveSearch}
+            </Text>
           )}
         </PressableScale>
       </View>

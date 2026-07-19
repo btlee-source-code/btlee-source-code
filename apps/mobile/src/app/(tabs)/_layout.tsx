@@ -32,6 +32,7 @@ export default function TabsLayout() {
           paddingTop: 8,
         },
         tabBarLabelStyle: { fontFamily: 'Cairo_600SemiBold', fontSize: 11 },
+        tabBarAllowFontScaling: false,
       }}>
       <Tabs.Screen
         name="index"

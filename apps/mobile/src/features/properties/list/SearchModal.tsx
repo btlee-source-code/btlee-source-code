@@ -10,6 +10,7 @@ import { AmountPicker, AREA_OPTIONS, PRICE_OPTIONS } from '@/shared/components/u
 import { DividedStack } from '@/shared/components/ui/DividedStack';
 import { AppTextInput } from '@/shared/components/ui/AppTextInput';
 import { GovernoratePicker } from '@/shared/components/ui/GovernoratePicker';
+import { ResponsiveFieldRow } from '@/shared/components/ui/ResponsiveFieldRow';
 import {
   CATEGORY_LABELS,
   FINISHING_LABELS,
@@ -95,7 +96,13 @@ export function SearchModal({
           <Pressable onPress={onClose} hitSlop={8}>
             <X size={24} color={c.foreground} />
           </Pressable>
-          <Text className="text-base font-cairo-bold text-foreground">{S.searchAndFilter}</Text>
+          <Text
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.75}
+            className="flex-1 mx-2 text-center text-base font-cairo-bold text-foreground">
+            {S.searchAndFilter}
+          </Text>
           <Pressable onPress={reset} hitSlop={8}>
             <Text className="text-sm font-cairo-semibold text-primary">{S.reset}</Text>
           </Pressable>
@@ -206,30 +213,26 @@ export function SearchModal({
           </Section>
 
           <Section title={S.fPrice}>
-            <View className="flex-row-reverse gap-3">
-              <View className="flex-1">
-                <AmountPicker
-                  value={f.minPrice}
-                  onChange={(n) => setF((p) => ({ ...p, minPrice: n }))}
-                  options={PRICE_OPTIONS}
-                  placeholder={S.fMinPrice}
-                  title={S.pricePickerTitle}
-                  suffix="ج.م"
-                  maxBound={f.maxPrice}
-                />
-              </View>
-              <View className="flex-1">
-                <AmountPicker
-                  value={f.maxPrice}
-                  onChange={(n) => setF((p) => ({ ...p, maxPrice: n }))}
-                  options={PRICE_OPTIONS}
-                  placeholder={S.fMaxPrice}
-                  title={S.pricePickerTitle}
-                  suffix="ج.م"
-                  minBound={f.minPrice}
-                />
-              </View>
-            </View>
+            <ResponsiveFieldRow reverse>
+              <AmountPicker
+                value={f.minPrice}
+                onChange={(n) => setF((p) => ({ ...p, minPrice: n }))}
+                options={PRICE_OPTIONS}
+                placeholder={S.fMinPrice}
+                title={S.pricePickerTitle}
+                suffix="ج.م"
+                maxBound={f.maxPrice}
+              />
+              <AmountPicker
+                value={f.maxPrice}
+                onChange={(n) => setF((p) => ({ ...p, maxPrice: n }))}
+                options={PRICE_OPTIONS}
+                placeholder={S.fMaxPrice}
+                title={S.pricePickerTitle}
+                suffix="ج.م"
+                minBound={f.minPrice}
+              />
+            </ResponsiveFieldRow>
           </Section>
 
           <Section title={S.fMinArea}>
@@ -258,7 +261,13 @@ export function SearchModal({
             onPress={apply}
             className="bg-accent rounded-xl h-12 flex-row items-center justify-center gap-2 active:opacity-90">
             <Search size={18} color="#FFFFFF" />
-            <Text className="text-white font-cairo-bold text-base">{S.showResults}</Text>
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+              className="flex-shrink text-white font-cairo-bold text-base">
+              {S.showResults}
+            </Text>
           </Pressable>
         </View>
       </SafeAreaView>

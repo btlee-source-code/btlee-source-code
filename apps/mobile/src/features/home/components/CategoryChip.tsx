@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
 import { useEffect } from 'react';
-import { Pressable, Text } from 'react-native';
+import { Image as NativeImage, Pressable, Text } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -41,6 +41,7 @@ const ICON = 38; // 3D icons read best a touch larger than the old line icon
  * Expo Go (no native module), so it always works while developing.
  */
 export function CategoryChip({ label, icon, Svg, accent, index = 0, onPress }: Props) {
+  const imageWidth = icon.imageWidth ?? ICON;
   // Idle "breathing" float — subtle vertical drift, phase-offset per chip.
   const float = useSharedValue(0);
   // A second, out-of-sync loop drives a gentle rocking rotation.
@@ -80,18 +81,30 @@ export function CategoryChip({ label, icon, Svg, accent, index = 0, onPress }: P
   return (
     <Pressable
       onPress={onTap}
-      className="items-center justify-center gap-1.5 w-full h-[80px] rounded-2xl border bg-card px-2 active:bg-secondary"
+      className="items-center justify-center gap-1.5 w-full min-h-[80px] rounded-2xl border bg-card px-2 py-2 active:bg-secondary"
       style={[shadows.sm, { borderColor: `${accent}4D` }]}>
-      <Animated.View style={[{ width: ICON, height: ICON, alignItems: 'center', justifyContent: 'center' }, iconStyle]}>
+      <Animated.View style={[{ width: imageWidth, height: ICON, alignItems: 'center', justifyContent: 'center' }, iconStyle]}>
         {Svg != null ? (
           <Svg size={ICON} color={accent} />
+        ) : icon.image != null && icon.nativeImage ? (
+          <NativeImage
+            source={icon.image}
+            style={{ width: imageWidth, height: ICON }}
+            resizeMode="contain"
+            fadeDuration={0}
+          />
         ) : icon.image != null ? (
-          <Image source={icon.image} style={{ width: ICON, height: ICON }} contentFit="contain" />
+          <Image source={icon.image} style={{ width: imageWidth, height: ICON }} contentFit="contain" />
         ) : (
           <Text style={{ fontSize: ICON - 8, lineHeight: ICON + 2 }}>{icon.emoji}</Text>
         )}
       </Animated.View>
-      <Text className="text-xs font-cairo-semibold text-foreground">{label}</Text>
+      <Text
+        numberOfLines={2}
+        maxFontSizeMultiplier={1.2}
+        className="text-xs font-cairo-semibold text-foreground text-center">
+        {label}
+      </Text>
     </Pressable>
   );
 }

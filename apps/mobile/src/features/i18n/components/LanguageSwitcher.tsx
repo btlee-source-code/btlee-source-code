@@ -32,7 +32,11 @@ export function LanguageSwitcher() {
               className={`flex-1 rounded-lg h-10 items-center justify-center active:opacity-90 ${
                 active ? 'bg-primary' : 'bg-secondary'
               }`}>
-              <Text className={`font-cairo-semibold ${active ? 'text-primary-foreground' : 'text-foreground'}`}>
+              <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.8}
+                className={`font-cairo-semibold ${active ? 'text-primary-foreground' : 'text-foreground'}`}>
                 {o.label}
               </Text>
             </Pressable>

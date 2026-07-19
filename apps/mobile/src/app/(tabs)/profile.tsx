@@ -236,7 +236,11 @@ function MenuRow({
         </View>
       ) : null}
       <View className="flex-1" />
-      <Text className={`font-cairo-medium ${muted ? 'text-muted-foreground' : 'text-foreground'} mr-3`}>
+      <Text
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.75}
+        className={`flex-shrink font-cairo-medium ${muted ? 'text-muted-foreground' : 'text-foreground'} mr-3`}>
         {label}
         {muted ? `  (${S.comingSoon})` : ''}
       </Text>

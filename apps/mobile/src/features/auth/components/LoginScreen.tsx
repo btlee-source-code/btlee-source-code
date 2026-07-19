@@ -142,7 +142,7 @@ export function LoginScreen() {
               )}
             </PressableScale>
 
-            <View className="flex-row items-center justify-center gap-1 mt-2">
+            <View className="flex-row flex-wrap items-center justify-center gap-x-1 gap-y-0.5 mt-2">
               <Pressable onPress={() => router.replace('/register')} hitSlop={8}>
                 <Text className="text-primary font-cairo-semibold text-sm">{S.createAccountBtn}</Text>
               </Pressable>

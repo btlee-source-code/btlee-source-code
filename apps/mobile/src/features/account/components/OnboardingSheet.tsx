@@ -1,6 +1,7 @@
 import { Eye, Home, KeyRound, ShoppingBag, type LucideIcon } from 'lucide-react-native';
 import { useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { useAuth } from '@/features/auth/hooks/useAuth';
@@ -41,8 +42,16 @@ export function OnboardingSheet({ visible, onComplete }: { visible: boolean; onC
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={() => {}}>
-      <View className="flex-1 bg-black/50 items-center justify-center px-6">
-        <View className="bg-background rounded-2xl p-5 gap-4 w-full">
+      <SafeAreaView className="flex-1 bg-black/50" edges={['top', 'bottom']}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: 'center',
+            paddingHorizontal: 24,
+            paddingVertical: 16,
+          }}>
+          <View className="bg-background rounded-2xl p-5 gap-4 w-full">
           <View className="items-center gap-1">
             <Text className="text-xl font-cairo-bold text-foreground text-center">{S.onboardingTitle}</Text>
             <Text className="text-sm text-muted-foreground font-cairo text-center">{S.onboardingSubtitle}</Text>
@@ -77,7 +86,13 @@ export function OnboardingSheet({ visible, onComplete }: { visible: boolean; onC
             <Pressable
               onPress={onComplete}
               className="flex-1 rounded-xl h-12 items-center justify-center border border-border active:bg-secondary">
-              <Text className="font-cairo-semibold text-muted-foreground">{S.skip}</Text>
+              <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.75}
+                className="font-cairo-semibold text-muted-foreground">
+                {S.skip}
+              </Text>
             </Pressable>
             <Pressable
               onPress={onContinue}
@@ -86,12 +101,19 @@ export function OnboardingSheet({ visible, onComplete }: { visible: boolean; onC
               {saving ? (
                 <ActivityIndicator color={c.primaryForeground} />
               ) : (
-                <Text className="text-primary-foreground font-cairo-bold">{S.continue}</Text>
+                <Text
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.75}
+                  className="text-primary-foreground font-cairo-bold">
+                  {S.continue}
+                </Text>
               )}
             </Pressable>
           </View>
-        </View>
-      </View>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     </Modal>
   );
 }

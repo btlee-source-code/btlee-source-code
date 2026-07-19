@@ -1,6 +1,15 @@
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
-import { Modal, Pressable, Text, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, {
   FadeIn,
@@ -30,6 +39,7 @@ export function BottomSheet({
   children: ReactNode;
 }) {
   const insets = useSafeAreaInsets();
+  const { height } = useWindowDimensions();
   const dragY = useSharedValue(0);
 
   // Fresh position every time the sheet opens.
@@ -55,7 +65,7 @@ export function BottomSheet({
 
   return (
     <Modal visible={visible} transparent statusBarTranslucent animationType="none" onRequestClose={onClose}>
-      <GestureHandlerRootView style={{ flex: 1, justifyContent: 'flex-end' }}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
         {/* Backdrop */}
         <Animated.View
           entering={FadeIn.duration(160)}
@@ -63,21 +73,42 @@ export function BottomSheet({
           <Pressable style={{ flex: 1 }} onPress={onClose} />
         </Animated.View>
 
+        <KeyboardAvoidingView
+          pointerEvents="box-none"
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1, justifyContent: 'flex-end' }}>
         {/* Sheet */}
         <Animated.View entering={SlideInDown.springify().damping(19).stiffness(220)} style={sheetStyle}>
           <View
             className="bg-background rounded-t-[28px] px-5"
-            style={{ paddingBottom: insets.bottom + 16 }}>
+            style={{
+              maxHeight: Math.max(280, height - insets.top - 12),
+              paddingBottom: insets.bottom + 16,
+              flexShrink: 1,
+            }}>
             <GestureDetector gesture={pan}>
               {/* Grab zone — drag here to dismiss */}
               <View className="items-center pt-3 pb-2">
                 <View className="h-1.5 w-11 rounded-full bg-border" />
-                {title ? <Text className="text-base font-cairo-bold text-foreground mt-3">{title}</Text> : null}
+                {title ? (
+                  <Text
+                    numberOfLines={2}
+                    maxFontSizeMultiplier={1.2}
+                    className="text-base font-cairo-bold text-foreground text-center mt-3">
+                    {title}
+                  </Text>
+                ) : null}
               </View>
             </GestureDetector>
-            {children}
+            <ScrollView
+              style={{ flexShrink: 1 }}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}>
+              {children}
+            </ScrollView>
           </View>
         </Animated.View>
+        </KeyboardAvoidingView>
       </GestureHandlerRootView>
     </Modal>
   );

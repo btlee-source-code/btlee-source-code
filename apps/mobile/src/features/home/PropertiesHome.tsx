@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { Search, SlidersHorizontal } from 'lucide-react-native';
 import { useRef, useState } from 'react';
-import { RefreshControl, ScrollView, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PROPERTY_ICONS } from '@/assets/icons3d/registry';
@@ -31,6 +31,8 @@ const cityFetcher = () => propertiesApi.list({ governorate: 'القاهرة', li
 export function PropertiesHome() {
   const router = useRouter();
   const c = useThemeColors();
+  const { width } = useWindowDimensions();
+  const compactCategories = width < 360;
 
   // Re-pressing the home tab scrolls back to the top.
   const scrollRef = useRef<ScrollView>(null);
@@ -104,7 +106,7 @@ export function PropertiesHome() {
           <SectionHeader title={S.exploreByType} onViewAll={() => router.push('/properties')} />
           <View className="flex-row-reverse flex-wrap justify-between gap-y-4 px-5">
             {CATEGORIES.map((type, i) => (
-              <View key={type} className="w-[30%]">
+              <View key={type} style={{ width: compactCategories ? '47%' : '30%' }}>
                 <CategoryChip
                   label={TYPE_LABELS[type]}
                   icon={PROPERTY_ICONS[type]}

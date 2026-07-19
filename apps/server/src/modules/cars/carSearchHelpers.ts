@@ -54,7 +54,7 @@ export function arabicTolerantPattern(input: string): string {
 // ── Bilingual synonym maps ──
 // The FIRST array entry per key is not special; every variant maps to the key.
 
-const MAKE_SYNONYMS: Record<string, string[]> = {
+const BASE_MAKE_SYNONYMS: Record<string, string[]> = {
   Toyota: ['تويوتا', 'toyota'],
   Hyundai: ['هيونداي', 'هيوندا', 'hyundai'],
   Kia: ['كيا', 'kia'],
@@ -78,6 +78,57 @@ const MAKE_SYNONYMS: Record<string, string[]> = {
   Audi: ['اودي', 'audi'],
   Seat: ['سيات', 'seat'],
   'Citroën': ['ستروين', 'سيتروين', 'citroen', 'citroën'],
+};
+
+/**
+ * Keep this list aligned with packages/shared/src/constants/car.ts.
+ * The base map preserves the richer legacy aliases while the additions make
+ * every make exposed by the mobile picker searchable in Arabic and English.
+ */
+const MAKE_SYNONYMS: Record<string, string[]> = {
+  ...BASE_MAKE_SYNONYMS,
+  Abarth: ['أبارث', 'ابارث', 'abarth'],
+  'Alfa Romeo': ['ألفا روميو', 'الفا روميو', 'alfa romeo'],
+  BAIC: ['بايك', 'بيك', 'baic'],
+  Bentley: ['بنتلي', 'bentley'],
+  Bestune: ['بيستون', 'bestune'],
+  Brilliance: ['بريليانس', 'brilliance'],
+  BYD: ['بي واي دي', 'بي واى دي', 'byd'],
+  Cadillac: ['كاديلاك', 'cadillac'],
+  Changan: ['شانجان', 'changan'],
+  Cupra: ['كوبرا', 'cupra'],
+  Daewoo: ['دايو', 'daewoo'],
+  Daihatsu: ['دايهاتسو', 'daihatsu'],
+  DFSK: ['دي اف اس كيه', 'دي إف إس كيه', 'dfsk'],
+  Dodge: ['دودج', 'dodge'],
+  Dongfeng: ['دونج فينج', 'دونغ فينغ', 'dongfeng'],
+  Exeed: ['إكسيد', 'اكسيد', 'exeed'],
+  Foton: ['فوتون', 'foton'],
+  GAC: ['جي ايه سي', 'جي إيه سي', 'gac'],
+  Geely: ['جيلي', 'geely'],
+  'Great Wall': ['جريت وول', 'great wall'],
+  Haval: ['هافال', 'haval'],
+  Hongqi: ['هونشي', 'hongqi'],
+  Infiniti: ['إنفينيتي', 'انفينيتي', 'infiniti'],
+  Isuzu: ['إيسوزو', 'ايسوزو', 'isuzu'],
+  JAC: ['جاك', 'jac'],
+  Jaguar: ['جاكوار', 'jaguar'],
+  Jetour: ['جيتور', 'jetour'],
+  Kaiyi: ['كايي', 'kaiyi'],
+  KGM: ['كي جي إم', 'كي جي ام', 'kgm'],
+  Lada: ['لادا', 'lada'],
+  'Land Rover': ['لاند روفر', 'رينج روفر', 'land rover', 'range rover'],
+  Lexus: ['لكزس', 'lexus'],
+  Mazda: ['مازدا', 'mazda'],
+  MINI: ['ميني', 'mini'],
+  Porsche: ['بورشه', 'porsche'],
+  Proton: ['بروتون', 'proton'],
+  SEAT: ['سيات', 'seat'],
+  Soueast: ['سوإيست', 'سوايست', 'soueast'],
+  Subaru: ['سوبارو', 'subaru'],
+  Tesla: ['تسلا', 'tesla'],
+  Volvo: ['فولفو', 'volvo'],
+  Zeekr: ['زيكر', 'zeekr'],
 };
 
 const MODEL_SYNONYMS: Record<string, string[]> = {

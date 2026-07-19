@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { S } from '@/config/strings';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { AppTextInput } from '@/shared/components/ui/AppTextInput';
+import { ResponsiveFieldRow } from '@/shared/components/ui/ResponsiveFieldRow';
 import {
   CATEGORY_LABELS,
   FINISHING_LABELS,
@@ -49,8 +50,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-const priceInput =
-  'flex-1 bg-secondary rounded-xl px-4 h-12 text-foreground font-cairo text-right';
+const priceInput = 'bg-secondary rounded-xl px-4 h-12 text-foreground font-cairo text-right';
 
 export function PropertyFilters({
   visible,
@@ -79,7 +79,13 @@ export function PropertyFilters({
           <Pressable onPress={onClose} hitSlop={8}>
             <X size={24} color={c.foreground} />
           </Pressable>
-          <Text className="text-lg font-cairo-bold text-foreground">{S.filterTitle}</Text>
+          <Text
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.75}
+            className="flex-1 mx-2 text-center text-lg font-cairo-bold text-foreground">
+            {S.filterTitle}
+          </Text>
           <Pressable onPress={() => setDraft({})} hitSlop={8}>
             <Text className="text-primary font-cairo-semibold text-sm">{S.reset}</Text>
           </Pressable>
@@ -123,7 +129,7 @@ export function PropertyFilters({
 
           <View className="gap-2.5">
             <Text className="text-sm font-cairo-semibold text-foreground text-right">{S.fPrice}</Text>
-            <View className="flex-row gap-3">
+            <ResponsiveFieldRow>
               <AppTextInput
                 placeholder={S.fMinPrice}
                 keyboardType="numeric"
@@ -142,7 +148,7 @@ export function PropertyFilters({
                 textAlign="right"
                 placeholderTextColor={c.muted}
               />
-            </View>
+            </ResponsiveFieldRow>
           </View>
 
           <View className="gap-2.5">
@@ -167,7 +173,13 @@ export function PropertyFilters({
 
         <View className="px-5 py-3 border-t border-border">
           <Pressable onPress={() => onApply(draft)} className="bg-primary rounded-xl h-12 items-center justify-center active:opacity-90">
-            <Text className="text-primary-foreground font-cairo-bold text-base">{S.apply}</Text>
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+              className="text-primary-foreground font-cairo-bold text-base">
+              {S.apply}
+            </Text>
           </Pressable>
         </View>
       </SafeAreaView>

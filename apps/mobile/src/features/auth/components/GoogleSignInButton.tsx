@@ -77,7 +77,13 @@ export function GoogleSignInButton({
         ) : (
           <>
             <GoogleGlyph />
-            <Text className="font-cairo-semibold text-foreground">{S.googleSignIn}</Text>
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+              className="flex-shrink font-cairo-semibold text-foreground">
+              {S.googleSignIn}
+            </Text>
           </>
         )}
       </Pressable>

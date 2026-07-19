@@ -2,6 +2,7 @@ import { Image } from 'expo-image';
 import { useLocalSearchParams } from 'expo-router';
 import { useCallback } from 'react';
 import { ActivityIndicator, FlatList, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { carsApi } from '@/features/cars/api/cars.api';
@@ -30,14 +31,14 @@ export function CarOwnerProfileScreen() {
 
   if (ownerLoading) {
     return (
-      <View className="flex-1 bg-background items-center justify-center">
+      <SafeAreaView className="flex-1 bg-background items-center justify-center" edges={['bottom']}>
         <ActivityIndicator color={c.primary} />
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
       <FlatList
         data={listings ?? []}
         keyExtractor={(car) => car._id}
@@ -77,6 +78,6 @@ export function CarOwnerProfileScreen() {
         }
         renderItem={({ item }) => <CarCard car={item} />}
       />
-    </View>
+    </SafeAreaView>
   );
 }
