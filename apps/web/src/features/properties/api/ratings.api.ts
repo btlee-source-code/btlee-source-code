@@ -10,7 +10,7 @@ export interface RateResult {
 }
 
 export const ratingsApi = {
-  /** Submit (or update) the current user's 1–5 rating for a property. */
+  /** Submit the current user's one-time 1–5 rating for a property. */
   rate: (propertyId: string, value: number) =>
     http.post<RateResult>(`/ratings/${propertyId}`, { value }),
 

@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from 'react';
-import { Text, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
 import Animated, {
+  cancelAnimation,
   Easing,
   useAnimatedStyle,
   useSharedValue,
@@ -11,16 +12,13 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { PROPERTY_ICONS } from '@/assets/icons3d/registry';
+import { CAR_ICONS, PROPERTY_ICONS } from '@/assets/icons3d/registry';
 import type { Section } from '@/config/theme';
 import { S } from '@/config/strings';
-import { CAR_BODY_SVG } from '@/features/cars/components/CarBodyIcons';
 import { useSection } from '@/features/section/hooks/useSection';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
-
-// The "hatchback" body-type icon from the explore-by-type grid.
-const HatchbackIcon = CAR_BODY_SVG.hatchback;
+import { shadows } from '@/shared/lib/shadows';
 
 const OPTIONS: { key: Section; label: () => string }[] = [
   { key: 'properties', label: () => S.sectionProperties },
@@ -30,9 +28,10 @@ const OPTIONS: { key: Section; label: () => string }[] = [
 /**
  * Segmented toggle that switches the active section (properties ⇄ cars). Each
  * pill carries the same icon as its explore-by-type grid — a villa for
- * properties, a hatchback for cars — which gently breathes when idle and pops
- * when tapped. The active pill uses a per-section brand color: GOLD (accent) for
- * properties, BLUE (primary) for cars. Flipping it re-tints the app + logo.
+ * properties, an SUV for cars — which performs a short idle flourish every four
+ * seconds and pops when tapped. The active pill uses a per-section brand color:
+ * GOLD (accent) for properties, BLUE (primary) for cars. Flipping it re-tints
+ * the app + logo.
  */
 export function SectionSwitcher() {
   const { section, setSection } = useSection();
@@ -42,7 +41,9 @@ export function SectionSwitcher() {
   const activeFg = section === 'cars' ? c.primaryForeground : c.accentForeground;
 
   return (
-    <View className="flex-row bg-secondary border border-border rounded-2xl p-1">
+    <View
+      className="w-[90%] max-w-[360px] self-center flex-row gap-1 rounded-[18px] p-1"
+      style={[shadows.sm, { backgroundColor: c.card, borderColor: c.border, borderWidth: 1 }]}>
       {OPTIONS.map(({ key, label }, i) => (
         <Pill
           key={key}
@@ -50,14 +51,21 @@ export function SectionSwitcher() {
           active={section === key}
           activeBg={activeBg}
           activeFg={activeFg}
-          mutedColor={c.muted}
+          borderColor={c.border}
+          inactiveBg={c.secondary}
+          inactiveFg={c.foreground}
           label={label()}
           onPress={() => setSection(key)}
           icon={
             key === 'properties' ? (
-              <Text style={{ fontSize: 29, lineHeight: 36 }}>{PROPERTY_ICONS.villa.emoji}</Text>
+              <Text style={{ fontSize: 24, lineHeight: 30 }}>{PROPERTY_ICONS.villa.emoji}</Text>
             ) : (
-              <HatchbackIcon size={36} />
+              <Image
+                source={CAR_ICONS.suv.image}
+                style={{ width: 46, height: 30 }}
+                resizeMode="contain"
+                fadeDuration={0}
+              />
             )
           }
         />
@@ -71,7 +79,9 @@ function Pill({
   active,
   activeBg,
   activeFg,
-  mutedColor,
+  borderColor,
+  inactiveBg,
+  inactiveFg,
   label,
   icon,
   onPress,
@@ -80,26 +90,40 @@ function Pill({
   active: boolean;
   activeBg: string;
   activeFg: string;
-  mutedColor: string;
+  borderColor: string;
+  inactiveBg: string;
+  inactiveFg: string;
   label: string;
   icon: ReactNode;
   onPress: () => void;
 }) {
-  // Press pop (squish → springy overshoot) layered over a gentle idle breathe.
+  // A press pop layered over a short, staggered idle flourish every four seconds.
   const scale = useSharedValue(1);
-  const float = useSharedValue(0);
+  const idlePulse = useSharedValue(0);
+  const interacting = useSharedValue(0);
 
   useEffect(() => {
-    float.value = withDelay(
-      index * 500,
-      withRepeat(withTiming(1, { duration: 1700, easing: Easing.inOut(Easing.sin) }), -1, true)
+    idlePulse.value = withDelay(
+      index * 450,
+      withRepeat(
+        withSequence(
+          withDelay(3100, withTiming(0, { duration: 0 })),
+          withTiming(1, { duration: 260, easing: Easing.out(Easing.cubic) }),
+          withTiming(0, { duration: 640, easing: Easing.out(Easing.elastic(1.15)) })
+        ),
+        -1,
+        false
+      )
     );
-  }, [float, index]);
+
+    return () => cancelAnimation(idlePulse);
+  }, [idlePulse, index]);
 
   const iconStyle = useAnimatedStyle(() => ({
     transform: [
-      { translateY: (float.value - 0.5) * 3 }, // bob ±1.5px when idle
-      { scale: scale.value * (0.97 + float.value * 0.06) }, // subtle breathe
+      { translateY: -4 * idlePulse.value * (1 - interacting.value) },
+      { rotate: `${(index === 0 ? -3 : 3) * idlePulse.value * (1 - interacting.value)}deg` },
+      { scale: scale.value * (1 + 0.1 * idlePulse.value * (1 - interacting.value)) },
     ],
   }));
 
@@ -117,11 +141,38 @@ function Pill({
       haptic
       scaleTo={0.97}
       onPress={onTap}
+      onPressIn={() => {
+        interacting.value = withTiming(1, { duration: 80 });
+      }}
+      onPressOut={() => {
+        interacting.value = withTiming(0, { duration: 180 });
+      }}
       containerClassName="flex-1"
-      className="flex-row items-center justify-center gap-2 rounded-xl py-2"
-      style={active ? { backgroundColor: activeBg } : undefined}>
-      <Animated.View style={iconStyle}>{icon}</Animated.View>
-      <Text className="font-cairo-bold text-[14px]" style={{ color: active ? activeFg : mutedColor }}>
+      className="min-h-[64px] items-center justify-center rounded-[14px] px-2 py-1"
+      style={[
+        {
+          backgroundColor: active ? activeBg : inactiveBg,
+          borderColor: active ? `${activeFg}4D` : borderColor,
+          borderWidth: 1,
+        },
+        active ? shadows.md : undefined,
+      ]}>
+      <Animated.View
+        style={[
+          { width: 52, height: 31, alignItems: 'center', justifyContent: 'center' },
+          iconStyle,
+        ]}>
+        {icon}
+      </Animated.View>
+      <Text
+        numberOfLines={1}
+        maxFontSizeMultiplier={1.15}
+        style={{
+          color: active ? activeFg : inactiveFg,
+          fontFamily: 'NotoKufiArabic_800ExtraBold',
+          fontSize: 14,
+          lineHeight: 24,
+        }}>
         {label}
       </Text>
     </PressableScale>

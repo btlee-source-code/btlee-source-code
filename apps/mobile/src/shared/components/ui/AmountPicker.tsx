@@ -85,7 +85,10 @@ export function AmountPicker({
         <Text
           className={`flex-1 mr-2 text-right ${value != null ? 'font-cairo' : 'font-cairo-medium'}`}
           style={{ color: value != null ? c.foreground : c.muted }}
-          numberOfLines={1}>
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.85}
+          maxFontSizeMultiplier={1.15}>
           {value != null ? show(value) : placeholder}
         </Text>
       </Pressable>
@@ -180,8 +183,14 @@ export const COUNT_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const NOW_YEAR = new Date().getFullYear();
 export const YEAR_OPTIONS = Array.from({ length: NOW_YEAR + 1 - 1990 + 1 }, (_, i) => NOW_YEAR + 1 - i);
 
-/** Preset mileage steps (km) offered in the mileage picker. */
+/** Preset mileage steps (km) offered in the search filter. */
 export const MILEAGE_OPTIONS = [
   0, 5_000, 10_000, 20_000, 30_000, 40_000, 50_000, 60_000, 75_000, 100_000, 125_000, 150_000,
   175_000, 200_000, 250_000, 300_000, 350_000, 400_000, 450_000, 500_000,
 ];
+
+/** Every 1,000 km from 1,000 through 500,000 for the car-listing form. */
+export const MILEAGE_FORM_OPTIONS = Array.from(
+  { length: 500 },
+  (_, index) => (index + 1) * 1_000
+);

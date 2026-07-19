@@ -1,3 +1,5 @@
+import { File } from 'expo-file-system';
+
 import { get } from '@/shared/api/httpClient';
 import type { PropertyImage } from '@/shared/types/property';
 
@@ -26,12 +28,11 @@ export interface LocalImage {
 
 async function uploadOne(img: LocalImage, sig: UploadSignature): Promise<PropertyImage> {
   const form = new FormData();
-  // RN multipart file part.
-  form.append('file', {
-    uri: img.uri,
-    name: img.name ?? `photo-${sig.timestamp}.jpg`,
-    type: img.mimeType ?? 'image/jpeg',
-  } as unknown as Blob);
+  // Expo's WinterCG fetch requires a Blob/File implementation with `bytes()`.
+  // A legacy React Native `{ uri, name, type }` part throws
+  // "Unsupported FormDataPart implementation" on current Expo SDKs.
+  const file = new File(img.uri);
+  form.append('file', file, img.name ?? file.name ?? `photo-${sig.timestamp}.jpg`);
   form.append('api_key', sig.apiKey);
   form.append('timestamp', String(sig.timestamp));
   form.append('signature', sig.signature);
@@ -41,8 +42,9 @@ async function uploadOne(img: LocalImage, sig: UploadSignature): Promise<Propert
     method: 'POST',
     body: form,
   });
-  if (!res.ok) throw new Error(`Cloudinary upload failed (${res.status})`);
-  const data = (await res.json()) as { public_id: string; secure_url: string };
+  if (!res.ok) throw new Error('IMAGE_UPLOAD_FAILED');
+  const data = (await res.json()) as { public_id?: string; secure_url?: string };
+  if (!data.public_id || !data.secure_url) throw new Error('IMAGE_UPLOAD_FAILED');
   return { publicId: data.public_id, url: optimizedUrl(data.secure_url) };
 }
 

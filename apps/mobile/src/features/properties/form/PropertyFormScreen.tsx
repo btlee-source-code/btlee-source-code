@@ -16,6 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { HttpError } from '@/shared/api/httpClient';
 import {
   DEPOSIT_LABELS,
   DEPOSIT_OPTIONS,
@@ -23,6 +24,7 @@ import {
   FINISHING_TYPES,
   LISTING_TYPE_LABELS,
   LISTING_TYPES,
+  MAX_IMAGES,
   PROPERTY_CATEGORIES,
   PROPERTY_SERVICES,
   PROPERTY_TYPES,
@@ -35,7 +37,9 @@ import { DividedStack } from '@/shared/components/ui/DividedStack';
 import { toast } from '@/shared/components/ui/Toast';
 import { GovernoratePicker } from '@/shared/components/ui/GovernoratePicker';
 import { AppTextInput } from '@/shared/components/ui/AppTextInput';
+import { FormField as Field } from '@/shared/components/ui/FormField';
 import { ResponsiveFieldRow } from '@/shared/components/ui/ResponsiveFieldRow';
+import { useFormErrorScroll } from '@/shared/hooks/useFormErrorScroll';
 import type { Property, PropertyImage } from '@/shared/types/property';
 import { propertiesApi, type PropertyInput } from '../api/properties.api';
 import { uploadsApi, type LocalImage } from '../api/uploads.api';
@@ -44,6 +48,58 @@ import { LocationPicker } from './LocationPicker';
 
 const DURATIONS = [30, 60, 90, 180, 365];
 
+type PropertyFieldKey =
+  | 'images'
+  | 'listingType'
+  | 'type'
+  | 'category'
+  | 'bedrooms'
+  | 'bathrooms'
+  | 'floor'
+  | 'area'
+  | 'price'
+  | 'finishing'
+  | 'governorate'
+  | 'areaName'
+  | 'description'
+  | 'whatsapp';
+
+type PropertyFieldErrors = Partial<Record<PropertyFieldKey, string>>;
+
+const PROPERTY_FIELD_ORDER: readonly PropertyFieldKey[] = [
+  'images',
+  'listingType',
+  'type',
+  'category',
+  'bedrooms',
+  'bathrooms',
+  'floor',
+  'area',
+  'price',
+  'finishing',
+  'governorate',
+  'areaName',
+  'description',
+  'whatsapp',
+];
+
+const PROPERTY_SERVER_FIELD_MAP: Record<string, PropertyFieldKey> = {
+  images: 'images',
+  listingType: 'listingType',
+  type: 'type',
+  category: 'category',
+  bedrooms: 'bedrooms',
+  bathrooms: 'bathrooms',
+  floor: 'floor',
+  area: 'area',
+  price: 'price',
+  finishing: 'finishing',
+  governorate: 'governorate',
+  area_name: 'areaName',
+  description: 'description',
+  whatsappNumber: 'whatsapp',
+};
+
 function Chip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
   return (
     <Pressable
@@ -51,27 +107,6 @@ function Chip({ label, active, onPress }: { label: string; active: boolean; onPr
       className={`rounded-full px-4 py-2.5 border ${active ? 'bg-accent border-accent' : 'bg-card border-border'} active:opacity-80`}>
       <Text className={`text-sm ${active ? 'font-cairo-bold text-white' : 'font-cairo-medium text-foreground'}`}>{label}</Text>
     </Pressable>
-  );
-}
-
-/**
- * Form field: a bold, clearly-marked heading with a brand-accent (gold) bar on
- * the RTL-leading side — matching the search filter sheet — over its control.
- */
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
-  return (
-    <View className="gap-2.5">
-      <View className="flex-row items-center justify-end gap-2">
-        <Text
-          maxFontSizeMultiplier={1.2}
-          className="flex-shrink text-[15px] font-cairo-bold text-foreground text-right">
-          {label}
-        </Text>
-        <View className="w-1.5 h-[18px] rounded-full bg-accent" />
-      </View>
-      {children}
-      {hint ? <Text className="text-xs text-muted-foreground font-cairo text-right">{hint}</Text> : null}
-    </View>
   );
 }
 
@@ -89,6 +124,26 @@ function normalizeWhatsapp(raw: string): string {
   if (d.startsWith('20')) return d;
   if (d.startsWith('0')) return `20${d.slice(1)}`;
   return `20${d}`;
+}
+
+function propertyFieldLabel(key: PropertyFieldKey): string {
+  const labels: Record<PropertyFieldKey, string> = {
+    images: S.fImages,
+    listingType: S.fListingType,
+    type: S.fType,
+    category: S.fCategory,
+    bedrooms: S.fBedrooms,
+    bathrooms: S.fBathrooms,
+    floor: S.fFloor,
+    area: S.fAreaM,
+    price: S.fPriceOne,
+    finishing: S.fFinishing,
+    governorate: S.fGovernorate,
+    areaName: S.fAreaName,
+    description: S.fDescription,
+    whatsapp: S.fWhatsapp,
+  };
+  return labels[key];
 }
 
 export function PropertyFormScreen({ initial }: { initial?: Property }) {
@@ -119,38 +174,121 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
   const [keptImages, setKeptImages] = useState<PropertyImage[]>(initial?.images ?? []);
   const [newImages, setNewImages] = useState<LocalImage[]>([]);
 
-  const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<PropertyFieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [phase, setPhase] = useState<'idle' | 'uploading' | 'saving'>('idle');
   const c = useThemeColors();
+  const { scrollRef, setFieldRef, handleScroll, scrollToFirstError } =
+    useFormErrorScroll<PropertyFieldKey>();
 
   const toggleService = (s: string) =>
     setServices((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]));
 
-  const validate = (): string | null => {
-    if (!type || !listingType || !category || !finishing || !governorate || !areaName.trim())
-      return S.fillRequired;
-    if (bedrooms == null || bathrooms == null) return S.fillRequired;
-    if (type === 'apartment' && floor == null) return S.fillRequired;
-    if (description.trim().length < 10) return S.descriptionHint;
-    if (!isEdit && !/^01[0125][0-9]{8}$/.test(whatsapp.replace(/\D/g, ''))) return S.whatsappHint;
-    if (keptImages.length + newImages.length < 1) return S.imagesRequired;
-    return null;
+  const clearFieldError = (key: PropertyFieldKey) => {
+    setFieldErrors((current) => {
+      if (!current[key]) return current;
+      const next = { ...current };
+      delete next[key];
+      return next;
+    });
+  };
+
+  const showFieldErrors = (errors: PropertyFieldErrors, toastMessage?: string) => {
+    const firstErrorKey = PROPERTY_FIELD_ORDER.find((key) => Boolean(errors[key]));
+    const firstError = firstErrorKey ? errors[firstErrorKey] : undefined;
+    setFieldErrors(errors);
+    scrollToFirstError(errors, PROPERTY_FIELD_ORDER);
+    toast.error(toastMessage ?? firstError ?? S.listingSubmitError);
+  };
+
+  const validate = (): PropertyFieldErrors => {
+    const errors: PropertyFieldErrors = {};
+    const trimmedAreaName = areaName.trim();
+    const trimmedDescription = description.trim();
+
+    const imageCount = keptImages.length + newImages.length;
+    if (imageCount < 1) errors.images = S.imagesRequired;
+    else if (imageCount > MAX_IMAGES) errors.images = S.maxImagesError(MAX_IMAGES);
+    if (!listingType) errors.listingType = S.selectFieldError(S.fListingType);
+    if (!type) errors.type = S.selectFieldError(S.fType);
+    if (!category) errors.category = S.selectFieldError(S.fCategory);
+
+    if (bedrooms == null) {
+      errors.bedrooms = S.selectFieldError(S.fBedrooms);
+    } else if (bedrooms < 0 || bedrooms > 50) {
+      errors.bedrooms = S.numberRangeError(S.fBedrooms, 0, 50);
+    }
+    if (bathrooms == null) {
+      errors.bathrooms = S.selectFieldError(S.fBathrooms);
+    } else if (bathrooms < 0 || bathrooms > 50) {
+      errors.bathrooms = S.numberRangeError(S.fBathrooms, 0, 50);
+    }
+    if (type === 'apartment') {
+      if (floor == null) errors.floor = S.enterFieldError(S.fFloor);
+      else if (floor < 0 || floor > 200) {
+        errors.floor = S.numberRangeError(S.fFloor, 0, 200);
+      }
+    }
+    if (area != null && area <= 0) errors.area = S.positiveNumberError(S.fAreaM);
+    if (price != null && price <= 0) errors.price = S.positiveNumberError(S.fPriceOne);
+    if (!finishing) errors.finishing = S.selectFieldError(S.fFinishing);
+    if (!governorate) errors.governorate = S.selectFieldError(S.fGovernorate);
+
+    if (!trimmedAreaName) errors.areaName = S.enterFieldError(S.fAreaName);
+    else if (trimmedAreaName.length > 120) {
+      errors.areaName = S.fieldMaxCharsError(S.fAreaName, 120);
+    }
+
+    if (trimmedDescription.length < 10) {
+      errors.description = S.fieldMinCharsError(S.fDescription, 10);
+    } else if (trimmedDescription.length > 500) {
+      errors.description = S.fieldMaxCharsError(S.fDescription, 500);
+    }
+
+    if (!isEdit && !/^01[0125][0-9]{8}$/.test(whatsapp.replace(/\D/g, ''))) {
+      errors.whatsapp = S.validWhatsappError;
+    }
+
+    return errors;
+  };
+
+  const getServerFieldErrors = (error: unknown): PropertyFieldErrors => {
+    if (!(error instanceof HttpError) || error.status !== 422 || !error.details) return {};
+    if (typeof error.details !== 'object' || Array.isArray(error.details)) return {};
+
+    const errors: PropertyFieldErrors = {};
+    for (const serverKey of Object.keys(error.details as Record<string, unknown>)) {
+      const fieldKey = PROPERTY_SERVER_FIELD_MAP[serverKey];
+      if (!fieldKey) continue;
+      if (fieldKey === 'images') {
+        errors.images =
+          keptImages.length + newImages.length > MAX_IMAGES
+            ? S.maxImagesError(MAX_IMAGES)
+            : S.imagesRequired;
+      }
+      else if (fieldKey === 'whatsapp') errors.whatsapp = S.validWhatsappError;
+      else errors[fieldKey] = S.invalidFieldError(propertyFieldLabel(fieldKey));
+    }
+    return errors;
   };
 
   const onSubmit = async () => {
-    const err = validate();
-    if (err) {
-      setError(err);
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      showFieldErrors(validationErrors);
       return;
     }
+
     setSubmitting(true);
-    setError(null);
+    setFieldErrors({});
+    let activePhase: 'uploading' | 'saving' = 'uploading';
+
     try {
       setPhase('uploading');
       const uploaded = newImages.length ? await uploadsApi.images(newImages) : [];
       const images = [...keptImages, ...uploaded];
 
+      activePhase = 'saving';
       setPhase('saving');
       const body: PropertyInput = {
         type,
@@ -181,8 +319,13 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
       toast.success(S.toastListingSubmitted);
       router.replace('/my-properties');
     } catch (e) {
-      setError(e instanceof Error ? e.message : S.genericError);
-      toast.error(S.toastListingFailed);
+      if (activePhase === 'uploading') {
+        showFieldErrors({ images: S.imagesUploadError }, S.imagesUploadError);
+      } else {
+        const serverErrors = getServerFieldErrors(e);
+        if (Object.keys(serverErrors).length > 0) showFieldErrors(serverErrors);
+        else toast.error(S.listingSubmitError);
+      }
     } finally {
       setSubmitting(false);
       setPhase('idle');
@@ -206,16 +349,29 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
       </View>
 
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView contentContainerClassName="px-5 py-4 gap-5" keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+        <ScrollView
+          ref={scrollRef}
+          contentContainerClassName="px-5 py-4 gap-5"
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}>
           <DividedStack>
-          <Field label={S.fImages}>
+          <Field
+            ref={(node) => setFieldRef('images', node)}
+            label={S.fImages}
+            error={fieldErrors.images}>
             {keptImages.length > 0 && (
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, marginBottom: 10 }}>
                 {keptImages.map((img) => (
                   <View key={img.publicId} className="h-24 w-24 rounded-xl overflow-hidden">
                     <Image source={{ uri: img.url }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
                     <Pressable
-                      onPress={() => setKeptImages((k) => k.filter((x) => x.publicId !== img.publicId))}
+                      onPress={() => {
+                        const images = keptImages.filter((item) => item.publicId !== img.publicId);
+                        setKeptImages(images);
+                        clearFieldError('images');
+                      }}
                       hitSlop={6}
                       className="absolute top-1 left-1 h-6 w-6 rounded-full items-center justify-center"
                       style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
@@ -225,48 +381,101 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
                 ))}
               </ScrollView>
             )}
-            <ImagePickerRow value={newImages} onChange={setNewImages} />
+            <ImagePickerRow
+              value={newImages}
+              existingCount={keptImages.length}
+              onChange={(images) => {
+                setNewImages(images);
+                clearFieldError('images');
+              }}
+            />
           </Field>
 
-          <Field label={S.fListingType}>
+          <Field
+            ref={(node) => setFieldRef('listingType', node)}
+            label={S.fListingType}
+            error={fieldErrors.listingType}>
             <View className="flex-row flex-wrap gap-2 justify-end">
               {LISTING_TYPES.map((v) => (
-                <Chip key={v} label={LISTING_TYPE_LABELS[v]} active={listingType === v} onPress={() => setListingType(v)} />
+                <Chip
+                  key={v}
+                  label={LISTING_TYPE_LABELS[v]}
+                  active={listingType === v}
+                  onPress={() => {
+                    setListingType(v);
+                    clearFieldError('listingType');
+                  }}
+                />
               ))}
             </View>
           </Field>
 
-          <Field label={S.fType}>
+          <Field
+            ref={(node) => setFieldRef('type', node)}
+            label={S.fType}
+            error={fieldErrors.type}>
             <View className="flex-row flex-wrap gap-2 justify-end">
               {PROPERTY_TYPES.map((v) => (
-                <Chip key={v} label={TYPE_LABELS[v]} active={type === v} onPress={() => setType(v)} />
+                <Chip
+                  key={v}
+                  label={TYPE_LABELS[v]}
+                  active={type === v}
+                  onPress={() => {
+                    setType(v);
+                    clearFieldError('type');
+                    if (v !== 'apartment') clearFieldError('floor');
+                  }}
+                />
               ))}
             </View>
           </Field>
 
-          <Field label={S.fCategory}>
+          <Field
+            ref={(node) => setFieldRef('category', node)}
+            label={S.fCategory}
+            error={fieldErrors.category}>
             <View className="flex-row flex-wrap gap-2 justify-end">
               {PROPERTY_CATEGORIES.map((v) => (
-                <Chip key={v} label={CATEGORY_LABELS[v]} active={category === v} onPress={() => setCategory(v)} />
+                <Chip
+                  key={v}
+                  label={CATEGORY_LABELS[v]}
+                  active={category === v}
+                  onPress={() => {
+                    setCategory(v);
+                    clearFieldError('category');
+                  }}
+                />
               ))}
             </View>
           </Field>
 
           <ResponsiveFieldRow>
-            <Field label={S.fBedrooms}>
+            <Field
+              ref={(node) => setFieldRef('bedrooms', node)}
+              label={S.fBedrooms}
+              error={fieldErrors.bedrooms}>
               <AmountPicker
                 value={bedrooms}
-                onChange={setBedrooms}
+                onChange={(value) => {
+                  setBedrooms(value);
+                  clearFieldError('bedrooms');
+                }}
                 options={COUNT_OPTIONS}
                 placeholder={S.countPickerPlaceholder}
                 title={S.fBedrooms}
                 clearable={false}
               />
             </Field>
-            <Field label={S.fBathrooms}>
+            <Field
+              ref={(node) => setFieldRef('bathrooms', node)}
+              label={S.fBathrooms}
+              error={fieldErrors.bathrooms}>
               <AmountPicker
                 value={bathrooms}
-                onChange={setBathrooms}
+                onChange={(value) => {
+                  setBathrooms(value);
+                  clearFieldError('bathrooms');
+                }}
                 options={COUNT_OPTIONS}
                 placeholder={S.countPickerPlaceholder}
                 title={S.fBathrooms}
@@ -277,14 +486,34 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
 
           <ResponsiveFieldRow>
             {type === 'apartment' && (
-              <Field label={S.fFloor}>
-                <AppTextInput keyboardType="numeric" value={floor != null ? String(floor) : ''} onChangeText={(t) => setFloor(toNum(t))} placeholder={S.phFloor} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+              <Field
+                ref={(node) => setFieldRef('floor', node)}
+                label={S.fFloor}
+                error={fieldErrors.floor}>
+                <AppTextInput
+                  keyboardType="numeric"
+                  value={floor != null ? String(floor) : ''}
+                  onChangeText={(value) => {
+                    setFloor(toNum(value));
+                    clearFieldError('floor');
+                  }}
+                  placeholder={S.phFloor}
+                  className={inputCls}
+                  textAlign="right"
+                  placeholderTextColor={c.muted}
+                />
               </Field>
             )}
-            <Field label={`${S.fAreaM} ${S.optional}`}>
+            <Field
+              ref={(node) => setFieldRef('area', node)}
+              label={`${S.fAreaM} ${S.optional}`}
+              error={fieldErrors.area}>
               <AmountPicker
                 value={area}
-                onChange={setArea}
+                onChange={(value) => {
+                  setArea(value);
+                  clearFieldError('area');
+                }}
                 options={AREA_OPTIONS}
                 placeholder={S.areaPickerPlaceholder}
                 title={S.areaPickerTitle}
@@ -294,10 +523,16 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
             </Field>
           </ResponsiveFieldRow>
 
-          <Field label={`${S.fPriceOne} ${S.optional}`}>
+          <Field
+            ref={(node) => setFieldRef('price', node)}
+            label={`${S.fPriceOne} ${S.optional}`}
+            error={fieldErrors.price}>
             <AppTextInput
               value={price != null ? String(price) : ''}
-              onChangeText={(t) => setPrice(toNum(t))}
+              onChangeText={(value) => {
+                setPrice(toNum(value));
+                clearFieldError('price');
+              }}
               keyboardType="numeric"
               placeholder={S.priceInputPlaceholder}
               className={inputCls}
@@ -306,10 +541,21 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
             />
           </Field>
 
-          <Field label={S.fFinishing}>
+          <Field
+            ref={(node) => setFieldRef('finishing', node)}
+            label={S.fFinishing}
+            error={fieldErrors.finishing}>
             <View className="flex-row flex-wrap gap-2 justify-end">
               {FINISHING_TYPES.map((v) => (
-                <Chip key={v} label={FINISHING_LABELS[v]} active={finishing === v} onPress={() => setFinishing(v)} />
+                <Chip
+                  key={v}
+                  label={FINISHING_LABELS[v]}
+                  active={finishing === v}
+                  onPress={() => {
+                    setFinishing(v);
+                    clearFieldError('finishing');
+                  }}
+                />
               ))}
             </View>
           </Field>
@@ -341,22 +587,52 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
             <Text className="font-cairo-medium text-foreground">{S.fGarage}</Text>
           </View>
 
-          <Field label={S.fGovernorate}>
-            <GovernoratePicker value={governorate || undefined} onChange={setGovernorate} />
+          <Field
+            ref={(node) => setFieldRef('governorate', node)}
+            label={S.fGovernorate}
+            error={fieldErrors.governorate}>
+            <GovernoratePicker
+              value={governorate || undefined}
+              onChange={(value) => {
+                setGovernorate(value);
+                clearFieldError('governorate');
+              }}
+            />
           </Field>
 
-          <Field label={S.fAreaName}>
-            <AppTextInput value={areaName} onChangeText={setAreaName} placeholder={S.phAreaName} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+          <Field
+            ref={(node) => setFieldRef('areaName', node)}
+            label={S.fAreaName}
+            error={fieldErrors.areaName}>
+            <AppTextInput
+              value={areaName}
+              onChangeText={(value) => {
+                setAreaName(value);
+                clearFieldError('areaName');
+              }}
+              maxLength={120}
+              placeholder={S.phAreaName}
+              className={inputCls}
+              textAlign="right"
+              placeholderTextColor={c.muted}
+            />
           </Field>
 
           <Field label={`${S.fLocation} ${S.optional}`}>
             <LocationPicker value={coordinates} onChange={setCoordinates} />
           </Field>
 
-          <Field label={S.fDescription} hint={S.descriptionHint}>
+          <Field
+            ref={(node) => setFieldRef('description', node)}
+            label={S.fDescription}
+            hint={S.descriptionHint}
+            error={fieldErrors.description}>
             <AppTextInput
               value={description}
-              onChangeText={setDescription}
+              onChangeText={(value) => {
+                setDescription(value);
+                clearFieldError('description');
+              }}
               multiline
               numberOfLines={4}
               maxLength={500}
@@ -369,8 +645,24 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
           </Field>
 
           {!isEdit && (
-            <Field label={S.fWhatsapp} hint={S.whatsappHint}>
-              <AppTextInput value={whatsapp} onChangeText={setWhatsapp} keyboardType="phone-pad" placeholder="01xxxxxxxxx" className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+            <Field
+              ref={(node) => setFieldRef('whatsapp', node)}
+              label={S.fWhatsapp}
+              hint={S.whatsappHint}
+              error={fieldErrors.whatsapp}>
+              <AppTextInput
+                value={whatsapp}
+                onChangeText={(value) => {
+                  setWhatsapp(value);
+                  clearFieldError('whatsapp');
+                }}
+                maxLength={11}
+                keyboardType="phone-pad"
+                placeholder="01xxxxxxxxx"
+                className={inputCls}
+                textAlign="right"
+                placeholderTextColor={c.muted}
+              />
             </Field>
           )}
 
@@ -383,11 +675,6 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
           </Field>
           </DividedStack>
 
-          {error ? (
-            <View className="bg-destructive/10 rounded-lg px-3 py-2">
-              <Text className="text-destructive text-sm font-cairo text-right">{error}</Text>
-            </View>
-          ) : null}
           <View className="h-2" />
         </ScrollView>
       </KeyboardAvoidingView>

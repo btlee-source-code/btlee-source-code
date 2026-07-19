@@ -1,7 +1,7 @@
 'use client';
 /**
  * Property rating card for the detail page — shows the average rating and lets
- * a logged-in (non-owner) visitor submit / update their own 1–5 rating.
+ * a logged-in (non-owner) visitor submit one 1–5 rating.
  */
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
@@ -38,6 +38,7 @@ export function PropertyRating({ propertyId, ratingAvg, ratingCount, ownerId }: 
   }, [propertyId, isAuthenticated, isHydrated]);
 
   async function handleRate(value: number) {
+    if (pending || myRating !== null) return;
     if (!isAuthenticated) {
       toast.error('سجل دخولك أولاً لتقييم العقار');
       return;
@@ -81,7 +82,12 @@ export function PropertyRating({ propertyId, ratingAvg, ratingCount, ownerId }: 
             <span className="text-sm font-medium text-foreground">
               {myRating ? t('yourRating') : t('rateThis')}
             </span>
-            <StarRatingInput value={myRating ?? 0} onRate={handleRate} disabled={pending} size={30} />
+            <StarRatingInput
+              value={myRating ?? 0}
+              onRate={handleRate}
+              disabled={pending || myRating !== null}
+              size={30}
+            />
           </div>
         )}
       </div>

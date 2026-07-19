@@ -54,7 +54,10 @@ export function GovernoratePicker({
         <Text
           className={`flex-1 mx-2 text-right ${value ? 'font-cairo' : 'font-cairo-medium'}`}
           style={{ color: value ? c.foreground : c.muted }}
-          numberOfLines={1}>
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.85}
+          maxFontSizeMultiplier={1.15}>
           {value || placeholder || S.govPickerPlaceholder}
         </Text>
         <ChevronDown size={18} color={c.muted} />
@@ -87,6 +90,7 @@ export function GovernoratePicker({
                 placeholder={S.govPickerSearch}
                 placeholderTextColor={c.muted}
                 className="flex-1 mx-2 text-foreground font-cairo text-right"
+                style={{ minWidth: 0, fontSize: 13 }}
                 textAlign="right"
               />
               {query.length > 0 && (

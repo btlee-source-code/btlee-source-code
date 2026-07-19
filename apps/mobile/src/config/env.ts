@@ -37,6 +37,15 @@ export const API_URL = process.env.EXPO_PUBLIC_API_URL ?? FALLBACK;
 export const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? 'https://www.btlee-eg.com';
 
 /**
+ * Emergency direct geocoding fallback. The app normally searches through our
+ * API proxy (which can switch providers server-side); this keeps location
+ * search working while a backend rollout is pending or temporarily unavailable.
+ */
+export const GEOCODING_SEARCH_URL =
+  process.env.EXPO_PUBLIC_GEOCODING_SEARCH_URL ??
+  'https://nominatim.openstreetmap.org/search';
+
+/**
  * Sentry DSN (crash + error reporting). A client DSN is not secret — it only
  * accepts events, it can't read them — so it's safe to inline via EXPO_PUBLIC_*.
  * Empty in local dev → reporting stays off until set for release builds.

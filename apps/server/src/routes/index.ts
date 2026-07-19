@@ -15,6 +15,7 @@ import { reportsRouter } from '../modules/reports/reports.routes.js';
 import { adminAuthRouter } from '../modules/admin-auth/adminAuth.routes.js';
 import { adminsRouter } from '../modules/admins/admins.routes.js';
 import { uploadsRouter } from '../modules/cloudinary/cloudinary.routes.js';
+import { locationsRouter } from '../modules/locations/locations.routes.js';
 
 export const apiRouter = Router();
 
@@ -33,6 +34,7 @@ apiRouter.use('/notifications', notificationsRouter);
 apiRouter.use('/saved-searches', savedSearchesRouter);
 apiRouter.use('/reports', reportsRouter);
 apiRouter.use('/uploads', uploadsRouter);
+apiRouter.use('/locations', locationsRouter);
 
 // Admin routes
 apiRouter.use('/admin/auth', adminAuthRouter);

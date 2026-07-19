@@ -40,6 +40,13 @@ export const uploadLimiter = rateLimit({
   message: tooMany('Too many uploads. Please try again later.'),
 });
 
+/** Explicit location searches from listing forms (never requests per keystroke). */
+export const locationSearchLimiter = rateLimit({
+  ...common,
+  max: 40,
+  message: tooMany('Too many location searches. Please try again later.'),
+});
+
 /** Ratings, reports, and other cheap engagement writes. */
 export const interactionLimiter = rateLimit({
   ...common,

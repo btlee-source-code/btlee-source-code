@@ -7,9 +7,9 @@ export interface RatingResult {
 }
 
 /**
- * Ratings API — mirrors the web `ratings.api.ts`. `rate` is an idempotent upsert
- * (one rating per user per property, enforced server-side); it 403s if you try
- * to rate your own listing and 400s for non-approved listings.
+ * Ratings API — one immutable rating per user per property, enforced
+ * server-side. Repeated submissions return 409; owners and non-approved
+ * listings are rejected too.
  */
 export const ratingsApi = {
   rate: (propertyId: string, value: number) => post<RatingResult>(`/ratings/${propertyId}`, { value }),

@@ -39,7 +39,7 @@ ratingsRouter.get(
   asyncHandler(controller.mineCar)
 );
 
-// Submit (or update) the current user's rating for a property.
+// Submit the current user's one-time rating for a property.
 ratingsRouter.post(
   '/:propertyId',
   protect,

@@ -49,7 +49,7 @@ export interface CarInput {
   make: string;
   model: string;
   year: number;
-  mileage?: number | null;
+  mileage: number;
   transmission: string;
   fuelType: string;
   bodyType: string;

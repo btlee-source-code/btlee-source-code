@@ -12,13 +12,15 @@ import type { LocalImage } from '../api/uploads.api';
 export function ImagePickerRow({
   value,
   onChange,
+  existingCount = 0,
 }: {
   value: LocalImage[];
   onChange: (imgs: LocalImage[]) => void;
+  existingCount?: number;
 }) {
   const c = useThemeColors();
   const pick = async () => {
-    const remaining = MAX_IMAGES - value.length;
+    const remaining = MAX_IMAGES - existingCount - value.length;
     if (remaining <= 0) return;
     const res = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
@@ -32,7 +34,7 @@ export function ImagePickerRow({
       name: a.fileName ?? undefined,
       mimeType: a.mimeType ?? undefined,
     }));
-    onChange([...value, ...picked].slice(0, MAX_IMAGES));
+    onChange([...value, ...picked].slice(0, Math.max(0, MAX_IMAGES - existingCount)));
   };
 
   return (
@@ -42,7 +44,7 @@ export function ImagePickerRow({
         className="h-24 w-24 rounded-xl border border-dashed border-border bg-secondary items-center justify-center gap-1 active:opacity-80">
         <ImagePlus size={22} color={c.primary} />
         <Text className="text-[11px] font-cairo-medium text-primary">
-          {S.addImages} {value.length}/{MAX_IMAGES}
+          {S.addImages} {existingCount + value.length}/{MAX_IMAGES}
         </Text>
       </Pressable>
 

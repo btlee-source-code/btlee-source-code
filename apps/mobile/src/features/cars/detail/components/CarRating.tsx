@@ -1,11 +1,11 @@
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Alert, Text, View } from 'react-native';
 
 import { S } from '@/config/strings';
 import { carRatingsApi } from '@/features/cars/api/carRatings.api';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { StarRating } from '@/shared/components/ui/StarRating';
+import { RatingInput, StarRating } from '@/shared/components/ui/StarRating';
 import type { Car } from '@/shared/types/car';
 
 /**
@@ -21,25 +21,34 @@ export function CarRating({ car }: { car: Car }) {
   const [count, setCount] = useState(car.ratingCount);
   const [myRating, setMyRating] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [checkedRatingKey, setCheckedRatingKey] = useState<string | null>(null);
+  const submittingRef = useRef(false);
 
   const isOwner = !!user && user.id === car.owner?._id;
+  const ratingCheckKey = isAuthenticated && !isOwner && user ? `${user.id}:${car._id}` : null;
+  const checkingExisting = ratingCheckKey !== null && checkedRatingKey !== ratingCheckKey;
+  const displayedRating = isAuthenticated ? myRating : 0;
 
   useEffect(() => {
     let active = true;
-    if (isAuthenticated && !isOwner) {
+    if (ratingCheckKey) {
       carRatingsApi
         .mine(car._id)
         .then((r) => {
-          if (active && r.myRating != null) setMyRating(r.myRating);
+          if (active) setMyRating(r.myRating ?? 0);
         })
-        .catch(() => {});
+        .catch(() => {})
+        .finally(() => {
+          if (active) setCheckedRatingKey(ratingCheckKey);
+        });
     }
     return () => {
       active = false;
     };
-  }, [isAuthenticated, isOwner, car._id]);
+  }, [car._id, ratingCheckKey]);
 
   const onRate = async (value: number) => {
+    if (submittingRef.current || checkingExisting) return;
     if (!isAuthenticated) {
       Alert.alert(S.loginToRateCar, undefined, [
         { text: S.signInTitle, onPress: () => router.push('/login') },
@@ -47,6 +56,9 @@ export function CarRating({ car }: { car: Car }) {
       ]);
       return;
     }
+    if (myRating > 0) return;
+
+    submittingRef.current = true;
     const prev = myRating;
     setMyRating(value);
     setSubmitting(true);
@@ -59,6 +71,7 @@ export function CarRating({ car }: { car: Car }) {
       setMyRating(prev);
       Alert.alert(e instanceof Error ? e.message : S.genericError);
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   };
@@ -79,9 +92,14 @@ export function CarRating({ car }: { car: Car }) {
       {!isOwner && (
         <View className="gap-2 items-end pt-1">
           <Text className="text-sm font-cairo-medium text-foreground text-right">
-            {myRating > 0 ? S.yourRating : S.rateThisCar}
+            {displayedRating > 0 ? S.ratingSubmitted(displayedRating) : S.rateThisCar}
           </Text>
-          <StarRating value={myRating} onChange={onRate} disabled={submitting} size={28} />
+          <RatingInput
+            value={displayedRating}
+            onChange={onRate}
+            disabled={submitting || checkingExisting || displayedRating > 0}
+            size={28}
+          />
         </View>
       )}
     </View>

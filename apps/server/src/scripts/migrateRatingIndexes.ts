@@ -11,7 +11,7 @@
  * Safe & idempotent: skips the drop if the legacy index is already partial/gone.
  * Run once against production BEFORE deploying car ratings: `npm run migrate:ratings`
  *
- * Standalone-script pattern (see seedCars.ts): connect → work → disconnect.
+ * Standalone-script pattern: connect → work → disconnect.
  */
 import { connectDatabase, disconnectDatabase } from '../config/database.js';
 import { Rating } from '../modules/ratings/rating.model.js';

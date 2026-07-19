@@ -36,6 +36,13 @@ const envSchema = z.object({
 
   MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
 
+  // Nominatim-compatible geocoding endpoint. Kept server-side so the provider
+  // can be switched without publishing a new mobile build.
+  GEOCODING_SEARCH_URL: z
+    .string()
+    .url()
+    .default('https://nominatim.openstreetmap.org/search'),
+
   JWT_ACCESS_SECRET: strongSecret('JWT_ACCESS_SECRET'),
   JWT_REFRESH_SECRET: strongSecret('JWT_REFRESH_SECRET'),
   JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),

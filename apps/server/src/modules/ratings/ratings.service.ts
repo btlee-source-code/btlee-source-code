@@ -1,8 +1,8 @@
 /**
  * Ratings Service
- * Users rate approved properties 1–5. Each user has a single, updatable rating
- * per property; the property's denormalized ratingAvg/ratingCount are recomputed
- * from the Rating collection after every change.
+ * Users rate approved listings 1–5. Each user can submit exactly one immutable
+ * rating per listing; denormalized ratingAvg/ratingCount values are recomputed
+ * from the Rating collection after each new rating.
  */
 import { Types } from 'mongoose';
 import { Rating } from './rating.model.js';
@@ -12,7 +12,12 @@ import {
   NotFoundError,
   ForbiddenError,
   BadRequestError,
+  ConflictError,
 } from '../../shared/errors/AppError.js';
+
+function isDuplicateKeyError(error: unknown): boolean {
+  return typeof error === 'object' && error !== null && 'code' in error && error.code === 11000;
+}
 
 /**
  * Recompute and persist a property's rating aggregates from the source-of-truth
@@ -44,14 +49,23 @@ export async function rateProperty(userId: string, propertyId: string, value: nu
   }
 
   const propertyOid = new Types.ObjectId(propertyId);
-  await Rating.findOneAndUpdate(
-    { user: new Types.ObjectId(userId), property: propertyOid },
-    // Dual-write the domain-agnostic target on insert; `value` on every upsert.
-    // `targetType` comes from its schema default via setDefaultsOnInsert — do NOT
-    // also put it in $setOnInsert (Mongoose would flag a path conflict).
-    { $set: { value }, $setOnInsert: { targetId: propertyOid } },
-    { upsert: true, setDefaultsOnInsert: true }
-  );
+  const userOid = new Types.ObjectId(userId);
+  const existing = await Rating.exists({ user: userOid, property: propertyOid });
+  if (existing) throw new ConflictError('لقد قيّمت هذا العقار من قبل');
+
+  try {
+    await Rating.create({
+      user: userOid,
+      targetType: 'property',
+      targetId: propertyOid,
+      property: propertyOid,
+      value,
+    });
+  } catch (error) {
+    // The unique index closes the race between the existence check and insert.
+    if (isDuplicateKeyError(error)) throw new ConflictError('لقد قيّمت هذا العقار من قبل');
+    throw error;
+  }
 
   const stats = await recomputeAggregates(propertyId);
   return { ...stats, myRating: value };
@@ -69,7 +83,7 @@ export async function getMyRating(userId: string, propertyId: string): Promise<n
 
 // ---------------------------------------------------------------------------
 // Cars — same collection, addressed via the domain-agnostic {targetType,targetId}
-// keys (no `property` field), so a user has one updatable rating per car.
+// keys (no `property` field), so a user has exactly one rating per car.
 // ---------------------------------------------------------------------------
 
 /** Recompute + persist a car's rating aggregates from the Rating collection. */
@@ -99,13 +113,18 @@ export async function rateCar(userId: string, carId: string, value: number) {
   }
 
   const carOid = new Types.ObjectId(carId);
-  await Rating.findOneAndUpdate(
-    // targetType/targetId come from the filter (applied to the upserted doc);
+  const userOid = new Types.ObjectId(userId);
+  const target = { user: userOid, targetType: 'car' as const, targetId: carOid };
+  const existing = await Rating.exists(target);
+  if (existing) throw new ConflictError('لقد قيّمت هذه العربية من قبل');
+
+  try {
     // `property` is intentionally omitted so the partial legacy index skips it.
-    { user: new Types.ObjectId(userId), targetType: 'car', targetId: carOid },
-    { $set: { value } },
-    { upsert: true, setDefaultsOnInsert: true }
-  );
+    await Rating.create({ ...target, value });
+  } catch (error) {
+    if (isDuplicateKeyError(error)) throw new ConflictError('لقد قيّمت هذه العربية من قبل');
+    throw error;
+  }
 
   const stats = await recomputeCarAggregates(carId);
   return { ...stats, myRating: value };

@@ -103,6 +103,9 @@ export function CarMakePicker({
         <ChevronDown size={18} color={c.muted} />
         <Text
           numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.85}
+          maxFontSizeMultiplier={1.15}
           className={`flex-1 mx-3 text-right ${
             value ? 'font-cairo-semibold text-foreground' : 'font-cairo-medium text-muted-foreground'
           }`}>
@@ -162,6 +165,7 @@ export function CarMakePicker({
                 textAlign="right"
                 returnKeyType="search"
                 className="flex-1 mx-3 text-foreground font-cairo text-right"
+                style={{ minWidth: 0, fontSize: 13 }}
               />
               {query ? (
                 <Pressable onPress={() => setQuery('')} hitSlop={8}>

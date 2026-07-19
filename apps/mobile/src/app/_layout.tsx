@@ -7,6 +7,7 @@ import {
   Cairo_700Bold,
   useFonts,
 } from '@expo-google-fonts/cairo';
+import { NotoKufiArabic_800ExtraBold } from '@expo-google-fonts/noto-kufi-arabic';
 import { Stack, type ErrorBoundaryProps } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
@@ -24,6 +25,7 @@ import { initSentry, isSentryEnabled, Sentry } from '@/shared/lib/sentry';
 initSentry();
 
 SplashScreen.preventAutoHideAsync();
+
 
 /**
  * Expo Router picks up a named `ErrorBoundary` export from the root layout and
@@ -68,12 +70,14 @@ function ThemedRoot() {
 }
 
 function RootLayout() {
-  // Load the brand font (Cairo) in the weights the UI uses.
+  // Load Cairo for the app UI and a distinct Kufi display face for the primary
+  // properties/cars section switcher.
   const [fontsLoaded] = useFonts({
     Cairo_400Regular,
     Cairo_500Medium,
     Cairo_600SemiBold,
     Cairo_700Bold,
+    NotoKufiArabic_800ExtraBold,
   });
 
   // The animated intro overlays the app until its fade-out completes.
