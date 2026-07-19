@@ -45,9 +45,12 @@ function buildHtml(value?: [number, number]): string {
 export function LocationPicker({
   value,
   onChange,
+  emptyHint = S.tapToSetLocation,
 }: {
   value?: [number, number];
   onChange: (c: [number, number]) => void;
+  /** Context-specific instruction; cars and properties share the same map. */
+  emptyHint?: string;
 }) {
   const [html] = useState(() => buildHtml(value));
 
@@ -70,7 +73,7 @@ export function LocationPicker({
         />
       </View>
       <Text className={`text-xs font-cairo text-right ${value ? 'text-primary' : 'text-muted-foreground'}`}>
-        {value ? S.locationSelected : S.tapToSetLocation}
+        {value ? S.locationSelected : emptyHint}
       </Text>
     </View>
   );

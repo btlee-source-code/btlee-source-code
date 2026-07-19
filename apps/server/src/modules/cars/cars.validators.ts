@@ -41,8 +41,8 @@ const carBaseSchema = z.object({
   fuelType: z.enum(CAR_FUEL_TYPES),
   bodyType: z.enum(CAR_BODY_TYPES),
   color: z.string().max(30).nullable().optional(),
-  // Price optional — owners may list without disclosing it.
-  price: z.coerce.number().positive().optional(),
+  // Optional price; `null` represents an intentionally hidden price ("price on request").
+  price: z.coerce.number().positive().nullable().optional(),
   governorate: z.string().min(1).max(60),
   area_name: z.string().min(1).max(120),
   // Map location is optional — the owner may skip pinning it.

@@ -1,10 +1,11 @@
 import { Check } from 'lucide-react-native';
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
 import { S } from '@/config/strings';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { HttpError } from '@/shared/api/httpClient';
+import { AppTextInput } from '@/shared/components/ui/AppTextInput';
 import { BottomSheet } from '@/shared/components/ui/BottomSheet';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
 import { toast } from '@/shared/components/ui/Toast';
@@ -91,7 +92,7 @@ export function ReportSheet({
         </View>
 
         {/* Optional details */}
-        <TextInput
+        <AppTextInput
           placeholder={S.reportDetailsPlaceholder}
           placeholderTextColor={c.muted}
           value={details}

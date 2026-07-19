@@ -8,7 +8,6 @@ import {
   Pressable,
   ScrollView,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { S } from '@/config/strings';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { HttpError } from '@/shared/api/httpClient';
+import { AppTextInput } from '@/shared/components/ui/AppTextInput';
 import { Logo } from '@/shared/components/layout/Logo';
 import { authApi } from '../api/auth.api';
 
@@ -92,7 +92,7 @@ export function ResetPasswordScreen() {
                     <Pressable onPress={() => setShow((v) => !v)} hitSlop={8}>
                       {show ? <EyeOff size={20} color={c.muted} /> : <Eye size={20} color={c.muted} />}
                     </Pressable>
-                    <TextInput
+                    <AppTextInput
                       value={password}
                       onChangeText={setPassword}
                       secureTextEntry={!show}
@@ -106,7 +106,7 @@ export function ResetPasswordScreen() {
                 {/* Confirm password */}
                 <View className="gap-1.5">
                   <Text className="text-sm font-cairo-medium text-foreground text-right">{S.confirmPasswordLabel}</Text>
-                  <TextInput
+                  <AppTextInput
                     value={confirm}
                     onChangeText={setConfirm}
                     secureTextEntry={!show}

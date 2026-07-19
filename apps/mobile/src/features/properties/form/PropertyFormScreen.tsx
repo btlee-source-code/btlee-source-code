@@ -10,7 +10,6 @@ import {
   ScrollView,
   Switch,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -31,10 +30,11 @@ import {
   CATEGORY_LABELS,
   TYPE_LABELS,
 } from '@/shared/lib/constants';
-import { AmountPicker, AREA_OPTIONS, COUNT_OPTIONS, PRICE_OPTIONS } from '@/shared/components/ui/AmountPicker';
+import { AmountPicker, AREA_OPTIONS, COUNT_OPTIONS } from '@/shared/components/ui/AmountPicker';
 import { DividedStack } from '@/shared/components/ui/DividedStack';
 import { toast } from '@/shared/components/ui/Toast';
 import { GovernoratePicker } from '@/shared/components/ui/GovernoratePicker';
+import { AppTextInput } from '@/shared/components/ui/AppTextInput';
 import type { Property, PropertyImage } from '@/shared/types/property';
 import { propertiesApi, type PropertyInput } from '../api/properties.api';
 import { uploadsApi, type LocalImage } from '../api/uploads.api';
@@ -72,7 +72,10 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 
 const inputCls = 'bg-secondary border border-border rounded-xl px-4 h-12 text-foreground font-cairo text-right';
 const toNum = (t: string): number | undefined => {
-  const n = parseInt(t.replace(/[^\d]/g, ''), 10);
+  const normalized = t
+    .replace(/[٠-٩]/g, (digit) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(digit)))
+    .replace(/[^\d]/g, '');
+  const n = parseInt(normalized, 10);
   return Number.isNaN(n) ? undefined : n;
 };
 /** Local EG number (01…) → Cloudinary/server format 201XXXXXXXXX. */
@@ -271,7 +274,7 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
             {type === 'apartment' && (
               <View className="flex-1">
                 <Field label={S.fFloor}>
-                  <TextInput keyboardType="numeric" value={floor != null ? String(floor) : ''} onChangeText={(t) => setFloor(toNum(t))} placeholder={S.phFloor} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+                  <AppTextInput keyboardType="numeric" value={floor != null ? String(floor) : ''} onChangeText={(t) => setFloor(toNum(t))} placeholder={S.phFloor} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
                 </Field>
               </View>
             )}
@@ -291,14 +294,14 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
           </View>
 
           <Field label={`${S.fPriceOne} ${S.optional}`}>
-            <AmountPicker
-              value={price}
-              onChange={setPrice}
-              options={PRICE_OPTIONS}
-              placeholder={S.pricePickerPlaceholder}
-              title={S.pricePickerTitle}
-              suffix="ج.م"
-              clearLabel={S.amountPickerNone}
+            <AppTextInput
+              value={price != null ? String(price) : ''}
+              onChangeText={(t) => setPrice(toNum(t))}
+              keyboardType="numeric"
+              placeholder={S.priceInputPlaceholder}
+              className={inputCls}
+              textAlign="right"
+              placeholderTextColor={c.muted}
             />
           </Field>
 
@@ -342,7 +345,7 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
           </Field>
 
           <Field label={S.fAreaName}>
-            <TextInput value={areaName} onChangeText={setAreaName} placeholder={S.phAreaName} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+            <AppTextInput value={areaName} onChangeText={setAreaName} placeholder={S.phAreaName} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
           </Field>
 
           <Field label={`${S.fLocation} ${S.optional}`}>
@@ -350,7 +353,7 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
           </Field>
 
           <Field label={S.fDescription} hint={S.descriptionHint}>
-            <TextInput
+            <AppTextInput
               value={description}
               onChangeText={setDescription}
               multiline
@@ -366,7 +369,7 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
 
           {!isEdit && (
             <Field label={S.fWhatsapp} hint={S.whatsappHint}>
-              <TextInput value={whatsapp} onChangeText={setWhatsapp} keyboardType="phone-pad" placeholder="01xxxxxxxxx" className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+              <AppTextInput value={whatsapp} onChangeText={setWhatsapp} keyboardType="phone-pad" placeholder="01xxxxxxxxx" className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
             </Field>
           )}
 

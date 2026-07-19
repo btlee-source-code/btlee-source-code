@@ -1,6 +1,6 @@
 import { Search, X } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
-import { Keyboard, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Keyboard, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
@@ -24,6 +24,7 @@ import {
   YEAR_OPTIONS,
 } from '@/shared/components/ui/AmountPicker';
 import { DividedStack } from '@/shared/components/ui/DividedStack';
+import { AppTextInput } from '@/shared/components/ui/AppTextInput';
 import { GovernoratePicker } from '@/shared/components/ui/GovernoratePicker';
 
 export type CarSort = 'newest' | 'oldest' | 'price_asc' | 'price_desc';
@@ -116,7 +117,7 @@ export function CarSearchModal({
         <View className="px-4 pt-3">
           <View className="flex-row items-center bg-secondary border border-border rounded-xl px-3 h-12">
             <Search size={20} color={c.muted} />
-            <TextInput
+            <AppTextInput
               value={search}
               onChangeText={setSearch}
               autoFocus

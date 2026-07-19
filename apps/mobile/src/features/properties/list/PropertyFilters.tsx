@@ -1,10 +1,11 @@
 import { X } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
-import { Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { AppTextInput } from '@/shared/components/ui/AppTextInput';
 import {
   CATEGORY_LABELS,
   FINISHING_LABELS,
@@ -123,7 +124,7 @@ export function PropertyFilters({
           <View className="gap-2.5">
             <Text className="text-sm font-cairo-semibold text-foreground text-right">{S.fPrice}</Text>
             <View className="flex-row gap-3">
-              <TextInput
+              <AppTextInput
                 placeholder={S.fMinPrice}
                 keyboardType="numeric"
                 value={draft.minPrice ? String(draft.minPrice) : ''}
@@ -132,7 +133,7 @@ export function PropertyFilters({
                 textAlign="right"
                 placeholderTextColor={c.muted}
               />
-              <TextInput
+              <AppTextInput
                 placeholder={S.fMaxPrice}
                 keyboardType="numeric"
                 value={draft.maxPrice ? String(draft.maxPrice) : ''}
@@ -146,7 +147,7 @@ export function PropertyFilters({
 
           <View className="gap-2.5">
             <Text className="text-sm font-cairo-semibold text-foreground text-right">{S.fMinArea}</Text>
-            <TextInput
+            <AppTextInput
               keyboardType="numeric"
               value={draft.minArea ? String(draft.minArea) : ''}
               onChangeText={(t) => set({ minArea: toNum(t) })}

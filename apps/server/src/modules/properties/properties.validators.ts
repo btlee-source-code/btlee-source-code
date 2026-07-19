@@ -39,14 +39,15 @@ const propertyBaseSchema = z.object({
   bedrooms: z.coerce.number().int().min(0).max(50),
   bathrooms: z.coerce.number().int().min(0).max(50),
   floor: z.coerce.number().int().min(-5).max(200).nullable().optional(),
-  // Area and price are optional — owners may list without disclosing them.
-  area: z.coerce.number().positive().optional(),
+  // Area and price are optional; `null` represents an intentionally omitted value.
+  area: z.coerce.number().positive().nullable().optional(),
   finishing: z.enum(FINISHING_TYPES),
   services: z.array(z.enum(PROPERTY_SERVICES)).optional(),
   hasElevator: z.boolean().optional(),
   hasGarage: z.boolean().optional(),
   deposit: z.enum(DEPOSIT_OPTIONS).nullable().optional(),
-  price: z.coerce.number().positive().optional(),
+  // `null` represents an intentionally hidden price ("price on request").
+  price: z.coerce.number().positive().nullable().optional(),
   governorate: z.string().min(1).max(60),
   area_name: z.string().min(1).max(120),
   // Map location is optional — the owner may skip pinning it.

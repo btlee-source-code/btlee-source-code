@@ -1,10 +1,11 @@
 import { Check, ChevronDown, MapPin, Search, X } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
-import { FlatList, Modal, Pressable, Text, TextInput, View } from 'react-native';
+import { FlatList, Modal, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { AppTextInput } from './AppTextInput';
 import { GOVERNORATES } from '@/shared/lib/constants';
 
 /**
@@ -74,7 +75,7 @@ export function GovernoratePicker({
           <View className="px-5 pt-3 pb-1">
             <View className="flex-row items-center bg-secondary border border-border rounded-xl px-3 h-11">
               <Search size={18} color={c.muted} />
-              <TextInput
+              <AppTextInput
                 value={query}
                 onChangeText={setQuery}
                 placeholder={S.govPickerSearch}

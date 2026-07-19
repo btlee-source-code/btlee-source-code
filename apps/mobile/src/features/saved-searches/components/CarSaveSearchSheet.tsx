@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { ActivityIndicator, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
 
 import { S } from '@/config/strings';
+import { AppTextInput } from '@/shared/components/ui/AppTextInput';
 import type { CarFilters } from '@/features/cars/list/CarSearchModal';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { HttpError } from '@/shared/api/httpClient';
@@ -73,7 +74,7 @@ export function CarSaveSearchSheet({
       <View className="gap-4 pt-2">
         <View className="gap-1.5">
           <Text className="text-sm font-cairo-medium text-foreground text-right">{S.savedSearchName}</Text>
-          <TextInput
+          <AppTextInput
             value={name}
             onChangeText={(t) => {
               setName(t);

@@ -1,7 +1,8 @@
 import { forwardRef, useState } from 'react';
-import { Text, TextInput, View, type TextInputProps } from 'react-native';
+import { Text, View, type TextInput, type TextInputProps } from 'react-native';
 
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { AppTextInput } from './AppTextInput';
 
 interface TextFieldProps extends TextInputProps {
   label: string;
@@ -23,7 +24,7 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
   return (
     <View className="gap-1.5">
       <Text className="text-sm font-cairo-medium text-foreground text-right">{label}</Text>
-      <TextInput
+      <AppTextInput
         ref={ref}
         placeholderTextColor={c.muted}
         textAlign="right"

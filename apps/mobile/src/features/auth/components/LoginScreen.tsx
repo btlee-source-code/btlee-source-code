@@ -8,7 +8,6 @@ import {
   Pressable,
   ScrollView,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,6 +17,7 @@ import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { HttpError } from '@/shared/api/httpClient';
 import { Logo } from '@/shared/components/layout/Logo';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
+import { AppTextInput } from '@/shared/components/ui/AppTextInput';
 import { TextField } from '@/shared/components/ui/TextField';
 import { toast } from '@/shared/components/ui/Toast';
 import { GoogleSignInButton } from './GoogleSignInButton';
@@ -106,7 +106,7 @@ export function LoginScreen() {
                 <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={8}>
                   {showPassword ? <EyeOff size={20} color={c.muted} /> : <Eye size={20} color={c.muted} />}
                 </Pressable>
-                <TextInput
+                <AppTextInput
                   value={password}
                   onChangeText={setPassword}
                   onFocus={() => setPwFocused(true)}

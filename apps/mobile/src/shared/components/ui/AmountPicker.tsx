@@ -1,10 +1,11 @@
 import { Check, ChevronDown, X } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
-import { FlatList, Modal, Pressable, Text, TextInput, View } from 'react-native';
+import { FlatList, Modal, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { AppTextInput } from './AppTextInput';
 
 /** Thousands separators without relying on Intl (Hermes-safe). */
 const fmt = (n: number) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -102,7 +103,7 @@ export function AmountPicker({
 
           {/* Free-typed custom amount */}
           <View className="px-5 pt-3 pb-1">
-            <TextInput
+            <AppTextInput
               value={typed}
               onChangeText={setTyped}
               keyboardType="numeric"
@@ -176,5 +177,5 @@ export const YEAR_OPTIONS = Array.from({ length: NOW_YEAR + 1 - 1990 + 1 }, (_, 
 /** Preset mileage steps (km) offered in the mileage picker. */
 export const MILEAGE_OPTIONS = [
   0, 5_000, 10_000, 20_000, 30_000, 40_000, 50_000, 60_000, 75_000, 100_000, 125_000, 150_000,
-  175_000, 200_000, 250_000, 300_000,
+  175_000, 200_000, 250_000, 300_000, 350_000, 400_000, 450_000, 500_000,
 ];

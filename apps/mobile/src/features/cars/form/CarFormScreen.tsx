@@ -9,7 +9,6 @@ import {
   Pressable,
   ScrollView,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -36,11 +35,11 @@ import { LISTING_TYPES, LISTING_TYPE_LABELS } from '@/shared/lib/constants';
 import {
   AmountPicker,
   MILEAGE_OPTIONS,
-  PRICE_OPTIONS,
   YEAR_OPTIONS,
 } from '@/shared/components/ui/AmountPicker';
 import { DividedStack } from '@/shared/components/ui/DividedStack';
 import { GovernoratePicker } from '@/shared/components/ui/GovernoratePicker';
+import { AppTextInput } from '@/shared/components/ui/AppTextInput';
 import { toast } from '@/shared/components/ui/Toast';
 
 const DURATIONS = [30, 60, 90, 180, 365];
@@ -74,6 +73,13 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 }
 
 const inputCls = 'bg-secondary border border-border rounded-xl px-4 h-12 text-foreground font-cairo text-right';
+const toNum = (t: string): number | undefined => {
+  const normalized = t
+    .replace(/[٠-٩]/g, (digit) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(digit)))
+    .replace(/[^\d]/g, '');
+  const n = parseInt(normalized, 10);
+  return Number.isNaN(n) ? undefined : n;
+};
 function normalizeWhatsapp(raw: string): string {
   const d = raw.replace(/\D/g, '');
   if (d.startsWith('20')) return d;
@@ -116,7 +122,7 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
     if (!listingType || !condition || !transmission || !fuelType || !bodyType || !governorate) return S.fillRequired;
     if (!make.trim() || !model.trim() || !areaName.trim()) return S.fillRequired;
     if (year == null || year < 1950 || year > CURRENT_YEAR + 1) return S.fillRequired;
-    if (description.trim().length < 10) return S.descriptionHint;
+    if (description.trim().length < 10) return S.carDescriptionHint;
     if (!isEdit && !/^01[0125][0-9]{8}$/.test(whatsapp.replace(/\D/g, ''))) return S.whatsappHint;
     if (keptImages.length + newImages.length < 1) return S.imagesRequired;
     return null;
@@ -223,12 +229,12 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
           <View className="flex-row gap-3">
             <View className="flex-1">
               <Field label={S.fMake} hint={S.makeHint}>
-                <TextInput value={make} onChangeText={setMake} placeholder={S.phMake} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+                <AppTextInput value={make} onChangeText={setMake} placeholder={S.phMake} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
               </Field>
             </View>
             <View className="flex-1">
               <Field label={S.fModel} hint={S.modelHint}>
-                <TextInput value={model} onChangeText={setModel} placeholder={S.phModel} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+                <AppTextInput value={model} onChangeText={setModel} placeholder={S.phModel} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
               </Field>
             </View>
           </View>
@@ -289,19 +295,19 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
           <View className="flex-row gap-3">
             <View className="flex-1">
               <Field label={`${S.fColor} ${S.optional}`}>
-                <TextInput value={color} onChangeText={setColor} placeholder={S.phColor} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+                <AppTextInput value={color} onChangeText={setColor} placeholder={S.phColor} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
               </Field>
             </View>
             <View className="flex-1">
               <Field label={`${S.fPriceOne} ${S.optional}`}>
-                <AmountPicker
-                  value={price}
-                  onChange={setPrice}
-                  options={PRICE_OPTIONS}
-                  placeholder={S.pricePickerPlaceholder}
-                  title={S.pricePickerTitle}
-                  suffix="ج.م"
-                  clearLabel={S.amountPickerNone}
+                <AppTextInput
+                  value={price != null ? String(price) : ''}
+                  onChangeText={(t) => setPrice(toNum(t))}
+                  keyboardType="numeric"
+                  placeholder={S.priceInputPlaceholder}
+                  className={inputCls}
+                  textAlign="right"
+                  placeholderTextColor={c.muted}
                 />
               </Field>
             </View>
@@ -312,21 +318,21 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
           </Field>
 
           <Field label={S.fAreaName}>
-            <TextInput value={areaName} onChangeText={setAreaName} placeholder={S.phAreaName} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+            <AppTextInput value={areaName} onChangeText={setAreaName} placeholder={S.phAreaName} className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
           </Field>
 
-          <Field label={`${S.fLocation} ${S.optional}`}>
-            <LocationPicker value={coordinates} onChange={setCoordinates} />
+          <Field label={`${S.fCarLocation} ${S.optional}`}>
+            <LocationPicker value={coordinates} onChange={setCoordinates} emptyHint={S.tapToSetCarLocation} />
           </Field>
 
-          <Field label={S.fDescription} hint={S.descriptionHint}>
-            <TextInput
+          <Field label={S.fCarDescription} hint={S.carDescriptionHint}>
+            <AppTextInput
               value={description}
               onChangeText={setDescription}
               multiline
               numberOfLines={4}
               maxLength={500}
-              placeholder={S.phDescription}
+              placeholder={S.phCarDescription}
               className="bg-secondary border border-border rounded-xl px-4 py-3 text-foreground font-cairo text-right"
               style={{ minHeight: 100, textAlignVertical: 'top' }}
               textAlign="right"
@@ -336,7 +342,7 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
 
           {!isEdit && (
             <Field label={S.fWhatsapp} hint={S.whatsappHint}>
-              <TextInput value={whatsapp} onChangeText={setWhatsapp} keyboardType="phone-pad" placeholder="01xxxxxxxxx" className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
+              <AppTextInput value={whatsapp} onChangeText={setWhatsapp} keyboardType="phone-pad" placeholder="01xxxxxxxxx" className={inputCls} textAlign="right" placeholderTextColor={c.muted} />
             </Field>
           )}
 

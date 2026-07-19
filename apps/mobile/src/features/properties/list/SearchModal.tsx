@@ -1,13 +1,14 @@
 import { useRouter } from 'expo-router';
 import { Search, X } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
-import { Keyboard, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Keyboard, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { AmountPicker, AREA_OPTIONS, PRICE_OPTIONS } from '@/shared/components/ui/AmountPicker';
 import { DividedStack } from '@/shared/components/ui/DividedStack';
+import { AppTextInput } from '@/shared/components/ui/AppTextInput';
 import { GovernoratePicker } from '@/shared/components/ui/GovernoratePicker';
 import {
   CATEGORY_LABELS,
@@ -105,7 +106,7 @@ export function SearchModal({
           <View style={{ zIndex: 50 }}>
             <View className="flex-row items-center bg-secondary border border-border rounded-xl px-3 h-12">
               <Search size={20} color={c.muted} />
-              <TextInput
+              <AppTextInput
                 value={search}
                 onChangeText={setSearch}
                 onFocus={() => setFocused(true)}
