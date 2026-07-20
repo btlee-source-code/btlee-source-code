@@ -1,8 +1,9 @@
 /**
- * Legal/static page content — ported verbatim from the web's Arabic messages
- * (apps/web/src/messages/ar.json: privacy / disclaimer / dataDeletion). The app
- * is Arabic-only today, so no i18n layer here. Required for app-store review.
+ * Localized legal/static page content. Arabic and English mirror the web legal
+ * copy so users see the same policy on every platform.
  */
+import { getLocale } from '@/config/locale';
+
 export interface LegalSection {
   title: string;
   body: string;
@@ -20,7 +21,7 @@ export interface LegalArticleData {
   contactBody?: string;
 }
 
-export const PRIVACY: LegalArticleData = {
+const PRIVACY_AR: LegalArticleData = {
   title: 'سياسة الخصوصية',
   intro:
     'توضّح هذه السياسة البيانات التي تجمعها منصة بيت لي وكيفية استخدامها وحقوقك بشأنها. باستخدامك للمنصة فإنك توافق على هذه السياسة.',
@@ -66,7 +67,7 @@ export const PRIVACY: LegalArticleData = {
     'لأي استفسار يخص الخصوصية أو طلبات البيانات، تواصل معنا عبر واتساب على ‎+20 107 001 0209‎ أو ‎+20 101 006 0446‎.',
 };
 
-export const DISCLAIMER: LegalArticleData = {
+const DISCLAIMER_AR: LegalArticleData = {
   title: 'إخلاء المسؤولية',
   intro:
     'يرجى قراءة إخلاء المسؤولية التالي بعناية قبل استخدام منصة بيت لي. باستخدامك للمنصة فإنك تقرّ بموافقتك على ما ورد فيه.',
@@ -113,7 +114,7 @@ export const DISCLAIMER: LegalArticleData = {
   ],
 };
 
-export const DATA_DELETION: LegalArticleData = {
+const DATA_DELETION_AR: LegalArticleData = {
   title: 'تعليمات حذف البيانات',
   intro: 'يمكنك حذف حسابك على بيت لي وكل البيانات المرتبطة به في أي وقت. إليك الطريقة:',
   steps: [
@@ -124,3 +125,128 @@ export const DATA_DELETION: LegalArticleData = {
   ],
   note: 'بمجرد التأكيد، يُحذف حسابك وإعلاناتك وبياناتك الشخصية نهائياً من أنظمتنا. كما يتم فصل البيانات المشاركة عبر الأطراف الخارجية (مثل جوجل).',
 };
+
+const PRIVACY_EN: LegalArticleData = {
+  title: 'Privacy Policy',
+  intro:
+    'This policy explains what information Btlee collects, how we use it, and your rights. By using the platform you agree to this policy.',
+  updated: 'Last updated: June 2026',
+  highlight:
+    'We only collect the data needed to run the platform and connect you with property owners. We never sell your personal data to third parties.',
+  sections: [
+    {
+      title: 'Information we collect',
+      body: 'When you create an account we collect your name, email address, and/or phone number, and any property listings you publish (including images, price, location, and a contact number). If you sign in with Google, we receive your name, email, and profile picture from Google — nothing else. We do not access your contacts, posts, or friends list.',
+    },
+    {
+      title: 'Social sign-in (Google)',
+      body: 'Signing in with Google is optional and only used to authenticate you and create your account. We request the basic profile and email scopes only. We do not post anything on your behalf and do not store your Google password.',
+    },
+    {
+      title: 'How we use your data',
+      body: 'We use your data to: create and secure your account, publish your listings, let interested users contact you, send service-related emails (such as password reset), and improve the platform. Your phone/WhatsApp number is shown on your own listings so buyers can reach you directly.',
+    },
+    {
+      title: 'Data sharing',
+      body: 'We do not sell your personal data. Contact details you choose to publish on a listing are visible to other users by design. We use trusted service providers (e.g. cloud hosting and image storage) solely to operate the platform.',
+    },
+    {
+      title: 'Cookies & sessions',
+      body: 'We use secure, httpOnly cookies to keep you signed in. These are essential for authentication and are not used for advertising or cross-site tracking.',
+    },
+    {
+      title: 'Data retention & deletion',
+      body: 'We keep your data while your account is active. You can delete your account and associated data at any time — see our Data Deletion page for instructions.',
+    },
+    {
+      title: 'Your rights',
+      body: 'You may access, correct, or delete your personal data, and withdraw consent for social sign-in at any time by contacting us or deleting your account.',
+    },
+    {
+      title: 'Changes to this policy',
+      body: 'We may update this policy from time to time. Continued use of the platform after changes constitutes acceptance of the updated policy.',
+    },
+  ],
+  contactTitle: 'Contact us',
+  contactBody:
+    'For any privacy questions or data requests, reach us on WhatsApp at +20 107 001 0209 or +20 101 006 0446.',
+};
+
+const DISCLAIMER_EN: LegalArticleData = {
+  title: 'Disclaimer',
+  intro:
+    'Please read the following disclaimer carefully before using the Btlee platform. By using the platform, you acknowledge your agreement to its terms.',
+  updated: 'Last updated: June 2026',
+  highlight:
+    'Btlee is only a listing medium that connects property owners directly with interested users — it is not a party to any deal. All transactions take place between users and at their sole responsibility.',
+  sections: [
+    {
+      title: 'Nature of the platform',
+      body: 'Btlee is an online real estate platform that lets property owners publish their listings and communicate directly with interested users, without any intermediary. The platform is not a real estate broker or agent and is not a party to any deal between users; its role is limited to displaying the listings that users themselves post.',
+    },
+    {
+      title: 'No responsibility for transactions',
+      body: 'Btlee is not responsible for any financial, administrative, or commercial transactions between users — whether between an owner and a buyer, an owner and a tenant, or any other parties. Any agreement, contract, or payment is the sole responsibility of the parties involved.',
+    },
+    {
+      title: 'Accuracy of information',
+      body: 'All listing data (price, area, location, images, description, and contact method) is entered by the advertisers themselves. Btlee does not guarantee the accuracy, completeness, or timeliness of this data, and users must verify it independently before making any decision or payment.',
+    },
+    {
+      title: 'Inspection and verification',
+      body: 'We advise users to inspect the property in person and to verify the ownership documents and the identity and details of the other party before signing any contract or paying any deposit.',
+    },
+    {
+      title: 'Payments and fraud',
+      body: 'Btlee does not receive or mediate any payments between users. Do not pay any amount before fully verifying the property and the other party. The platform is not liable for any loss resulting from fraud or scams, and we urge you to be cautious and to report any suspicious listing.',
+    },
+    {
+      title: 'Responsibility for posted content',
+      body: 'Advertisers are solely and fully responsible for the legality and accuracy of the content they publish. Btlee may remove any listing that violates these terms or the law without prior notice, but is not responsible for content posted by users.',
+    },
+    {
+      title: 'No warranty',
+      body: "Btlee does not endorse or recommend any specific property or advertiser, and provides no warranty regarding a property's condition, legal status, or fitness for any particular purpose.",
+    },
+    {
+      title: 'Third parties',
+      body: 'The platform may contain contact methods or links to third parties (such as WhatsApp). Btlee is not responsible for the services or content of any third party.',
+    },
+    {
+      title: 'Changes to this disclaimer',
+      body: 'Btlee may amend or update this disclaimer at any time. Your continued use of the platform constitutes acceptance of the updated version.',
+    },
+  ],
+};
+
+const DATA_DELETION_EN: LegalArticleData = {
+  title: 'Data Deletion Instructions',
+  intro: "You can delete your Btlee account and all associated data at any time. Here's how:",
+  steps: [
+    'Sign in to your Btlee account.',
+    'Go to your Profile / Account settings.',
+    'Choose "Delete account" and confirm.',
+    'Alternatively, message us on WhatsApp at +20 107 001 0209 or +20 101 006 0446 with the email or phone number on your account and request deletion.',
+  ],
+  note: 'Once confirmed, your account, listings, and personal data are permanently removed from our systems. Data shared via third parties (e.g. Google) is also disconnected.',
+};
+
+/**
+ * Read the active locale lazily. The navigator remounts after a language switch,
+ * and the proxy also keeps direct reads correct without duplicating page routes.
+ */
+function localizedArticle(
+  arabic: LegalArticleData,
+  english: LegalArticleData
+): LegalArticleData {
+  return new Proxy(arabic, {
+    get(target, property, receiver) {
+      const source = getLocale() === 'en' ? english : target;
+      return Reflect.get(source, property, receiver);
+    },
+  });
+}
+
+export const PRIVACY = localizedArticle(PRIVACY_AR, PRIVACY_EN);
+export const DISCLAIMER = localizedArticle(DISCLAIMER_AR, DISCLAIMER_EN);
+export const DATA_DELETION = localizedArticle(DATA_DELETION_AR, DATA_DELETION_EN);
