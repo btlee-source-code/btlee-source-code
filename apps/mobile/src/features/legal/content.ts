@@ -64,7 +64,7 @@ const PRIVACY_AR: LegalArticleData = {
   ],
   contactTitle: 'تواصل معنا',
   contactBody:
-    'لأي استفسار يخص الخصوصية أو طلبات البيانات، تواصل معنا عبر واتساب على ‎+20 107 001 0209‎ أو ‎+20 101 006 0446‎.',
+    'لأي استفسار يخص الخصوصية أو طلبات البيانات، تواصل معنا عبر واتساب على 01066001035.',
 };
 
 const DISCLAIMER_AR: LegalArticleData = {
@@ -121,7 +121,7 @@ const DATA_DELETION_AR: LegalArticleData = {
     'سجّل الدخول إلى حسابك على بيت لي.',
     'اذهب إلى صفحة الحساب الشخصي / الإعدادات.',
     'اختر "حذف الحساب" وأكّد العملية.',
-    'أو راسلنا على واتساب على ‎+20 107 001 0209‎ أو ‎+20 101 006 0446‎ مرفقاً البريد الإلكتروني أو رقم الهاتف المسجّل بحسابك واطلب الحذف.',
+    'أو راسلنا على واتساب على 01066001035 مرفقاً البريد الإلكتروني أو رقم الهاتف المسجّل بحسابك واطلب الحذف.',
   ],
   note: 'بمجرد التأكيد، يُحذف حسابك وإعلاناتك وبياناتك الشخصية نهائياً من أنظمتنا. كما يتم فصل البيانات المشاركة عبر الأطراف الخارجية (مثل جوجل).',
 };
@@ -169,7 +169,7 @@ const PRIVACY_EN: LegalArticleData = {
   ],
   contactTitle: 'Contact us',
   contactBody:
-    'For any privacy questions or data requests, reach us on WhatsApp at +20 107 001 0209 or +20 101 006 0446.',
+    'For any privacy questions or data requests, reach us on WhatsApp at 01066001035.',
 };
 
 const DISCLAIMER_EN: LegalArticleData = {
@@ -226,7 +226,7 @@ const DATA_DELETION_EN: LegalArticleData = {
     'Sign in to your Btlee account.',
     'Go to your Profile / Account settings.',
     'Choose "Delete account" and confirm.',
-    'Alternatively, message us on WhatsApp at +20 107 001 0209 or +20 101 006 0446 with the email or phone number on your account and request deletion.',
+    'Alternatively, message us on WhatsApp at 01066001035 with the email or phone number on your account and request deletion.',
   ],
   note: 'Once confirmed, your account, listings, and personal data are permanently removed from our systems. Data shared via third parties (e.g. Google) is also disconnected.',
 };

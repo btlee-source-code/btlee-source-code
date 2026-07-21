@@ -4,7 +4,7 @@
     "slug": "btlee",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/btleeAppIcon1024.png",
     "scheme": "btlee",
     "userInterfaceStyle": "automatic",
     "runtimeVersion": {
@@ -14,22 +14,21 @@
       "url": "https://u.expo.dev/661190eb-8852-4169-bf85-7f3aa9eb1ebc"
     },
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/images/btleeAppIcon1024.png"
     },
     "android": {
       "package": "com.btlee.app",
       "googleServicesFile": "./google-services.json",
+      "icon": "./assets/images/btleeAppIcon1024.png",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#1A1B1A",
+        "foregroundImage": "./assets/images/btleeAppIcon1024.png"
       },
       "predictiveBackGestureEnabled": false
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/btleeAppIcon1024.png"
     },
     "plugins": [
       "expo-router",
@@ -37,8 +36,8 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#F4F4F3",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "image": "./assets/images/splash-logo.png",
+          "imageWidth": 320
         }
       ],
       "expo-secure-store",
@@ -55,7 +54,6 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/android-icon-monochrome.png",
           "color": "#1A3C34"
         }
       ]

@@ -34,7 +34,7 @@ import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { useAppSelector } from '@/shared/store/hooks';
 
 /** WhatsApp contact (support). Matches the number on the legal pages. */
-const SUPPORT_WHATSAPP = '201070010209';
+const SUPPORT_WHATSAPP = '201066001035';
 
 /**
  * Sleek slide-in navigation drawer (opens from the right, RTL-natural). Groups

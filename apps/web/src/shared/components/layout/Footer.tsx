@@ -103,24 +103,14 @@ export function Footer() {
           </p>
           <div className="flex items-center gap-4">
             <a
-              href="https://wa.me/201070010209"
+              href="https://wa.me/201066001035"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 hover:text-primary transition-colors"
               dir="ltr"
             >
               <MessageCircle className="size-3.5" />
-              01070010209
-            </a>
-            <a
-              href="https://wa.me/201010060446"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 hover:text-primary transition-colors"
-              dir="ltr"
-            >
-              <MessageCircle className="size-3.5" />
-              01010060446
+              01066001035
             </a>
           </div>
         </div>
