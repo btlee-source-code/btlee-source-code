@@ -45,6 +45,8 @@ import {
   LISTING_TYPE_LABELS,
   SERVICE_LABELS,
   TYPE_LABELS,
+  propertyTypeHasFinishing,
+  propertyTypeHasRooms,
 } from '@/shared/lib/constants';
 import { formatPrice, whatsappLink } from '@/shared/lib/format';
 import { blurPlaceholder } from '@/shared/lib/images';
@@ -141,10 +143,23 @@ export function PropertyDetailScreen() {
   const title = `${TYPE_LABELS[property.type]} ${S.in} ${property.area_name}`;
 
   // Details rows — built once so separators can skip the last row.
-  const specRows: { key: string; icon: React.ReactNode; label: string; value: string }[] = [
-    { key: 'bed', icon: <BedDouble size={19} color={c.muted} />, label: S.bedrooms, value: String(property.bedrooms) },
-    { key: 'bath', icon: <Bath size={19} color={c.muted} />, label: S.bathrooms, value: String(property.bathrooms) },
-  ];
+  const specRows: { key: string; icon: React.ReactNode; label: string; value: string }[] = [];
+  if (propertyTypeHasRooms(property.type)) {
+    specRows.push(
+      {
+        key: 'bed',
+        icon: <BedDouble size={19} color={c.muted} />,
+        label: S.bedrooms,
+        value: String(property.bedrooms),
+      },
+      {
+        key: 'bath',
+        icon: <Bath size={19} color={c.muted} />,
+        label: S.bathrooms,
+        value: String(property.bathrooms),
+      }
+    );
+  }
   if (property.area != null)
     specRows.push({
       key: 'area',
@@ -154,12 +169,14 @@ export function PropertyDetailScreen() {
     });
   if (property.floor != null)
     specRows.push({ key: 'floor', icon: <Layers size={19} color={c.muted} />, label: S.floor, value: String(property.floor) });
-  specRows.push({
-    key: 'finishing',
-    icon: <Paintbrush size={19} color={c.muted} />,
-    label: S.finishingLabel,
-    value: FINISHING_LABELS[property.finishing],
-  });
+  if (propertyTypeHasFinishing(property.type)) {
+    specRows.push({
+      key: 'finishing',
+      icon: <Paintbrush size={19} color={c.muted} />,
+      label: S.finishingLabel,
+      value: FINISHING_LABELS[property.finishing],
+    });
+  }
   if (property.deposit)
     specRows.push({
       key: 'deposit',

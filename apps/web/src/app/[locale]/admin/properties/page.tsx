@@ -1,43 +1,54 @@
-'use client';
-import { useState, useEffect, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
-import { motion } from 'framer-motion';
-import Image from 'next/image';
-import { MapPin, Check, X, Star, Trash2, Loader2 } from 'lucide-react';
-import { Card } from '@/shared/components/ui/card';
-import { Badge } from '@/shared/components/ui/badge';
-import { Button } from '@/shared/components/ui/button';
-import { Checkbox } from '@/shared/components/ui/checkbox';
+"use client";
+import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { MapPin, Check, X, Star, Trash2, Loader2 } from "lucide-react";
+import { Card } from "@/shared/components/ui/card";
+import { Badge } from "@/shared/components/ui/badge";
+import { Button } from "@/shared/components/ui/button";
+import { Checkbox } from "@/shared/components/ui/checkbox";
 import {
-  Tabs, TabsList, TabsTrigger, TabsContent,
-} from '@/shared/components/ui/tabs';
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@/shared/components/ui/tabs";
 import {
-  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
-} from '@/shared/components/ui/dialog';
-import { Textarea } from '@/shared/components/ui/textarea';
-import { PropertyDetailsDialog } from '@/features/admin/components/PropertyDetailsDialog';
-import { adminApi } from '@/features/admin/api/admin.api';
-import { useAdminAuth } from '@/features/admin/hooks/useAdminAuth';
-import { formatPrice } from '@/shared/lib/utils';
-import { toast } from 'sonner';
-import type { Property } from '@/shared/types/property';
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/shared/components/ui/dialog";
+import { Textarea } from "@/shared/components/ui/textarea";
+import { PropertyDetailsDialog } from "@/features/admin/components/PropertyDetailsDialog";
+import { adminApi } from "@/features/admin/api/admin.api";
+import { useAdminAuth } from "@/features/admin/hooks/useAdminAuth";
+import { formatPrice } from "@/shared/lib/utils";
+import { toast } from "sonner";
+import type { Property } from "@/shared/types/property";
 
 // How many listings each page/"load more" click fetches. The API caps a single
 // request at 100, so we page in chunks and append.
 const PAGE_SIZE = 20;
 
-const statusVariant: Record<string, 'pending' | 'approved' | 'rejected' | 'sold' | 'default'> = {
-  pending: 'pending',
-  approved: 'approved',
-  rejected: 'rejected',
-  sold: 'sold',
-  rented: 'sold',
-  expired: 'default',
+const statusVariant: Record<
+  string,
+  "pending" | "approved" | "rejected" | "sold" | "default"
+> = {
+  pending: "pending",
+  approved: "approved",
+  rejected: "rejected",
+  sold: "sold",
+  rented: "sold",
+  expired: "default",
 };
 
 export default function AdminPropertiesPage() {
   const { isAuthenticated, isHydrated } = useAdminAuth();
-  const [status, setStatus] = useState('pending');
+  const [status, setStatus] = useState("pending");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
 
@@ -57,12 +68,14 @@ export default function AdminPropertiesPage() {
         const all: Property[] = [];
         let loaded = 0;
         let pages = 1;
+
         for (let p = 1; p <= count; p++) {
           const { items, meta } = await adminApi.listPropertiesPaged({
             status,
             page: p,
             limit: PAGE_SIZE,
           });
+
           all.push(...(items as Property[]));
           pages = meta?.totalPages ?? 1;
           loaded = p;
@@ -72,12 +85,12 @@ export default function AdminPropertiesPage() {
         setPagesLoaded(loaded);
         setTotalPages(pages);
       } catch {
-        toast.error('تعذّر تحميل العقارات');
+        toast.error("تعذّر تحميل العقارات");
       } finally {
         setIsLoading(false);
       }
     },
-    [status]
+    [status],
   );
 
   // Appends the next page without disturbing the ones already shown.
@@ -94,7 +107,7 @@ export default function AdminPropertiesPage() {
       setPagesLoaded(next);
       setTotalPages(meta?.totalPages ?? totalPages);
     } catch {
-      toast.error('تعذّر تحميل المزيد');
+      toast.error("تعذّر تحميل المزيد");
     } finally {
       setIsLoadingMore(false);
     }
@@ -127,21 +140,26 @@ export default function AdminPropertiesPage() {
     });
   }
 
-  const allSelected = properties.length > 0 && selectedIds.size === properties.length;
+  const allSelected =
+    properties.length > 0 && selectedIds.size === properties.length;
 
   function toggleAll() {
-    setSelectedIds(allSelected ? new Set() : new Set(properties.map((p) => p._id)));
+    setSelectedIds(
+      allSelected ? new Set() : new Set(properties.map((p) => p._id)),
+    );
   }
 
   async function bulkDelete() {
     setBulkDeleting(true);
     try {
-      const { deletedCount } = await adminApi.bulkDeleteProperties([...selectedIds]);
+      const { deletedCount } = await adminApi.bulkDeleteProperties([
+        ...selectedIds,
+      ]);
       toast.success(`تم حذف ${deletedCount} إعلان`);
       setSelectedIds(new Set());
       refetch();
     } catch {
-      toast.error('تعذّر حذف الإعلانات');
+      toast.error("تعذّر حذف الإعلانات");
     } finally {
       setBulkDeleting(false);
     }
@@ -151,8 +169,13 @@ export default function AdminPropertiesPage() {
 
   return (
     <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-7xl">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-5 sm:mb-6">إدارة العقارات</h1>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-5 sm:mb-6">
+          إدارة العقارات
+        </h1>
 
         <Tabs value={status} onValueChange={changeStatus}>
           {/* Scrollable tabs on mobile */}
@@ -170,7 +193,10 @@ export default function AdminPropertiesPage() {
             {isLoading ? (
               <div className="space-y-3">
                 {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="h-40 sm:h-32 rounded-xl bg-secondary animate-pulse" />
+                  <div
+                    key={i}
+                    className="h-40 sm:h-32 rounded-xl bg-secondary animate-pulse"
+                  />
                 ))}
               </div>
             ) : properties.length === 0 ? (
@@ -184,13 +210,19 @@ export default function AdminPropertiesPage() {
                   <label className="flex items-center gap-2 cursor-pointer select-none text-sm">
                     <Checkbox
                       checked={
-                        allSelected ? true : selectedIds.size > 0 ? 'indeterminate' : false
+                        allSelected
+                          ? true
+                          : selectedIds.size > 0
+                            ? "indeterminate"
+                            : false
                       }
                       onCheckedChange={toggleAll}
                       aria-label="تحديد كل العقارات"
                     />
                     <span className="text-foreground">
-                      {selectedIds.size > 0 ? `تم تحديد ${selectedIds.size}` : 'تحديد الكل'}
+                      {selectedIds.size > 0
+                        ? `تم تحديد ${selectedIds.size}`
+                        : "تحديد الكل"}
                     </span>
                   </label>
 
@@ -207,8 +239,9 @@ export default function AdminPropertiesPage() {
                           <DialogTitle>حذف الإعلانات المحددة</DialogTitle>
                         </DialogHeader>
                         <p className="text-sm text-muted-foreground leading-relaxed">
-                          هل أنت متأكد من حذف {selectedIds.size} إعلان؟ سيتم حذف الإعلانات
-                          وصورها نهائياً ولا يمكن التراجع عن هذا الإجراء.
+                          هل أنت متأكد من حذف {selectedIds.size} إعلان؟ سيتم حذف
+                          الإعلانات وصورها نهائياً ولا يمكن التراجع عن هذا
+                          الإجراء.
                         </p>
                         <DialogFooter className="flex-col sm:flex-row gap-2">
                           <Button
@@ -217,7 +250,9 @@ export default function AdminPropertiesPage() {
                             disabled={bulkDeleting}
                             className="w-full sm:w-auto"
                           >
-                            {bulkDeleting && <Loader2 className="size-4 animate-spin" />}
+                            {bulkDeleting && (
+                              <Loader2 className="size-4 animate-spin" />
+                            )}
                             تأكيد حذف {selectedIds.size} إعلان
                           </Button>
                         </DialogFooter>
@@ -246,7 +281,9 @@ export default function AdminPropertiesPage() {
                       variant="outline"
                       className="min-w-40"
                     >
-                      {isLoadingMore && <Loader2 className="size-4 animate-spin" />}
+                      {isLoadingMore && (
+                        <Loader2 className="size-4 animate-spin" />
+                      )}
                       عرض المزيد
                     </Button>
                   </div>
@@ -271,8 +308,8 @@ function AdminPropertyRow({
   selected: boolean;
   onToggleSelect: (id: string) => void;
 }) {
-  const tProp = useTranslations('property');
-  const [rejectionReason, setRejectionReason] = useState('');
+  const tProp = useTranslations("property");
+  const [rejectionReason, setRejectionReason] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -280,10 +317,10 @@ function AdminPropertyRow({
     setDeleting(true);
     try {
       await adminApi.deleteProperty(property._id);
-      toast.success('تم حذف الإعلان');
+      toast.success("تم حذف الإعلان");
       onAction();
     } catch {
-      toast.error('تعذّر حذف الإعلان');
+      toast.error("تعذّر حذف الإعلان");
     } finally {
       setDeleting(false);
     }
@@ -292,8 +329,8 @@ function AdminPropertyRow({
   async function approve() {
     setSubmitting(true);
     try {
-      await adminApi.reviewProperty(property._id, 'approved');
-      toast.success('تم القبول');
+      await adminApi.reviewProperty(property._id, "approved");
+      toast.success("تم القبول");
       onAction();
     } finally {
       setSubmitting(false);
@@ -302,13 +339,13 @@ function AdminPropertyRow({
 
   async function reject() {
     if (rejectionReason.trim().length < 5) {
-      toast.error('سبب الرفض 5 أحرف على الأقل');
+      toast.error("سبب الرفض 5 أحرف على الأقل");
       return;
     }
     setSubmitting(true);
     try {
-      await adminApi.reviewProperty(property._id, 'rejected', rejectionReason);
-      toast.success('تم الرفض');
+      await adminApi.reviewProperty(property._id, "rejected", rejectionReason);
+      toast.success("تم الرفض");
       onAction();
     } finally {
       setSubmitting(false);
@@ -318,13 +355,13 @@ function AdminPropertyRow({
   return (
     <Card
       className={`border-border p-3 sm:p-4 overflow-hidden ${
-        selected ? 'ring-2 ring-primary' : ''
+        selected ? "ring-2 ring-primary" : ""
       }`}
     >
       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
         <div className="relative w-full sm:w-40 aspect-[16/9] sm:aspect-[4/3] rounded-lg overflow-hidden shrink-0 bg-secondary">
           <Image
-            src={property.images[0]?.url ?? ''}
+            src={property.images[0]?.url ?? ""}
             alt={property.area_name}
             fill
             sizes="(min-width: 640px) 200px, 100vw"
@@ -344,23 +381,30 @@ function AdminPropertyRow({
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <h3 className="font-semibold text-foreground truncate">{property.area_name}</h3>
+              <h3 className="font-semibold text-foreground truncate">
+                {property.area_name}
+              </h3>
               <p className="text-xs text-muted-foreground flex items-center gap-1">
                 <MapPin className="size-3 shrink-0" />
                 <span className="truncate">{property.governorate}</span>
               </p>
               <p className="text-xs text-muted-foreground mt-1 truncate">
-                المعلن: {property.owner?.name ?? '—'}
+                المعلن: {property.owner?.name ?? "—"}
               </p>
             </div>
-            <Badge variant={statusVariant[property.status]} className="shrink-0">
+            <Badge
+              variant={statusVariant[property.status]}
+              className="shrink-0"
+            >
               {tProp(`status.${property.status}`)}
             </Badge>
           </div>
 
           <div className="flex items-center justify-between gap-2 mt-2">
             <div className="text-base sm:text-lg font-bold text-primary tabular-nums">
-              {property.price != null ? `${formatPrice(property.price)} ج.م` : 'السعر عند التواصل'}
+              {property.price != null
+                ? `${formatPrice(property.price)} ج.م`
+                : "السعر عند التواصل"}
             </div>
 
             {/* Rating — so the admin sees how each listing is rated */}
@@ -370,17 +414,21 @@ function AdminPropertyRow({
                 <span className="text-sm font-semibold text-foreground tabular-nums">
                   {property.ratingAvg.toFixed(1)}
                 </span>
-                <span className="text-xs text-muted-foreground">({property.ratingCount} تقييم)</span>
+                <span className="text-xs text-muted-foreground">
+                  ({property.ratingCount} تقييم)
+                </span>
               </span>
             ) : (
-              <span className="shrink-0 text-xs text-muted-foreground">بدون تقييم</span>
+              <span className="shrink-0 text-xs text-muted-foreground">
+                بدون تقييم
+              </span>
             )}
           </div>
 
           <div className="flex flex-wrap gap-2 mt-3">
             <PropertyDetailsDialog property={property} onAction={onAction} />
 
-            {property.status === 'pending' && (
+            {property.status === "pending" && (
               <>
                 <Button
                   onClick={approve}
@@ -410,7 +458,12 @@ function AdminPropertyRow({
                       rows={4}
                     />
                     <DialogFooter className="flex-col sm:flex-row gap-2">
-                      <Button onClick={reject} variant="destructive" disabled={submitting} className="w-full sm:w-auto">
+                      <Button
+                        onClick={reject}
+                        variant="destructive"
+                        disabled={submitting}
+                        className="w-full sm:w-auto"
+                      >
                         تأكيد الرفض
                       </Button>
                     </DialogFooter>
@@ -419,19 +472,28 @@ function AdminPropertyRow({
               </>
             )}
 
-            {property.status === 'approved' && (
+            {property.status === "approved" && (
               <Button
                 onClick={async () => {
-                  await adminApi.setFeatured(property._id, !property.isFeatured);
-                  toast.success(property.isFeatured ? 'تم الإلغاء' : 'تم إضافته للمميزة');
+                  await adminApi.setFeatured(
+                    property._id,
+                    !property.isFeatured,
+                  );
+                  toast.success(
+                    property.isFeatured ? "تم الإلغاء" : "تم إضافته للمميزة",
+                  );
                   onAction();
                 }}
                 variant="outline"
                 size="sm"
-                className={property.isFeatured ? 'text-amber-600 border-amber-300' : ''}
+                className={
+                  property.isFeatured ? "text-amber-600 border-amber-300" : ""
+                }
               >
-                <Star className={`size-4 ${property.isFeatured ? 'fill-current' : ''}`} />
-                {property.isFeatured ? 'مميز' : 'إضافة للمميزة'}
+                <Star
+                  className={`size-4 ${property.isFeatured ? "fill-current" : ""}`}
+                />
+                {property.isFeatured ? "مميز" : "إضافة للمميزة"}
               </Button>
             )}
 
@@ -452,8 +514,9 @@ function AdminPropertyRow({
                   <DialogTitle>حذف الإعلان</DialogTitle>
                 </DialogHeader>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  هل أنت متأكد من حذف إعلان &quot;{property.area_name}&quot;؟ سيتم حذف
-                  الإعلان وصوره نهائياً ولا يمكن التراجع عن هذا الإجراء.
+                  هل أنت متأكد من حذف إعلان &quot;{property.area_name}&quot;؟
+                  سيتم حذف الإعلان وصوره نهائياً ولا يمكن التراجع عن هذا
+                  الإجراء.
                 </p>
                 <DialogFooter className="flex-col sm:flex-row gap-2">
                   <Button

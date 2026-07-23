@@ -32,6 +32,8 @@ import {
   SERVICE_LABELS,
   CATEGORY_LABELS,
   TYPE_LABELS,
+  propertyTypeHasFinishing,
+  propertyTypeHasRooms,
 } from '@/shared/lib/constants';
 import { AmountPicker, AREA_OPTIONS, COUNT_OPTIONS } from '@/shared/components/ui/AmountPicker';
 import { DividedStack } from '@/shared/components/ui/DividedStack';
@@ -48,6 +50,7 @@ import { ImagePickerRow } from './ImagePickerRow';
 import { LocationPicker } from './LocationPicker';
 
 const DURATIONS = [30, 60, 90, 180, 365];
+const ADVERTISABLE_PROPERTY_TYPES = PROPERTY_TYPES.filter((value) => value !== 'building');
 
 type PropertyFieldKey =
   | 'images'
@@ -178,6 +181,8 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
   const [fieldErrors, setFieldErrors] = useState<PropertyFieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [phase, setPhase] = useState<'idle' | 'uploading' | 'saving'>('idle');
+  const hasRoomCounts = propertyTypeHasRooms(type);
+  const hasFinishing = propertyTypeHasFinishing(type);
   const c = useThemeColors();
   const { scrollRef, setFieldRef, handleScroll, scrollToFirstError } =
     useFormErrorScroll<PropertyFieldKey>();
@@ -214,15 +219,17 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
     if (!type) errors.type = S.selectFieldError(S.fType);
     if (!category) errors.category = S.selectFieldError(S.fCategory);
 
-    if (bedrooms == null) {
-      errors.bedrooms = S.selectFieldError(S.fBedrooms);
-    } else if (bedrooms < 0 || bedrooms > 50) {
-      errors.bedrooms = S.numberRangeError(S.fBedrooms, 0, 50);
-    }
-    if (bathrooms == null) {
-      errors.bathrooms = S.selectFieldError(S.fBathrooms);
-    } else if (bathrooms < 0 || bathrooms > 50) {
-      errors.bathrooms = S.numberRangeError(S.fBathrooms, 0, 50);
+    if (hasRoomCounts) {
+      if (bedrooms == null) {
+        errors.bedrooms = S.selectFieldError(S.fBedrooms);
+      } else if (bedrooms < 0 || bedrooms > 50) {
+        errors.bedrooms = S.numberRangeError(S.fBedrooms, 0, 50);
+      }
+      if (bathrooms == null) {
+        errors.bathrooms = S.selectFieldError(S.fBathrooms);
+      } else if (bathrooms < 0 || bathrooms > 50) {
+        errors.bathrooms = S.numberRangeError(S.fBathrooms, 0, 50);
+      }
     }
     if (type === 'apartment') {
       if (floor == null) errors.floor = S.enterFieldError(S.fFloor);
@@ -232,7 +239,7 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
     }
     if (area != null && area <= 0) errors.area = S.positiveNumberError(S.fAreaM);
     if (price != null && price <= 0) errors.price = S.positiveNumberError(S.fPriceOne);
-    if (!finishing) errors.finishing = S.selectFieldError(S.fFinishing);
+    if (hasFinishing && !finishing) errors.finishing = S.selectFieldError(S.fFinishing);
     if (!governorate) errors.governorate = S.selectFieldError(S.fGovernorate);
 
     if (!trimmedAreaName) errors.areaName = S.enterFieldError(S.fAreaName);
@@ -295,11 +302,11 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
         type,
         listingType,
         category,
-        bedrooms: bedrooms!,
-        bathrooms: bathrooms!,
+        bedrooms: hasRoomCounts ? bedrooms! : 0,
+        bathrooms: hasRoomCounts ? bathrooms! : 0,
         floor: type === 'apartment' ? floor ?? null : null,
         area: area ?? null,
-        finishing,
+        finishing: hasFinishing ? finishing : 'unfurnished',
         services,
         hasElevator,
         hasGarage,
@@ -417,7 +424,7 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
             label={S.fType}
             error={fieldErrors.type}>
             <View className="flex-row flex-wrap gap-2 justify-end">
-              {PROPERTY_TYPES.map((v) => (
+              {ADVERTISABLE_PROPERTY_TYPES.map((v) => (
                 <Chip
                   key={v}
                   label={TYPE_LABELS[v]}
@@ -426,6 +433,16 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
                     setType(v);
                     clearFieldError('type');
                     if (v !== 'apartment') clearFieldError('floor');
+                    if (!propertyTypeHasRooms(v)) {
+                      setBedrooms(undefined);
+                      setBathrooms(undefined);
+                      clearFieldError('bedrooms');
+                      clearFieldError('bathrooms');
+                    }
+                    if (!propertyTypeHasFinishing(v)) {
+                      setFinishing('');
+                      clearFieldError('finishing');
+                    }
                   }}
                 />
               ))}
@@ -451,40 +468,42 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
             </View>
           </Field>
 
-          <ResponsiveFieldRow>
-            <Field
-              ref={(node) => setFieldRef('bedrooms', node)}
-              label={S.fBedrooms}
-              error={fieldErrors.bedrooms}>
-              <AmountPicker
-                value={bedrooms}
-                onChange={(value) => {
-                  setBedrooms(value);
-                  clearFieldError('bedrooms');
-                }}
-                options={COUNT_OPTIONS}
-                placeholder={S.countPickerPlaceholder}
-                title={S.fBedrooms}
-                clearable={false}
-              />
-            </Field>
-            <Field
-              ref={(node) => setFieldRef('bathrooms', node)}
-              label={S.fBathrooms}
-              error={fieldErrors.bathrooms}>
-              <AmountPicker
-                value={bathrooms}
-                onChange={(value) => {
-                  setBathrooms(value);
-                  clearFieldError('bathrooms');
-                }}
-                options={COUNT_OPTIONS}
-                placeholder={S.countPickerPlaceholder}
-                title={S.fBathrooms}
-                clearable={false}
-              />
-            </Field>
-          </ResponsiveFieldRow>
+          {hasRoomCounts && (
+            <ResponsiveFieldRow>
+              <Field
+                ref={(node) => setFieldRef('bedrooms', node)}
+                label={S.fBedrooms}
+                error={fieldErrors.bedrooms}>
+                <AmountPicker
+                  value={bedrooms}
+                  onChange={(value) => {
+                    setBedrooms(value);
+                    clearFieldError('bedrooms');
+                  }}
+                  options={COUNT_OPTIONS}
+                  placeholder={S.countPickerPlaceholder}
+                  title={S.fBedrooms}
+                  clearable={false}
+                />
+              </Field>
+              <Field
+                ref={(node) => setFieldRef('bathrooms', node)}
+                label={S.fBathrooms}
+                error={fieldErrors.bathrooms}>
+                <AmountPicker
+                  value={bathrooms}
+                  onChange={(value) => {
+                    setBathrooms(value);
+                    clearFieldError('bathrooms');
+                  }}
+                  options={COUNT_OPTIONS}
+                  placeholder={S.countPickerPlaceholder}
+                  title={S.fBathrooms}
+                  clearable={false}
+                />
+              </Field>
+            </ResponsiveFieldRow>
+          )}
 
           <ResponsiveFieldRow>
             {type === 'apartment' && (
@@ -543,24 +562,26 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
             />
           </Field>
 
-          <Field
-            ref={(node) => setFieldRef('finishing', node)}
-            label={S.fFinishing}
-            error={fieldErrors.finishing}>
-            <View className="flex-row flex-wrap gap-2 justify-end">
-              {FINISHING_TYPES.map((v) => (
-                <Chip
-                  key={v}
-                  label={FINISHING_LABELS[v]}
-                  active={finishing === v}
-                  onPress={() => {
-                    setFinishing(v);
-                    clearFieldError('finishing');
-                  }}
-                />
-              ))}
-            </View>
-          </Field>
+          {hasFinishing && (
+            <Field
+              ref={(node) => setFieldRef('finishing', node)}
+              label={S.fFinishing}
+              error={fieldErrors.finishing}>
+              <View className="flex-row flex-wrap gap-2 justify-end">
+                {FINISHING_TYPES.map((v) => (
+                  <Chip
+                    key={v}
+                    label={FINISHING_LABELS[v]}
+                    active={finishing === v}
+                    onPress={() => {
+                      setFinishing(v);
+                      clearFieldError('finishing');
+                    }}
+                  />
+                ))}
+              </View>
+            </Field>
+          )}
 
           {listingType === 'rent' && (
             <Field label={`${S.fDeposit} ${S.optional}`}>

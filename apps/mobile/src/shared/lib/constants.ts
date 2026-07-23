@@ -36,6 +36,17 @@ export const TYPE_LABELS = localeMap<PropertyType>(
   { apartment: 'Apartment', villa: 'Villa', chalet: 'Chalet', shop: 'Shop', building: 'Building', factory: 'Factory', land: 'Land' }
 );
 
+const PROPERTY_TYPES_WITHOUT_ROOMS = new Set(['shop', 'factory', 'land']);
+const PROPERTY_TYPES_WITHOUT_FINISHING = new Set(['factory', 'land']);
+
+export function propertyTypeHasRooms(type: string): boolean {
+  return type !== '' && !PROPERTY_TYPES_WITHOUT_ROOMS.has(type);
+}
+
+export function propertyTypeHasFinishing(type: string): boolean {
+  return type !== '' && !PROPERTY_TYPES_WITHOUT_FINISHING.has(type);
+}
+
 export const LISTING_TYPE_LABELS = localeMap<ListingType>(
   { sale: 'للبيع', rent: 'للإيجار' },
   { sale: 'For sale', rent: 'For rent' }

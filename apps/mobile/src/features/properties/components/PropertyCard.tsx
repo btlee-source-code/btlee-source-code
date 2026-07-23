@@ -13,7 +13,11 @@ import { S } from '@/config/strings';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { useWishlist } from '@/features/wishlist/hooks/useWishlist';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
-import { LISTING_TYPE_LABELS, TYPE_LABELS } from '@/shared/lib/constants';
+import {
+  LISTING_TYPE_LABELS,
+  TYPE_LABELS,
+  propertyTypeHasRooms,
+} from '@/shared/lib/constants';
 import { formatPrice } from '@/shared/lib/format';
 import { blurPlaceholder } from '@/shared/lib/images';
 import { shadows } from '@/shared/lib/shadows';
@@ -46,8 +50,12 @@ export function PropertyCard({ property }: { property: Property }) {
   };
 
   const specs = [
-    `${property.bedrooms} ${S.roomsShort}`,
-    `${property.bathrooms} ${S.bathsShort}`,
+    ...(propertyTypeHasRooms(property.type)
+      ? [
+          `${property.bedrooms} ${S.roomsShort}`,
+          `${property.bathrooms} ${S.bathsShort}`,
+        ]
+      : []),
     property.area != null ? `${property.area} ${S.areaUnit}` : null,
   ]
     .filter(Boolean)
