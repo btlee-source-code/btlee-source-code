@@ -43,6 +43,11 @@ export function RegisterScreen() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [agreed, setAgreed] = useState(false);
 
+  const leaveAuthScreen = () => {
+    if (router.canGoBack()) router.back();
+    else router.replace('/');
+  };
+
   const validate = (): boolean => {
     const e: Errors = {};
     if (name.trim().length < 2) e.name = S.required;
@@ -80,7 +85,7 @@ export function RegisterScreen() {
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerClassName="px-6 pt-2 pb-8 flex-grow" keyboardShouldPersistTaps="handled">
           <Pressable
-            onPress={() => router.back()}
+            onPress={leaveAuthScreen}
             hitSlop={8}
             className="h-10 w-10 rounded-full border border-border bg-card items-center justify-center active:bg-secondary">
             <ArrowRight size={20} color={c.foreground} />
@@ -101,7 +106,8 @@ export function RegisterScreen() {
           <GoogleSignInButton
             onSuccess={(isNewUser) => {
               toast.success(isNewUser ? S.toastRegisterSuccess : S.toastLoginSuccess);
-              isNewUser ? setShowOnboarding(true) : router.back();
+              if (isNewUser) setShowOnboarding(true);
+              else router.replace('/');
             }}
             blocked={!agreed}
             onBlockedPress={() => setErrors({ form: S.mustAcceptTerms })}

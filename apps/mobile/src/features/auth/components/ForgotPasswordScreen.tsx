@@ -34,6 +34,11 @@ export function ForgotPasswordScreen() {
   const [done, setDone] = useState(false);
   const c = useThemeColors();
 
+  const leaveAuthScreen = () => {
+    if (router.canGoBack()) router.back();
+    else router.replace('/login');
+  };
+
   const onSubmit = async () => {
     if (!EMAIL_RE.test(email.trim())) {
       setError(S.invalidEmail);
@@ -56,7 +61,7 @@ export function ForgotPasswordScreen() {
       <ResponsivePage size="compact">
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerClassName="px-6 pt-2 pb-8 flex-grow" keyboardShouldPersistTaps="handled">
-          <Pressable onPress={() => router.back()} hitSlop={8} className="h-10 w-10 items-start justify-center">
+          <Pressable onPress={leaveAuthScreen} hitSlop={8} className="h-10 w-10 items-start justify-center">
             <ArrowRight size={24} color={c.primary} />
           </Pressable>
           <View className="items-center mt-4 mb-8">

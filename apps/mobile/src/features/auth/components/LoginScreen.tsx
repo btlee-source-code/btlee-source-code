@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
+import { OnboardingSheet } from '@/features/account/components/OnboardingSheet';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { HttpError } from '@/shared/api/httpClient';
 import { Logo } from '@/shared/components/layout/Logo';
@@ -35,6 +36,12 @@ export function LoginScreen() {
   const [pwFocused, setPwFocused] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  const leaveAuthScreen = () => {
+    if (router.canGoBack()) router.back();
+    else router.replace('/');
+  };
 
   const onSubmit = async () => {
     if (!identifier.trim() || !password) {
@@ -46,7 +53,7 @@ export function LoginScreen() {
     try {
       await login(identifier.trim(), password);
       toast.success(S.toastLoginSuccess);
-      router.back(); // return to wherever the user came from (now authenticated)
+      leaveAuthScreen();
     } catch (e) {
       const err = e as HttpError;
       const msg = err.status === 401 ? S.loginFailed : err.message || S.genericError;
@@ -64,7 +71,7 @@ export function LoginScreen() {
         <ScrollView contentContainerClassName="px-6 pt-3 pb-8 flex-grow" keyboardShouldPersistTaps="handled">
           {/* Back */}
           <Pressable
-            onPress={() => router.back()}
+            onPress={leaveAuthScreen}
             hitSlop={8}
             className="h-10 w-10 rounded-full border border-border bg-card items-center justify-center active:bg-secondary">
             <ArrowRight size={20} color={c.foreground} />
@@ -83,9 +90,16 @@ export function LoginScreen() {
           <Text className="text-sm text-muted-foreground font-cairo text-right mb-6">{S.signInSubtitle}</Text>
 
           <GoogleSignInButton
-            onSuccess={() => {
-              toast.success(S.toastLoginSuccess);
-              router.back();
+            onSuccess={(isNewUser) => {
+              toast.success(isNewUser ? S.toastRegisterSuccess : S.toastLoginSuccess);
+              if (isNewUser) {
+                setShowOnboarding(true);
+                return;
+              }
+              // OAuth also activates the dedicated /oauth route. Replacing with
+              // home is deterministic even if both callbacks finish together;
+              // going back here could pop the app or return to the login screen.
+              router.replace('/');
             }}
           />
 
@@ -154,6 +168,8 @@ export function LoginScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
       </ResponsivePage>
+
+      <OnboardingSheet visible={showOnboarding} onComplete={() => router.replace('/')} />
     </SafeAreaView>
   );
 }
