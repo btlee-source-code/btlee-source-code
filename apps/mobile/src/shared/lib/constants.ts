@@ -53,8 +53,18 @@ export const LISTING_TYPE_LABELS = localeMap<ListingType>(
 );
 
 export const CATEGORY_LABELS = localeMap<PropertyCategory>(
-  { residential: 'سكني', commercial: 'تجاري' },
-  { residential: 'Residential', commercial: 'Commercial' }
+  {
+    residential: 'سكني',
+    commercial: 'تجاري',
+    industrial: 'صناعي',
+    agricultural: 'زراعي',
+  },
+  {
+    residential: 'Residential',
+    commercial: 'Commercial',
+    industrial: 'Industrial',
+    agricultural: 'Agricultural',
+  }
 );
 
 export const FINISHING_LABELS = localeMap<FinishingType>(

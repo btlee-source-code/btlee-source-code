@@ -31,7 +31,7 @@ function chipsFromFilters(f: Filters): { key: keyof Filters; label: string }[] {
   const chips: { key: keyof Filters; label: string }[] = [];
   if (f.listingType) chips.push({ key: 'listingType', label: LISTING_TYPE_LABELS[f.listingType as 'sale' | 'rent'] });
   if (f.type) chips.push({ key: 'type', label: TYPE_LABELS[f.type as keyof typeof TYPE_LABELS] });
-  if (f.category) chips.push({ key: 'category', label: CATEGORY_LABELS[f.category as 'residential' | 'commercial'] });
+  if (f.category) chips.push({ key: 'category', label: CATEGORY_LABELS[f.category as keyof typeof CATEGORY_LABELS] });
   if (f.finishing) chips.push({ key: 'finishing', label: FINISHING_LABELS[f.finishing as keyof typeof FINISHING_LABELS] });
   if (f.governorate) chips.push({ key: 'governorate', label: f.governorate });
   if (f.minBedrooms) chips.push({ key: 'minBedrooms', label: S.chipMinBedrooms(f.minBedrooms) });

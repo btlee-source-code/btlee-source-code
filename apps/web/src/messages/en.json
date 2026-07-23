@@ -284,7 +284,9 @@
     },
     "categories": {
       "residential": "Residential",
-      "commercial": "Commercial"
+      "commercial": "Commercial",
+      "industrial": "Industrial",
+      "agricultural": "Agricultural"
     },
     "finishing": {
       "furnished": "Furnished",

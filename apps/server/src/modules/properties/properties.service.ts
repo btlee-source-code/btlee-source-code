@@ -293,7 +293,31 @@ export async function getPropertiesByOwner(ownerId: string, limit = 12) {
  * Creates a new listing. Status is always 'pending' — admin must approve.
  * Computes expiresAt from durationDays.
  */
+function assertPropertyCategoryMatchesType(type: string, category: string): void {
+  const fixedCategory =
+    type === 'shop'
+      ? 'commercial'
+      : type === 'factory'
+        ? 'industrial'
+        : type === 'land'
+          ? 'agricultural'
+          : undefined;
+
+  if (fixedCategory && category !== fixedCategory) {
+    throw new BadRequestError(
+      `${type === 'shop' ? 'Shops' : type === 'factory' ? 'Factories' : 'Land listings'} must use the ${fixedCategory} category`
+    );
+  }
+  if (!fixedCategory && (category === 'industrial' || category === 'agricultural')) {
+    throw new BadRequestError(
+      'Industrial and agricultural categories are reserved for factories and land'
+    );
+  }
+}
+
 export async function createProperty(ownerId: string, input: CreatePropertyInput) {
+  assertPropertyCategoryMatchesType(input.type, input.category);
+
   const expiresAt = new Date(Date.now() + input.durationDays * 24 * 60 * 60 * 1000);
   const seq = await getNextSequence('property');
 
@@ -308,9 +332,15 @@ export async function createProperty(ownerId: string, input: CreatePropertyInput
     floor: input.type === 'apartment' ? input.floor : null,
     area: input.area,
     finishing: input.finishing,
-    services: input.services ?? [],
-    hasElevator: input.hasElevator ?? false,
-    hasGarage: input.hasGarage ?? false,
+    services:
+      input.type === 'land'
+        ? []
+        : input.type === 'shop'
+          ? (input.services ?? []).filter((service) => service !== 'wifi')
+          : input.services ?? [],
+    hasElevator:
+      input.type === 'land' || input.type === 'shop' ? false : input.hasElevator ?? false,
+    hasGarage: input.type === 'land' ? false : input.hasGarage ?? false,
     deposit: input.deposit ?? null,
     price: input.price,
     governorate: input.governorate,
@@ -351,6 +381,9 @@ export async function updateProperty(
   }
 
   const wasRejected = property.status === 'rejected';
+  const finalType = input.type ?? property.type;
+  const finalCategory = input.category ?? property.category;
+  assertPropertyCategoryMatchesType(finalType, finalCategory);
 
   Object.assign(property, {
     ...(input.type !== undefined && { type: input.type }),
@@ -373,11 +406,19 @@ export async function updateProperty(
   });
 
   // Floor only applies to apartments
-  const finalType = input.type ?? property.type;
   if (finalType === 'apartment' && input.floor !== undefined) {
     property.floor = input.floor;
   } else if (finalType !== 'apartment') {
     property.floor = null;
+  }
+
+  if (finalType === 'land') {
+    property.services = [];
+    property.hasElevator = false;
+    property.hasGarage = false;
+  } else if (finalType === 'shop') {
+    property.services = property.services.filter((service) => service !== 'wifi');
+    property.hasElevator = false;
   }
 
   if (input.coordinates) {

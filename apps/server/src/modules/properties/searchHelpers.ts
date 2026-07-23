@@ -92,6 +92,8 @@ const LISTING_SYNONYMS: Record<ListingType, string[]> = {
 const CATEGORY_SYNONYMS: Record<PropertyCategory, string[]> = {
   residential: ['سكني', 'سكنيه', 'residential'],
   commercial: ['تجاري', 'تجاريه', 'commercial'],
+  industrial: ['صناعي', 'صناعيه', 'industrial'],
+  agricultural: ['زراعي', 'زراعيه', 'agricultural'],
 };
 
 const FINISHING_SYNONYMS: Record<FinishingType, string[]> = {

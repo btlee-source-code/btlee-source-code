@@ -283,7 +283,9 @@
     },
     "categories": {
       "residential": "سكني",
-      "commercial": "تجاري"
+      "commercial": "تجاري",
+      "industrial": "صناعي",
+      "agricultural": "زراعي"
     },
     "finishing": {
       "furnished": "مفروش",

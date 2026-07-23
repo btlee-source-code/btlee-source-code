@@ -141,6 +141,12 @@ export function PropertyDetailScreen() {
     Linking.openURL(whatsappLink(property.whatsappNumber, msg)).catch(() => {});
   };
   const title = `${TYPE_LABELS[property.type]} ${S.in} ${property.area_name}`;
+  const visibleServices =
+    property.type === 'land'
+      ? []
+      : property.type === 'shop'
+        ? property.services.filter((service) => service !== 'wifi')
+        : property.services;
 
   // Details rows — built once so separators can skip the last row.
   const specRows: { key: string; icon: React.ReactNode; label: string; value: string }[] = [];
@@ -184,9 +190,9 @@ export function PropertyDetailScreen() {
       label: S.depositLabel,
       value: DEPOSIT_LABELS[property.deposit],
     });
-  if (property.hasElevator)
+  if (property.type !== 'land' && property.type !== 'shop' && property.hasElevator)
     specRows.push({ key: 'elevator', icon: <MoveVertical size={19} color={c.muted} />, label: S.elevator, value: S.available });
-  if (property.hasGarage)
+  if (property.type !== 'land' && property.hasGarage)
     specRows.push({ key: 'garage', icon: <CarFront size={19} color={c.muted} />, label: S.garage, value: S.available });
 
   return (
@@ -357,13 +363,13 @@ export function PropertyDetailScreen() {
           </View>
 
           {/* Services */}
-          {property.services.length > 0 && (
+          {visibleServices.length > 0 && (
             <>
               <View className="h-px bg-border" />
               <View className="gap-2.5">
                 <Text className="text-base font-cairo-bold text-foreground text-right">{S.servicesLabel}</Text>
                 <View className="flex-row flex-wrap gap-2 justify-end">
-                  {property.services.map((svc) => (
+                  {visibleServices.map((svc) => (
                     <View key={svc} className="border border-border bg-card rounded-full px-3.5 py-1.5">
                       <Text className="text-foreground font-cairo-medium text-xs">{SERVICE_LABELS[svc]}</Text>
                     </View>

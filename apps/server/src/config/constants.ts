@@ -9,7 +9,12 @@ export type PropertyType = (typeof PROPERTY_TYPES)[number];
 export const LISTING_TYPES = ['sale', 'rent'] as const;
 export type ListingType = (typeof LISTING_TYPES)[number];
 
-export const PROPERTY_CATEGORIES = ['residential', 'commercial'] as const;
+export const PROPERTY_CATEGORIES = [
+  'residential',
+  'commercial',
+  'industrial',
+  'agricultural',
+] as const;
 export type PropertyCategory = (typeof PROPERTY_CATEGORIES)[number];
 
 export const FINISHING_TYPES = ['furnished', 'unfurnished', 'semi-finished'] as const;

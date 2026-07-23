@@ -67,13 +67,81 @@ const propertyBaseSchema = z.object({
     .max(MAX_LISTING_DURATION_DAYS),
 });
 
-export const createPropertySchema = propertyBaseSchema.refine(
-  (data) => {
-    if (data.type === 'apartment') return data.floor !== null && data.floor !== undefined;
-    return true;
-  },
-  { message: 'Floor number is required for apartments', path: ['floor'] }
-);
+export const createPropertySchema = propertyBaseSchema.superRefine((data, ctx) => {
+  if (data.type === 'apartment' && (data.floor === null || data.floor === undefined)) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Floor number is required for apartments',
+      path: ['floor'],
+    });
+  }
+
+  const fixedCategory =
+    data.type === 'shop'
+      ? 'commercial'
+      : data.type === 'factory'
+        ? 'industrial'
+        : data.type === 'land'
+          ? 'agricultural'
+          : undefined;
+  if (fixedCategory && data.category !== fixedCategory) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `${data.type === 'shop' ? 'Shops' : data.type === 'factory' ? 'Factories' : 'Land listings'} must use the ${fixedCategory} category`,
+      path: ['category'],
+    });
+  } else if (
+    !fixedCategory &&
+    (data.category === 'industrial' || data.category === 'agricultural')
+  ) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Industrial and agricultural categories are reserved for factories and land',
+      path: ['category'],
+    });
+  }
+
+  if (data.type === 'land') {
+    if (data.services && data.services.length > 0) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Services cannot be selected for land listings',
+        path: ['services'],
+      });
+    }
+    if (data.hasElevator) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Elevators cannot be selected for land listings',
+        path: ['hasElevator'],
+      });
+    }
+    if (data.hasGarage) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Garages cannot be selected for land listings',
+        path: ['hasGarage'],
+      });
+    }
+  }
+
+  if (data.type === 'shop') {
+    if (data.services?.includes('wifi')) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Wi-Fi cannot be selected for shop listings',
+        path: ['services'],
+      });
+    }
+    if (data.hasElevator) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Elevators cannot be selected for shop listings',
+        path: ['hasElevator'],
+      });
+    }
+  }
+});
 
 export const updatePropertySchema = propertyBaseSchema.partial();
 

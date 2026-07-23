@@ -51,6 +51,17 @@ import { LocationPicker } from './LocationPicker';
 
 const DURATIONS = [30, 60, 90, 180, 365];
 const ADVERTISABLE_PROPERTY_TYPES = PROPERTY_TYPES.filter((value) => value !== 'building');
+const GENERAL_PROPERTY_CATEGORIES = PROPERTY_CATEGORIES.filter(
+  (value) => value !== 'industrial' && value !== 'agricultural'
+);
+const SHOP_SERVICES = PROPERTY_SERVICES.filter((service) => service !== 'wifi');
+
+function fixedCategoryForPropertyType(type: string) {
+  if (type === 'shop') return 'commercial' as const;
+  if (type === 'factory') return 'industrial' as const;
+  if (type === 'land') return 'agricultural' as const;
+  return undefined;
+}
 
 type PropertyFieldKey =
   | 'images'
@@ -156,7 +167,9 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
 
   const [type, setType] = useState(initial?.type ?? '');
   const [listingType, setListingType] = useState(initial?.listingType ?? '');
-  const [category, setCategory] = useState(initial?.category ?? '');
+  const [category, setCategory] = useState(
+    initial ? fixedCategoryForPropertyType(initial.type) ?? initial.category : ''
+  );
   const [finishing, setFinishing] = useState(initial?.finishing ?? '');
   const [governorate, setGovernorate] = useState(initial?.governorate ?? '');
   const [areaName, setAreaName] = useState(initial?.area_name ?? '');
@@ -183,6 +196,10 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
   const [phase, setPhase] = useState<'idle' | 'uploading' | 'saving'>('idle');
   const hasRoomCounts = propertyTypeHasRooms(type);
   const hasFinishing = propertyTypeHasFinishing(type);
+  const fixedCategory = fixedCategoryForPropertyType(type);
+  const categoryOptions = fixedCategory ? [fixedCategory] : GENERAL_PROPERTY_CATEGORIES;
+  const hasServicesAndAmenities = type !== 'land';
+  const serviceOptions = type === 'shop' ? SHOP_SERVICES : PROPERTY_SERVICES;
   const c = useThemeColors();
   const { scrollRef, setFieldRef, handleScroll, scrollToFirstError } =
     useFormErrorScroll<PropertyFieldKey>();
@@ -217,7 +234,14 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
     else if (imageCount > MAX_IMAGES) errors.images = S.maxImagesError(MAX_IMAGES);
     if (!listingType) errors.listingType = S.selectFieldError(S.fListingType);
     if (!type) errors.type = S.selectFieldError(S.fType);
-    if (!category) errors.category = S.selectFieldError(S.fCategory);
+    if (
+      !category ||
+      (fixedCategory
+        ? category !== fixedCategory
+        : category === 'industrial' || category === 'agricultural')
+    ) {
+      errors.category = S.selectFieldError(S.fCategory);
+    }
 
     if (hasRoomCounts) {
       if (bedrooms == null) {
@@ -307,9 +331,13 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
         floor: type === 'apartment' ? floor ?? null : null,
         area: area ?? null,
         finishing: hasFinishing ? finishing : 'unfurnished',
-        services,
-        hasElevator,
-        hasGarage,
+        services: hasServicesAndAmenities
+          ? type === 'shop'
+            ? services.filter((service) => service !== 'wifi')
+            : services
+          : [],
+        hasElevator: hasServicesAndAmenities && type !== 'shop' ? hasElevator : false,
+        hasGarage: hasServicesAndAmenities ? hasGarage : false,
         deposit: listingType === 'rent' ? deposit ?? null : null,
         price: price ?? null,
         governorate,
@@ -433,6 +461,13 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
                     setType(v);
                     clearFieldError('type');
                     if (v !== 'apartment') clearFieldError('floor');
+                    const nextFixedCategory = fixedCategoryForPropertyType(v);
+                    if (nextFixedCategory) {
+                      setCategory(nextFixedCategory);
+                      clearFieldError('category');
+                    } else if (category === 'industrial' || category === 'agricultural') {
+                      setCategory('');
+                    }
                     if (!propertyTypeHasRooms(v)) {
                       setBedrooms(undefined);
                       setBathrooms(undefined);
@@ -442,6 +477,16 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
                     if (!propertyTypeHasFinishing(v)) {
                       setFinishing('');
                       clearFieldError('finishing');
+                    }
+                    if (v === 'land') {
+                      setServices([]);
+                      setHasElevator(false);
+                      setHasGarage(false);
+                    } else if (v === 'shop') {
+                      setServices((current) =>
+                        current.filter((service) => service !== 'wifi')
+                      );
+                      setHasElevator(false);
                     }
                   }}
                 />
@@ -454,7 +499,7 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
             label={S.fCategory}
             error={fieldErrors.category}>
             <View className="flex-row flex-wrap gap-2 justify-end">
-              {PROPERTY_CATEGORIES.map((v) => (
+              {categoryOptions.map((v) => (
                 <Chip
                   key={v}
                   label={CATEGORY_LABELS[v]}
@@ -593,22 +638,28 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
             </Field>
           )}
 
-          <Field label={`${S.fServices} ${S.optional}`}>
-            <View className="flex-row flex-wrap gap-2 justify-end">
-              {PROPERTY_SERVICES.map((v) => (
-                <Chip key={v} label={SERVICE_LABELS[v]} active={services.includes(v)} onPress={() => toggleService(v)} />
-              ))}
-            </View>
-          </Field>
+          {hasServicesAndAmenities && (
+            <>
+              <Field label={`${S.fServices} ${S.optional}`}>
+                <View className="flex-row flex-wrap gap-2 justify-end">
+                  {serviceOptions.map((v) => (
+                    <Chip key={v} label={SERVICE_LABELS[v]} active={services.includes(v)} onPress={() => toggleService(v)} />
+                  ))}
+                </View>
+              </Field>
 
-          <View className="flex-row items-center justify-between bg-secondary rounded-xl px-4 py-3">
-            <Switch value={hasElevator} onValueChange={setHasElevator} trackColor={{ true: c.accent }} />
-            <Text className="font-cairo-medium text-foreground">{S.fElevator}</Text>
-          </View>
-          <View className="flex-row items-center justify-between bg-secondary rounded-xl px-4 py-3">
-            <Switch value={hasGarage} onValueChange={setHasGarage} trackColor={{ true: c.accent }} />
-            <Text className="font-cairo-medium text-foreground">{S.fGarage}</Text>
-          </View>
+              {type !== 'shop' && (
+                <View className="flex-row items-center justify-between bg-secondary rounded-xl px-4 py-3">
+                  <Switch value={hasElevator} onValueChange={setHasElevator} trackColor={{ true: c.accent }} />
+                  <Text className="font-cairo-medium text-foreground">{S.fElevator}</Text>
+                </View>
+              )}
+              <View className="flex-row items-center justify-between bg-secondary rounded-xl px-4 py-3">
+                <Switch value={hasGarage} onValueChange={setHasGarage} trackColor={{ true: c.accent }} />
+                <Text className="font-cairo-medium text-foreground">{S.fGarage}</Text>
+              </View>
+            </>
+          )}
 
           <Field
             ref={(node) => setFieldRef('governorate', node)}

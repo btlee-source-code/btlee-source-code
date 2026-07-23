@@ -119,9 +119,38 @@ function buildPropertySchema(
         .min(MIN_DURATION_DAYS)
         .max(MAX_DURATION_DAYS),
     })
-    .refine((data) => data.floor != null, {
+    .refine((data) => data.type !== 'apartment' || data.floor != null, {
       message: tErr('floorRequired'),
       path: ['floor'],
+    })
+    .superRefine((data, ctx) => {
+      const fixedCategory =
+        data.type === 'shop' ? 'commercial' : data.type === 'factory' ? 'industrial' : undefined;
+      if (
+        (fixedCategory && data.category !== fixedCategory) ||
+        (!fixedCategory &&
+          (data.category === 'industrial' || data.category === 'agricultural'))
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          message: tErr('required'),
+          path: ['category'],
+        });
+      }
+      if (data.type === 'shop' && data.services.includes('wifi')) {
+        ctx.addIssue({
+          code: 'custom',
+          message: tErr('required'),
+          path: ['services'],
+        });
+      }
+      if (data.type === 'shop' && data.hasElevator) {
+        ctx.addIssue({
+          code: 'custom',
+          message: tErr('required'),
+          path: ['hasElevator'],
+        });
+      }
     });
 }
 
@@ -166,6 +195,7 @@ export function PropertyForm({
     handleSubmit,
     control,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<PropertyFormInput, unknown, PropertyFormValues>({
     resolver: zodResolver(schema),
@@ -184,8 +214,22 @@ export function PropertyForm({
     },
   });
 
+  const watchType = watch('type');
   const watchCategory = watch('category');
   const watchListingType = watch('listingType');
+  const watchServices = watch('services') ?? [];
+  const fixedCategory =
+    watchType === 'shop' ? 'commercial' : watchType === 'factory' ? 'industrial' : undefined;
+  const categoryOptions =
+    fixedCategory
+      ? [fixedCategory]
+        : PROPERTY_CATEGORIES.filter(
+          (category) => category !== 'industrial' && category !== 'agricultural'
+        );
+  const serviceOptions =
+    watchType === 'shop'
+      ? PROPERTY_SERVICES.filter((service) => service !== 'wifi')
+      : PROPERTY_SERVICES;
 
   // On a failed submit, bring the first invalid field into view. RHF focuses
   // native inputs, but custom controls (Select/RadioGroup/chips) aren't always
@@ -230,7 +274,32 @@ export function PropertyForm({
               control={control}
               name="type"
               render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                    const nextFixedCategory =
+                      value === 'shop'
+                        ? 'commercial'
+                        : value === 'factory'
+                          ? 'industrial'
+                          : undefined;
+                    if (nextFixedCategory) {
+                      setValue('category', nextFixedCategory, { shouldValidate: true });
+                    } else if (
+                      watchCategory === 'industrial' ||
+                      watchCategory === 'agricultural'
+                    ) {
+                      setValue('category', 'residential', { shouldValidate: true });
+                    }
+                    if (value === 'shop') {
+                      setValue(
+                        'services',
+                        watchServices.filter((service) => service !== 'wifi')
+                      );
+                      setValue('hasElevator', false);
+                    }
+                  }}>
                   <SelectTrigger>
                     <SelectValue placeholder={t('fields.selectType')} />
                   </SelectTrigger>
@@ -285,7 +354,7 @@ export function PropertyForm({
                   onValueChange={field.onChange}
                   className="grid grid-cols-2 gap-3"
                 >
-                  {PROPERTY_CATEGORIES.map((c) => (
+                  {categoryOptions.map((c) => (
                     <label
                       key={c}
                       className="flex items-center gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-secondary"
@@ -398,7 +467,7 @@ export function PropertyForm({
                 const selected = field.value ?? [];
                 return (
                   <div className="flex flex-wrap gap-2">
-                    {PROPERTY_SERVICES.map((s) => {
+                    {serviceOptions.map((s) => {
                       const Icon = SERVICE_ICONS[s];
                       const active = selected.includes(s);
                       return (
@@ -432,35 +501,37 @@ export function PropertyForm({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Elevator */}
-            <div className="space-y-2">
-              <Label className="flex items-center gap-1.5">
-                <ArrowUpDown className="size-4" />
-                {t('fields.elevator')}
-              </Label>
-              <Controller
-                control={control}
-                name="hasElevator"
-                render={({ field }) => (
-                  <RadioGroup
-                    value={String(field.value)}
-                    onValueChange={(v) => field.onChange(v === 'true')}
-                    className="grid grid-cols-2 gap-3"
-                  >
-                    {[true, false].map((val) => (
-                      <label
-                        key={String(val)}
-                        className="flex items-center gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-secondary"
-                      >
-                        <RadioGroupItem value={String(val)} />
-                        <span className="font-medium">
-                          {val ? t('fields.yes') : t('fields.no')}
-                        </span>
-                      </label>
-                    ))}
-                  </RadioGroup>
-                )}
-              />
-            </div>
+            {watchType !== 'shop' && (
+              <div className="space-y-2">
+                <Label className="flex items-center gap-1.5">
+                  <ArrowUpDown className="size-4" />
+                  {t('fields.elevator')}
+                </Label>
+                <Controller
+                  control={control}
+                  name="hasElevator"
+                  render={({ field }) => (
+                    <RadioGroup
+                      value={String(field.value)}
+                      onValueChange={(v) => field.onChange(v === 'true')}
+                      className="grid grid-cols-2 gap-3"
+                    >
+                      {[true, false].map((val) => (
+                        <label
+                          key={String(val)}
+                          className="flex items-center gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-secondary"
+                        >
+                          <RadioGroupItem value={String(val)} />
+                          <span className="font-medium">
+                            {val ? t('fields.yes') : t('fields.no')}
+                          </span>
+                        </label>
+                      ))}
+                    </RadioGroup>
+                  )}
+                />
+              </div>
+            )}
 
             {/* Garage */}
             <div className="space-y-2">

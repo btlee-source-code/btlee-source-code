@@ -1,83 +1,87 @@
 /**
  * Properties Routes — /api/properties/*
  */
-import { Router } from 'express';
-import * as controller from './properties.controller.js';
-import { protect, optionalAuth } from '../../shared/middlewares/authMiddleware.js';
-import { validate } from '../../shared/middlewares/validate.js';
-import { asyncHandler } from '../../shared/middlewares/asyncHandler.js';
-import { createListingLimiter } from '../../shared/middlewares/rateLimiters.js';
+import { Router } from "express";
+import * as controller from "./properties.controller.js";
+import {
+  protect,
+  optionalAuth,
+} from "../../shared/middlewares/authMiddleware.js";
+import { validate } from "../../shared/middlewares/validate.js";
+import { asyncHandler } from "../../shared/middlewares/asyncHandler.js";
+import { createListingLimiter } from "../../shared/middlewares/rateLimiters.js";
 import {
   createPropertySchema,
   updatePropertySchema,
   propertyListQuerySchema,
   propertyIdParamsSchema,
   markAsSoldRentedSchema,
-} from './properties.validators.js';
-import { z } from 'zod';
+} from "./properties.validators.js";
+import { z } from "zod";
 
 export const propertiesRouter = Router();
 
 const ownerIdParams = z.object({
-  ownerId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid owner id'),
+  ownerId: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid owner id"),
 });
 
 // Public listings — anyone can browse
 propertiesRouter.get(
-  '/',
+  "/",
   validate({ query: propertyListQuerySchema }),
-  asyncHandler(controller.list)
+  asyncHandler(controller.list),
 );
-propertiesRouter.get('/featured', asyncHandler(controller.featured));
-propertiesRouter.get('/latest', asyncHandler(controller.latest));
-propertiesRouter.get('/suggestions', asyncHandler(controller.suggestions));
+propertiesRouter.get("/featured", asyncHandler(controller.featured));
+propertiesRouter.get("/latest", asyncHandler(controller.latest));
+propertiesRouter.get("/suggestions", asyncHandler(controller.suggestions));
 
 // Authenticated user — must be before the /:id route to avoid clashing
-propertiesRouter.get('/mine', protect, asyncHandler(controller.getMine));
+propertiesRouter.get("/mine", protect, asyncHandler(controller.getMine));
 
 // Specific property detail
 propertiesRouter.get(
-  '/:id',
+  "/:id",
   optionalAuth,
   validate({ params: propertyIdParamsSchema }),
-  asyncHandler(controller.getOne)
+  asyncHandler(controller.getOne),
 );
+
 propertiesRouter.get(
-  '/:id/similar',
+  "/:id/similar",
   validate({ params: propertyIdParamsSchema }),
-  asyncHandler(controller.similar)
+  asyncHandler(controller.similar),
 );
 
 // Public owner listings
 propertiesRouter.get(
-  '/by-owner/:ownerId',
+  "/by-owner/:ownerId",
   validate({ params: ownerIdParams }),
-  asyncHandler(controller.byOwner)
+  asyncHandler(controller.byOwner),
 );
 
 // Create + manage listing (owner only)
 propertiesRouter.post(
-  '/',
+  "/",
   protect,
   createListingLimiter,
   validate({ body: createPropertySchema }),
-  asyncHandler(controller.create)
+  asyncHandler(controller.create),
 );
 propertiesRouter.patch(
-  '/:id',
+  "/:id",
   protect,
   validate({ params: propertyIdParamsSchema, body: updatePropertySchema }),
-  asyncHandler(controller.update)
+  asyncHandler(controller.update),
 );
 propertiesRouter.delete(
-  '/:id',
+  "/:id",
   protect,
   validate({ params: propertyIdParamsSchema }),
-  asyncHandler(controller.remove)
+  asyncHandler(controller.remove),
 );
 propertiesRouter.post(
-  '/:id/mark',
+  "/:id/mark",
   protect,
   validate({ params: propertyIdParamsSchema, body: markAsSoldRentedSchema }),
-  asyncHandler(controller.markSoldOrRented)
+  asyncHandler(controller.markSoldOrRented),
 );
