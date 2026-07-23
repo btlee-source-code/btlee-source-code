@@ -58,10 +58,10 @@ export function ToastHost() {
         key={current.id}
         entering={FadeInDown.duration(300).easing(Easing.out(Easing.cubic))}
         exiting={FadeOutUp.duration(200).easing(Easing.in(Easing.cubic))}
-        style={{ maxWidth: '100%' }}>
+        style={{ width: '100%', maxWidth: 560 }}>
         <View
           className="flex-row items-center gap-2.5 bg-foreground rounded-3xl pl-5 pr-2.5 py-2.5"
-          style={[shadows.lg, { maxWidth: '100%', minHeight: 48 }]}>
+          style={[shadows.lg, { width: '100%', minHeight: 48 }]}>
           <Text
             className="flex-shrink text-background font-cairo-semibold text-[13px] text-right"
             maxFontSizeMultiplier={1.2}>

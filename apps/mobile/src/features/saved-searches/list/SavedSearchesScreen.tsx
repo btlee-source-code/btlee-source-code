@@ -9,6 +9,7 @@ import { useAuth } from '@/features/auth/hooks/useAuth';
 import { CAR_BODY_TYPE_LABELS, CAR_CONDITION_LABELS } from '@/features/cars/lib/carConstants';
 import { useSection } from '@/features/section/hooks/useSection';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import { LISTING_TYPE_LABELS, TYPE_LABELS } from '@/shared/lib/constants';
 import { formatPrice } from '@/shared/lib/format';
 import type { CarBodyType, CarCondition } from '@/shared/types/car';
@@ -110,6 +111,7 @@ export function SavedSearchesScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
+      <ResponsivePage size="content">
       {/* Header */}
       <View className="flex-row items-center justify-between px-5 py-3 border-b border-border">
         <Pressable onPress={() => router.back()} hitSlop={8}>
@@ -190,6 +192,7 @@ export function SavedSearchesScreen() {
           }
         />
       )}
+      </ResponsivePage>
     </SafeAreaView>
   );
 }

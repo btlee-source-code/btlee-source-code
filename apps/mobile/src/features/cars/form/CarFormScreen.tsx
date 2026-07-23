@@ -44,6 +44,7 @@ import { FormField as Field } from '@/shared/components/ui/FormField';
 import { ResponsiveFieldRow } from '@/shared/components/ui/ResponsiveFieldRow';
 import { toast } from '@/shared/components/ui/Toast';
 import { HttpError } from '@/shared/api/httpClient';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import { useFormErrorScroll } from '@/shared/hooks/useFormErrorScroll';
 import { CarMakePicker } from './CarMakePicker';
 
@@ -338,6 +339,7 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
+      <ResponsivePage size="form">
       <View className="flex-row items-center justify-between px-5 py-3 border-b border-border">
         <Pressable onPress={() => router.back()} hitSlop={8}>
           <ArrowRight size={24} color={c.primary} />
@@ -717,6 +719,7 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
           )}
         </Pressable>
       </View>
+      </ResponsivePage>
     </SafeAreaView>
   );
 }

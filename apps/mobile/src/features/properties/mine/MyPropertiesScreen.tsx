@@ -8,6 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { S } from '@/config/strings';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import { STATUS_LABELS } from '@/shared/lib/constants';
 import { formatPrice } from '@/shared/lib/format';
 import type { Property, PropertyStatus } from '@/shared/types/property';
@@ -80,6 +81,7 @@ export function MyPropertiesScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
+      <ResponsivePage size="content">
       {/* Header */}
       <View className="flex-row items-center justify-between px-5 py-3 border-b border-border">
         <Pressable onPress={() => router.back()} hitSlop={8}>
@@ -206,6 +208,7 @@ export function MyPropertiesScreen() {
           }
         />
       )}
+      </ResponsivePage>
     </SafeAreaView>
   );
 }

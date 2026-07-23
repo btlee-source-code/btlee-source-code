@@ -12,9 +12,11 @@ import { useSection } from '@/features/section/hooks/useSection';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { carWishlistApi } from '@/features/wishlist/api/carWishlist.api';
 import { wishlistApi } from '@/features/wishlist/api/wishlist.api';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import { EmptyState } from '@/shared/components/ui/EmptyState';
 import { SkeletonPropertyCard } from '@/shared/components/ui/Skeleton';
 import { useFetch } from '@/shared/hooks/useFetch';
+import { useResponsiveLayout } from '@/shared/hooks/useResponsiveLayout';
 import { useTabPressScrollToTop } from '@/shared/hooks/useTabPressScrollToTop';
 import { useAppSelector } from '@/shared/store/hooks';
 import type { Car } from '@/shared/types/car';
@@ -42,6 +44,8 @@ export default function WishlistTab() {
     `${isCars ? 'cars' : 'props'}:${isAuthenticated ? ids.join(',') : 'guest'}`
   );
   const c = useThemeColors();
+  const { listColumns } = useResponsiveLayout();
+  const cardSlotWidth = listColumns === 3 ? '31.8%' : listColumns === 2 ? '48.8%' : '100%';
 
   const listRef = useRef<FlatList<Property | Car>>(null);
   useTabPressScrollToTop(() => listRef.current?.scrollToOffset({ offset: 0, animated: true }));
@@ -53,11 +57,13 @@ export default function WishlistTab() {
   if (isLoading) {
     return (
       <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-        {Header}
-        <View className="px-5 gap-6">
-          <SkeletonPropertyCard />
-          <SkeletonPropertyCard />
-        </View>
+        <ResponsivePage size="wide">
+          {Header}
+          <View className="px-5 gap-6">
+            <SkeletonPropertyCard />
+            <SkeletonPropertyCard />
+          </View>
+        </ResponsivePage>
       </SafeAreaView>
     );
   }
@@ -65,16 +71,18 @@ export default function WishlistTab() {
   if (!isAuthenticated) {
     return (
       <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-        {Header}
-        <View className="flex-1 justify-center pb-16">
-          <EmptyState
-            icon={Heart}
-            title={S.wishlistEmptyTitle}
-            description={S.wishlistEmptyDesc}
-            actionLabel={S.signInTitle}
-            onAction={() => router.push('/login')}
-          />
-        </View>
+        <ResponsivePage size="wide">
+          {Header}
+          <View className="flex-1 justify-center pb-16">
+            <EmptyState
+              icon={Heart}
+              title={S.wishlistEmptyTitle}
+              description={S.wishlistEmptyDesc}
+              actionLabel={S.signInTitle}
+              onAction={() => router.push('/login')}
+            />
+          </View>
+        </ResponsivePage>
       </SafeAreaView>
     );
   }
@@ -84,44 +92,51 @@ export default function WishlistTab() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-      {Header}
-      <FlatList
-        ref={listRef}
-        data={items}
-        keyExtractor={(x) => x._id}
-        renderItem={({ item }) =>
-          isCars ? <CarCard car={item as Car} /> : <PropertyCard property={item as Property} />
-        }
-        contentContainerClassName="px-5 pb-8 gap-6"
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={() => {
-              setRefreshing(true);
-              refetch();
-              setTimeout(() => setRefreshing(false), 800);
-            }}
-            tintColor={c.primary}
-            colors={[c.primary]}
-            progressBackgroundColor={c.card}
-          />
-        }
-        ListEmptyComponent={
-          loading ? (
-            <View className="gap-6">
-              <SkeletonPropertyCard />
-              <SkeletonPropertyCard />
+      <ResponsivePage size="wide">
+        {Header}
+        <FlatList
+          key={listColumns}
+          ref={listRef}
+          data={items}
+          numColumns={listColumns}
+          columnWrapperStyle={listColumns > 1 ? { gap: 16 } : undefined}
+          keyExtractor={(x) => x._id}
+          renderItem={({ item }) => (
+            <View style={{ width: cardSlotWidth }}>
+              {isCars ? <CarCard car={item as Car} /> : <PropertyCard property={item as Property} />}
             </View>
-          ) : (
-            <EmptyState
-              icon={Heart}
-              title={isCars ? S.wishlistEmptyTitleCar : S.wishlistEmptyTitle}
-              description={isCars ? S.wishlistEmptyDescCar : S.wishlistEmptyDesc}
+          )}
+          contentContainerClassName="px-5 pb-8 gap-6"
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => {
+                setRefreshing(true);
+                refetch();
+                setTimeout(() => setRefreshing(false), 800);
+              }}
+              tintColor={c.primary}
+              colors={[c.primary]}
+              progressBackgroundColor={c.card}
             />
-          )
-        }
-      />
+          }
+          ListEmptyComponent={
+            loading ? (
+              <View className="gap-6">
+                <SkeletonPropertyCard />
+                <SkeletonPropertyCard />
+              </View>
+            ) : (
+              <EmptyState
+                icon={Heart}
+                title={isCars ? S.wishlistEmptyTitleCar : S.wishlistEmptyTitle}
+                description={isCars ? S.wishlistEmptyDescCar : S.wishlistEmptyDesc}
+              />
+            )
+          }
+        />
+      </ResponsivePage>
     </SafeAreaView>
   );
 }

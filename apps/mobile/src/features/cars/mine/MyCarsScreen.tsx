@@ -9,6 +9,7 @@ import { S } from '@/config/strings';
 import { carsApi } from '@/features/cars/api/cars.api';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import { STATUS_LABELS } from '@/shared/lib/constants';
 import { formatPrice } from '@/shared/lib/format';
 import type { Car, CarStatus } from '@/shared/types/car';
@@ -80,6 +81,7 @@ export function MyCarsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
+      <ResponsivePage size="content">
       <View className="flex-row items-center justify-between px-5 py-3 border-b border-border">
         <Pressable onPress={() => router.back()} hitSlop={8}>
           <ArrowRight size={24} color={c.primary} />
@@ -204,6 +206,7 @@ export function MyCarsScreen() {
           }
         />
       )}
+      </ResponsivePage>
     </SafeAreaView>
   );
 }

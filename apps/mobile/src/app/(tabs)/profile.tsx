@@ -26,6 +26,7 @@ import { LanguageSwitcher } from '@/features/i18n/components/LanguageSwitcher';
 import { useSection } from '@/features/section/hooks/useSection';
 import { ThemeToggle } from '@/features/theme/components/ThemeToggle';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import { toast } from '@/shared/components/ui/Toast';
 import { useAppSelector } from '@/shared/store/hooks';
 
@@ -71,22 +72,24 @@ export default function ProfileTab() {
   if (!isAuthenticated || !user) {
     return (
       <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-        <View className="flex-1 items-center justify-center px-10 gap-3">
-          <User size={40} color={c.muted} strokeWidth={1.4} />
-          <Text className="text-lg font-cairo-bold text-foreground text-center mt-2">{S.profileGuestTitle}</Text>
-          <Text className="text-sm text-muted-foreground font-cairo text-center">{S.profileGuestDesc}</Text>
-          <Pressable
-            onPress={() => router.push('/login')}
-            className="mt-2 bg-primary rounded-full h-12 px-8 flex-row items-center gap-2 active:opacity-90">
-            <LogIn size={18} color={c.primaryForeground} />
-            <Text className="text-primary-foreground font-cairo-semibold">{S.signInTitle}</Text>
-          </Pressable>
-        </View>
-        <View className="px-5 pb-2 gap-4">
-          <ThemeToggle />
-          <LanguageSwitcher />
-        </View>
-        <LegalLinks />
+        <ResponsivePage size="compact">
+          <View className="flex-1 items-center justify-center px-10 gap-3">
+            <User size={40} color={c.muted} strokeWidth={1.4} />
+            <Text className="text-lg font-cairo-bold text-foreground text-center mt-2">{S.profileGuestTitle}</Text>
+            <Text className="text-sm text-muted-foreground font-cairo text-center">{S.profileGuestDesc}</Text>
+            <Pressable
+              onPress={() => router.push('/login')}
+              className="mt-2 bg-primary rounded-full h-12 px-8 flex-row items-center gap-2 active:opacity-90">
+              <LogIn size={18} color={c.primaryForeground} />
+              <Text className="text-primary-foreground font-cairo-semibold">{S.signInTitle}</Text>
+            </Pressable>
+          </View>
+          <View className="px-5 pb-2 gap-4">
+            <ThemeToggle />
+            <LanguageSwitcher />
+          </View>
+          <LegalLinks />
+        </ResponsivePage>
       </SafeAreaView>
     );
   }
@@ -94,7 +97,8 @@ export default function ProfileTab() {
   // Authenticated
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-      <ScrollView contentContainerClassName="px-5 pt-4 pb-6 gap-6" showsVerticalScrollIndicator={false}>
+      <ResponsivePage size="compact">
+        <ScrollView contentContainerClassName="px-5 pt-4 pb-6 gap-6" showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View className="items-center gap-3 pt-4">
           {user.avatar ? (
@@ -190,7 +194,8 @@ export default function ProfileTab() {
             </>
           )}
         </Pressable>
-      </ScrollView>
+        </ScrollView>
+      </ResponsivePage>
     </SafeAreaView>
   );
 }

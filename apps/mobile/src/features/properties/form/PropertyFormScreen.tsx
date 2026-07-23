@@ -17,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { S } from '@/config/strings';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { HttpError } from '@/shared/api/httpClient';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import {
   DEPOSIT_LABELS,
   DEPOSIT_OPTIONS,
@@ -334,6 +335,7 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
+      <ResponsivePage size="form">
       <View className="flex-row items-center justify-between px-5 py-3 border-b border-border">
         <Pressable onPress={() => router.back()} hitSlop={8}>
           <ArrowRight size={24} color={c.primary} />
@@ -706,6 +708,7 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
           )}
         </Pressable>
       </View>
+      </ResponsivePage>
     </SafeAreaView>
   );
 }

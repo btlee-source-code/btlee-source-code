@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { S } from '@/config/strings';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import { EmptyState } from '@/shared/components/ui/EmptyState';
 import { formatDate } from '@/shared/lib/format';
 import { useAppDispatch, useAppSelector } from '@/shared/store/hooks';
@@ -82,6 +83,7 @@ export function NotificationsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
+      <ResponsivePage size="form">
       {/* Header */}
       <View className="flex-row items-center justify-between px-5 py-3 border-b border-border">
         <Pressable onPress={() => router.back()} hitSlop={8}>
@@ -155,6 +157,7 @@ export function NotificationsScreen() {
           }
         />
       )}
+      </ResponsivePage>
     </SafeAreaView>
   );
 }

@@ -14,7 +14,7 @@ import {
   Star,
 } from 'lucide-react-native';
 import { useCallback, useState } from 'react';
-import { Linking, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { Linking, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
@@ -35,9 +35,11 @@ import { useAuth } from '@/features/auth/hooks/useAuth';
 import { ReportSheet } from '@/features/reports/components/ReportSheet';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { WhatsAppIcon } from '@/shared/components/icons/WhatsAppIcon';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
 import { Skeleton } from '@/shared/components/ui/Skeleton';
 import { useFetch } from '@/shared/hooks/useFetch';
+import { RESPONSIVE_MAX_WIDTH, useResponsiveLayout } from '@/shared/hooks/useResponsiveLayout';
 import { LISTING_TYPE_LABELS } from '@/shared/lib/constants';
 import { formatPrice, whatsappLink } from '@/shared/lib/format';
 import { blurPlaceholder } from '@/shared/lib/images';
@@ -46,7 +48,8 @@ import { shadows } from '@/shared/lib/shadows';
 export function CarDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { width } = useWindowDimensions();
+  const { width, isTablet } = useResponsiveLayout();
+  const detailWidth = Math.min(width, RESPONSIVE_MAX_WIDTH.content);
   const insets = useSafeAreaInsets();
   const { data: car, isLoading, error, refetch } = useFetch(
     useCallback(() => carsApi.detail(id), [id]),
@@ -58,11 +61,12 @@ export function CarDetailScreen() {
   const { isAuthenticated } = useAuth();
   const c = useThemeColors();
 
-  const galleryHeight = Math.round(width * 0.78);
+  const galleryHeight = Math.min(620, Math.round(detailWidth * (isTablet ? 0.68 : 0.78)));
 
   if (isLoading) {
     return (
       <View className="flex-1 bg-background">
+        <ResponsivePage size="content">
         <Skeleton className="w-full" style={{ height: galleryHeight }} />
         <View className="px-5 pt-5 gap-3 items-end">
           <Skeleton className="h-6 w-3/4 rounded-full" />
@@ -70,6 +74,7 @@ export function CarDetailScreen() {
           <Skeleton className="h-5 w-2/5 rounded-full mt-2" />
           <Skeleton className="h-28 w-full rounded-2xl mt-3" />
         </View>
+        </ResponsivePage>
       </View>
     );
   }
@@ -77,11 +82,13 @@ export function CarDetailScreen() {
   if (error || !car) {
     return (
       <View className="flex-1 items-center justify-center bg-background gap-3 px-8">
-        <Text className="text-lg font-cairo-bold text-foreground">{S.errorTitle}</Text>
-        <Text className="text-sm text-muted-foreground font-cairo text-center">{S.carsErrorDesc}</Text>
-        <PressableScale haptic onPress={refetch} className="bg-primary rounded-full px-7 h-11 items-center justify-center">
-          <Text className="text-primary-foreground font-cairo-semibold">{S.retry}</Text>
-        </PressableScale>
+        <ResponsivePage size="compact" style={{ justifyContent: 'center', alignItems: 'center', gap: 12 }}>
+          <Text className="text-lg font-cairo-bold text-foreground">{S.errorTitle}</Text>
+          <Text className="text-sm text-muted-foreground font-cairo text-center">{S.carsErrorDesc}</Text>
+          <PressableScale haptic onPress={refetch} className="bg-primary rounded-full px-7 h-11 items-center justify-center">
+            <Text className="text-primary-foreground font-cairo-semibold">{S.retry}</Text>
+          </PressableScale>
+        </ResponsivePage>
       </View>
     );
   }
@@ -117,6 +124,7 @@ export function CarDetailScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
+      <ResponsivePage size="content">
       <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="pb-32">
         {/* Full-bleed swipeable gallery */}
         <View className="bg-secondary" style={{ height: galleryHeight }}>
@@ -125,14 +133,14 @@ export function CarDetailScreen() {
               horizontal
               pagingEnabled
               showsHorizontalScrollIndicator={false}
-              onMomentumScrollEnd={(e) => setImgIndex(Math.round(e.nativeEvent.contentOffset.x / width))}>
+              onMomentumScrollEnd={(e) => setImgIndex(Math.round(e.nativeEvent.contentOffset.x / detailWidth))}>
               {images.map((img) => (
                 <Pressable key={img.publicId} onPress={() => setViewerOpen(true)}>
                   <Image
                     source={{ uri: img.url }}
                     placeholder={blurPlaceholder(img.url) ? { uri: blurPlaceholder(img.url) } : undefined}
                     placeholderContentFit="cover"
-                    style={{ width, height: galleryHeight }}
+                    style={{ width: detailWidth, height: galleryHeight }}
                     contentFit="cover"
                     transition={250}
                   />
@@ -371,6 +379,7 @@ export function CarDetailScreen() {
       />
 
       <ReportSheet visible={reportOpen} onClose={() => setReportOpen(false)} carId={car._id} />
+      </ResponsivePage>
     </SafeAreaView>
   );
 }

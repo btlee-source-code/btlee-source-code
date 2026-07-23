@@ -3,7 +3,7 @@
     "name": "Bt Lee",
     "slug": "btlee",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/btleeAppIcon1024.png",
     "scheme": "btlee",
     "userInterfaceStyle": "automatic",
@@ -14,7 +14,8 @@
       "url": "https://u.expo.dev/661190eb-8852-4169-bf85-7f3aa9eb1ebc"
     },
     "ios": {
-      "icon": "./assets/images/btleeAppIcon1024.png"
+      "icon": "./assets/images/btleeAppIcon1024.png",
+      "supportsTablet": true
     },
     "android": {
       "package": "com.btlee.app",
@@ -24,7 +25,8 @@
         "backgroundColor": "#1A1B1A",
         "foregroundImage": "./assets/images/btleeAppIcon1024.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "versionCode": 2
     },
     "web": {
       "output": "static",

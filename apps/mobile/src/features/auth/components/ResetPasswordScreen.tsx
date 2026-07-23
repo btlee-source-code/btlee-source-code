@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { S } from '@/config/strings';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { HttpError } from '@/shared/api/httpClient';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import { AppTextInput } from '@/shared/components/ui/AppTextInput';
 import { Logo } from '@/shared/components/layout/Logo';
 import { authApi } from '../api/auth.api';
@@ -56,6 +57,7 @@ export function ResetPasswordScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
+      <ResponsivePage size="compact">
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerClassName="px-6 pt-2 pb-8 flex-grow" keyboardShouldPersistTaps="handled">
           <Pressable onPress={() => router.replace('/login')} hitSlop={8} className="h-10 w-10 items-start justify-center">
@@ -140,6 +142,7 @@ export function ResetPasswordScreen() {
           )}
         </ScrollView>
       </KeyboardAvoidingView>
+      </ResponsivePage>
     </SafeAreaView>
   );
 }

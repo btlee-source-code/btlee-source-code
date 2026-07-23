@@ -8,7 +8,9 @@ import { S } from '@/config/strings';
 import { propertiesApi } from '@/features/properties/api/properties.api';
 import { PropertyCard } from '@/features/properties/components/PropertyCard';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import { useFetch } from '@/shared/hooks/useFetch';
+import { useResponsiveLayout } from '@/shared/hooks/useResponsiveLayout';
 import { formatDate } from '@/shared/lib/format';
 import { usersApi } from './api/users.api';
 
@@ -28,6 +30,8 @@ export function OwnerProfileScreen() {
     id
   );
   const c = useThemeColors();
+  const { listColumns } = useResponsiveLayout();
+  const cardSlotWidth = listColumns === 3 ? '31.8%' : listColumns === 2 ? '48.8%' : '100%';
 
   if (ownerLoading) {
     return (
@@ -39,10 +43,14 @@ export function OwnerProfileScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
-      <FlatList
+      <ResponsivePage size="wide">
+        <FlatList
+        key={listColumns}
         data={listings ?? []}
+        numColumns={listColumns}
+        columnWrapperStyle={listColumns > 1 ? { gap: 16 } : undefined}
         keyExtractor={(p) => p._id}
-        contentContainerClassName="px-4 pb-6"
+        contentContainerClassName="px-4 pb-6 gap-6"
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
           <View className="gap-2 py-5">
@@ -76,8 +84,13 @@ export function OwnerProfileScreen() {
             </View>
           )
         }
-        renderItem={({ item }) => <PropertyCard property={item} />}
+        renderItem={({ item }) => (
+          <View style={{ width: cardSlotWidth }}>
+            <PropertyCard property={item} />
+          </View>
+        )}
       />
+      </ResponsivePage>
     </SafeAreaView>
   );
 }

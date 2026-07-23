@@ -11,7 +11,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export function ErrorScreen({ error, retry }: { error: Error; retry: () => void }) {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F5F5F5' }}>
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32, gap: 12 }}>
+      <View
+        style={{
+          flex: 1,
+          width: '100%',
+          maxWidth: 560,
+          alignSelf: 'center',
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingHorizontal: 32,
+          gap: 12,
+        }}>
         <View
           style={{
             width: 64,

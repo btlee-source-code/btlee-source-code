@@ -16,6 +16,7 @@ import { S } from '@/config/strings';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { HttpError } from '@/shared/api/httpClient';
 import { Logo } from '@/shared/components/layout/Logo';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
 import { AppTextInput } from '@/shared/components/ui/AppTextInput';
 import { TextField } from '@/shared/components/ui/TextField';
@@ -58,6 +59,7 @@ export function LoginScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
+      <ResponsivePage size="compact">
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerClassName="px-6 pt-3 pb-8 flex-grow" keyboardShouldPersistTaps="handled">
           {/* Back */}
@@ -151,6 +153,7 @@ export function LoginScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      </ResponsivePage>
     </SafeAreaView>
   );
 }

@@ -17,6 +17,7 @@ import { S } from '@/config/strings';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { HttpError } from '@/shared/api/httpClient';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import { TextField } from '@/shared/components/ui/TextField';
 import { accountApi } from '../api/account.api';
 
@@ -54,6 +55,7 @@ export function EditProfileScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
+      <ResponsivePage size="compact">
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerClassName="px-6 pt-2 pb-8" keyboardShouldPersistTaps="handled">
           {/* Header */}
@@ -116,6 +118,7 @@ export function EditProfileScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      </ResponsivePage>
     </SafeAreaView>
   );
 }

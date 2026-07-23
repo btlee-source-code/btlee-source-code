@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { Search, SlidersHorizontal } from 'lucide-react-native';
 import { useRef, useState } from 'react';
-import { RefreshControl, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PROPERTY_ICONS } from '@/assets/icons3d/registry';
@@ -12,8 +12,10 @@ import { HomeTopBar } from '@/features/home/components/HomeTopBar';
 import { PropertySection } from '@/features/home/components/PropertySection';
 import { propertiesApi } from '@/features/properties/api/properties.api';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
 import { SectionHeader } from '@/shared/components/ui/SectionHeader';
+import { useResponsiveLayout } from '@/shared/hooks/useResponsiveLayout';
 import { useTabPressScrollToTop } from '@/shared/hooks/useTabPressScrollToTop';
 import { TYPE_LABELS } from '@/shared/lib/constants';
 import { shadows } from '@/shared/lib/shadows';
@@ -31,8 +33,9 @@ const cityFetcher = () => propertiesApi.list({ governorate: 'القاهرة', li
 export function PropertiesHome() {
   const router = useRouter();
   const c = useThemeColors();
-  const { width } = useWindowDimensions();
-  const compactCategories = width < 360;
+  const { categoryColumns } = useResponsiveLayout();
+  const categoryWidth =
+    categoryColumns === 6 ? '15%' : categoryColumns === 2 ? '47%' : '30%';
 
   // Re-pressing the home tab scrolls back to the top.
   const scrollRef = useRef<ScrollView>(null);
@@ -49,19 +52,20 @@ export function PropertiesHome() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-      <ScrollView
-        ref={scrollRef}
-        showsVerticalScrollIndicator={false}
-        contentContainerClassName="pb-12"
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={c.primary}
-            colors={[c.primary]}
-            progressBackgroundColor={c.card}
-          />
-        }>
+      <ResponsivePage size="wide">
+        <ScrollView
+          ref={scrollRef}
+          showsVerticalScrollIndicator={false}
+          contentContainerClassName="pb-12"
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={c.primary}
+              colors={[c.primary]}
+              progressBackgroundColor={c.card}
+            />
+          }>
         {/* Shared header: logo + section switcher + utility controls */}
         <HomeTopBar />
 
@@ -106,7 +110,7 @@ export function PropertiesHome() {
           <SectionHeader title={S.exploreByType} onViewAll={() => router.push('/properties')} />
           <View className="flex-row-reverse flex-wrap justify-between gap-y-4 px-5">
             {CATEGORIES.map((type, i) => (
-              <View key={type} style={{ width: compactCategories ? '47%' : '30%' }}>
+              <View key={type} style={{ width: categoryWidth }}>
                 <CategoryChip
                   label={TYPE_LABELS[type]}
                   icon={PROPERTY_ICONS[type]}
@@ -171,7 +175,8 @@ export function PropertiesHome() {
             viewAllParams={{ governorate: 'القاهرة' }}
           />
         </View>
-      </ScrollView>
+        </ScrollView>
+      </ResponsivePage>
     </SafeAreaView>
   );
 }

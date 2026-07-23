@@ -16,6 +16,7 @@ import {
   CAR_TRANSMISSIONS,
 } from '@/features/cars/lib/carConstants';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import { LISTING_TYPE_LABELS, LISTING_TYPES, SORT_OPTIONS } from '@/shared/lib/constants';
 import {
   AmountPicker,
@@ -103,6 +104,7 @@ export function CarSearchModal({
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
       <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
+        <ResponsivePage size="form">
         {/* Header */}
         <View className="flex-row items-center justify-between px-4 py-3 border-b border-border">
           <Pressable onPress={onClose} hitSlop={8}>
@@ -271,6 +273,7 @@ export function CarSearchModal({
             </Text>
           </Pressable>
         </View>
+        </ResponsivePage>
       </SafeAreaView>
     </Modal>
   );

@@ -51,7 +51,9 @@ export function OnboardingSheet({ visible, onComplete }: { visible: boolean; onC
             paddingHorizontal: 24,
             paddingVertical: 16,
           }}>
-          <View className="bg-background rounded-2xl p-5 gap-4 w-full">
+          <View
+            className="bg-background rounded-2xl p-5 gap-4 w-full"
+            style={{ maxWidth: 600, alignSelf: 'center' }}>
           <View className="items-center gap-1">
             <Text className="text-xl font-cairo-bold text-foreground text-center">{S.onboardingTitle}</Text>
             <Text className="text-sm text-muted-foreground font-cairo text-center">{S.onboardingSubtitle}</Text>

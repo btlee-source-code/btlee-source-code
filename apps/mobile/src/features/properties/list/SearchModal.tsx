@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import { AmountPicker, AREA_OPTIONS, PRICE_OPTIONS } from '@/shared/components/ui/AmountPicker';
 import { DividedStack } from '@/shared/components/ui/DividedStack';
 import { AppTextInput } from '@/shared/components/ui/AppTextInput';
@@ -91,6 +92,7 @@ export function SearchModal({
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
       <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
+        <ResponsivePage size="form">
         {/* Header */}
         <View className="flex-row items-center justify-between px-4 py-3 border-b border-border">
           <Pressable onPress={onClose} hitSlop={8}>
@@ -270,6 +272,7 @@ export function SearchModal({
             </Text>
           </Pressable>
         </View>
+        </ResponsivePage>
       </SafeAreaView>
     </Modal>
   );

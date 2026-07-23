@@ -18,6 +18,7 @@ import { S } from '@/config/strings';
 import { useSection } from '@/features/section/hooks/useSection';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
+import { useResponsiveLayout } from '@/shared/hooks/useResponsiveLayout';
 import { shadows } from '@/shared/lib/shadows';
 
 const OPTIONS: { key: Section; label: () => string }[] = [
@@ -36,14 +37,18 @@ const OPTIONS: { key: Section; label: () => string }[] = [
 export function SectionSwitcher() {
   const { section, setSection } = useSection();
   const c = useThemeColors();
+  const { isTablet } = useResponsiveLayout();
 
   const activeBg = section === 'cars' ? c.primary : c.accent;
   const activeFg = section === 'cars' ? c.primaryForeground : c.accentForeground;
 
   return (
     <View
-      className="w-[90%] max-w-[360px] self-center flex-row gap-1 rounded-[18px] p-1"
-      style={[shadows.sm, { backgroundColor: c.card, borderColor: c.border, borderWidth: 1 }]}>
+      className="w-[90%] self-center flex-row gap-1 rounded-[18px] p-1"
+      style={[
+        shadows.sm,
+        { maxWidth: isTablet ? 460 : 360, backgroundColor: c.card, borderColor: c.border, borderWidth: 1 },
+      ]}>
       {OPTIONS.map(({ key, label }, i) => (
         <Pill
           key={key}

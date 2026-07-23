@@ -7,6 +7,7 @@ import { S } from '@/config/strings';
 import { AddTabButton } from '@/features/home/components/AddTabButton';
 import { useSection } from '@/features/section/hooks/useSection';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { useResponsiveLayout } from '@/shared/hooks/useResponsiveLayout';
 import { tapHaptic } from '@/shared/lib/haptics';
 
 export default function TabsLayout() {
@@ -15,6 +16,8 @@ export default function TabsLayout() {
   // Respect the device's gesture/nav bar — a fixed height clips the labels on
   // phones with a bottom inset.
   const insets = useSafeAreaInsets();
+  const { width, isTablet } = useResponsiveLayout();
+  const tabBarWidth = isTablet ? Math.min(width - 40, 680) : width;
 
   return (
     <Tabs
@@ -30,7 +33,12 @@ export default function TabsLayout() {
           height: 58 + insets.bottom,
           paddingBottom: Math.max(insets.bottom, 10),
           paddingTop: 8,
+          width: tabBarWidth,
+          alignSelf: 'center',
+          borderTopLeftRadius: isTablet ? 22 : 0,
+          borderTopRightRadius: isTablet ? 22 : 0,
         },
+        tabBarItemStyle: isTablet ? { maxWidth: 136 } : undefined,
         tabBarLabelStyle: { fontFamily: 'Cairo_600SemiBold', fontSize: 11 },
         tabBarAllowFontScaling: false,
       }}>

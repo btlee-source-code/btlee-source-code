@@ -8,9 +8,11 @@ import { S } from '@/config/strings';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { SaveSearchSheet } from '@/features/saved-searches/components/SaveSearchSheet';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import { EmptyState } from '@/shared/components/ui/EmptyState';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
 import { SkeletonPropertyCard } from '@/shared/components/ui/Skeleton';
+import { useResponsiveLayout } from '@/shared/hooks/useResponsiveLayout';
 import { useTabPressScrollToTop } from '@/shared/hooks/useTabPressScrollToTop';
 import { CATEGORY_LABELS, FINISHING_LABELS, LISTING_TYPE_LABELS, SORT_OPTIONS, TYPE_LABELS } from '@/shared/lib/constants';
 import { formatPrice } from '@/shared/lib/format';
@@ -56,6 +58,8 @@ export function PropertiesScreen() {
   const router = useRouter();
   const c = useThemeColors();
   const { isAuthenticated } = useAuth();
+  const { listColumns } = useResponsiveLayout();
+  const cardSlotWidth = listColumns === 3 ? '31.8%' : listColumns === 2 ? '48.8%' : '100%';
 
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState<Filters>({});
@@ -171,6 +175,7 @@ export function PropertiesScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
+      <ResponsivePage size="wide">
       {/* Search bar (opens the unified search + filter sheet) + save */}
       <View className="px-5 pt-3 pb-2">
         <View className="flex-row items-center gap-2.5">
@@ -215,10 +220,17 @@ export function PropertiesScreen() {
       </View>
 
       <FlatList
+        key={listColumns}
         ref={listRef}
         data={items}
+        numColumns={listColumns}
+        columnWrapperStyle={listColumns > 1 ? { gap: 16 } : undefined}
         keyExtractor={(p) => p._id}
-        renderItem={({ item }) => <PropertyCard property={item} />}
+        renderItem={({ item }) => (
+          <View style={{ width: cardSlotWidth }}>
+            <PropertyCard property={item} />
+          </View>
+        )}
         contentContainerClassName="px-5 pb-28 gap-6"
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -296,6 +308,7 @@ export function PropertiesScreen() {
       />
       <SaveSearchSheet visible={showSave} onClose={() => setShowSave(false)} filters={filters} search={search} />
       <SortSheet visible={showSort} value={sort} onSelect={setSort} onClose={() => setShowSort(false)} />
+      </ResponsivePage>
     </SafeAreaView>
   );
 }

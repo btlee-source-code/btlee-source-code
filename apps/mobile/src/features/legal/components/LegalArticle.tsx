@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useLocale } from '@/features/i18n/hooks/useLocale';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import type { LegalArticleData } from '../content';
 
 /** Locale-aware renderer for the three legal pages and their numbered content. */
@@ -18,10 +19,11 @@ export function LegalArticle({ data, Icon }: { data: LegalArticleData; Icon: Luc
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
-      <ScrollView
-        className="flex-1"
-        contentContainerClassName="px-5 py-6 gap-5"
-        showsVerticalScrollIndicator={false}>
+      <ResponsivePage size="form">
+        <ScrollView
+          className="flex-1"
+          contentContainerClassName="px-5 py-6 gap-5"
+          showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View className="items-center gap-3">
         <View className="h-14 w-14 rounded-2xl bg-primary/10 items-center justify-center">
@@ -113,7 +115,8 @@ export function LegalArticle({ data, Icon }: { data: LegalArticleData; Icon: Luc
           </Text>
         </View>
       ) : null}
-      </ScrollView>
+        </ScrollView>
+      </ResponsivePage>
     </SafeAreaView>
   );
 }

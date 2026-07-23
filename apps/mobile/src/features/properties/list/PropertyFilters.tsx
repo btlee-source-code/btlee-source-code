@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import { AppTextInput } from '@/shared/components/ui/AppTextInput';
 import { ResponsiveFieldRow } from '@/shared/components/ui/ResponsiveFieldRow';
 import {
@@ -75,6 +76,7 @@ export function PropertyFilters({
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose} presentationStyle="pageSheet">
       <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
+        <ResponsivePage size="form">
         <View className="flex-row items-center justify-between px-5 py-3 border-b border-border">
           <Pressable onPress={onClose} hitSlop={8}>
             <X size={24} color={c.foreground} />
@@ -182,6 +184,7 @@ export function PropertyFilters({
             </Text>
           </Pressable>
         </View>
+        </ResponsivePage>
       </SafeAreaView>
     </Modal>
   );

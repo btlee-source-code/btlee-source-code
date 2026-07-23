@@ -39,7 +39,8 @@ export function BottomSheet({
   children: ReactNode;
 }) {
   const insets = useSafeAreaInsets();
-  const { height } = useWindowDimensions();
+  const { height, width } = useWindowDimensions();
+  const isTablet = width >= 600;
   const dragY = useSharedValue(0);
 
   // Fresh position every time the sheet opens.
@@ -78,13 +79,24 @@ export function BottomSheet({
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{ flex: 1, justifyContent: 'flex-end' }}>
         {/* Sheet */}
-        <Animated.View entering={SlideInDown.springify().damping(19).stiffness(220)} style={sheetStyle}>
+        <Animated.View
+          entering={SlideInDown.springify().damping(19).stiffness(220)}
+          style={[
+            sheetStyle,
+            {
+              width: '100%',
+              maxWidth: 680,
+              alignSelf: 'center',
+              marginBottom: isTablet ? Math.max(insets.bottom, 20) : 0,
+            },
+          ]}>
           <View
             className="bg-background rounded-t-[28px] px-5"
             style={{
               maxHeight: Math.max(280, height - insets.top - 12),
               paddingBottom: insets.bottom + 16,
               flexShrink: 1,
+              borderRadius: isTablet ? 28 : undefined,
             }}>
             <GestureDetector gesture={pan}>
               {/* Grab zone — drag here to dismiss */}

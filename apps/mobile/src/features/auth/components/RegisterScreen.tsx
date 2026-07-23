@@ -17,6 +17,7 @@ import { OnboardingSheet } from '@/features/account/components/OnboardingSheet';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { HttpError } from '@/shared/api/httpClient';
 import { Logo } from '@/shared/components/layout/Logo';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
 import { TextField } from '@/shared/components/ui/TextField';
 import { toast } from '@/shared/components/ui/Toast';
@@ -75,6 +76,7 @@ export function RegisterScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
+      <ResponsivePage size="compact">
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerClassName="px-6 pt-2 pb-8 flex-grow" keyboardShouldPersistTaps="handled">
           <Pressable
@@ -186,6 +188,7 @@ export function RegisterScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      </ResponsivePage>
 
       <OnboardingSheet visible={showOnboarding} onComplete={() => router.replace('/')} />
     </SafeAreaView>

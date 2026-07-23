@@ -17,7 +17,7 @@ import {
   Star,
 } from 'lucide-react-native';
 import { useCallback, useState } from 'react';
-import { Linking, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { Linking, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, {
   interpolate,
   Extrapolation,
@@ -34,9 +34,11 @@ import { useAuth } from '@/features/auth/hooks/useAuth';
 import { ReportSheet } from '@/features/reports/components/ReportSheet';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { WhatsAppIcon } from '@/shared/components/icons/WhatsAppIcon';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
 import { Skeleton } from '@/shared/components/ui/Skeleton';
 import { useFetch } from '@/shared/hooks/useFetch';
+import { RESPONSIVE_MAX_WIDTH, useResponsiveLayout } from '@/shared/hooks/useResponsiveLayout';
 import {
   DEPOSIT_LABELS,
   FINISHING_LABELS,
@@ -57,7 +59,8 @@ import { SimilarProperties } from './components/SimilarProperties';
 export function PropertyDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { width } = useWindowDimensions();
+  const { width, isTablet } = useResponsiveLayout();
+  const detailWidth = Math.min(width, RESPONSIVE_MAX_WIDTH.content);
   const insets = useSafeAreaInsets();
   const { isAuthenticated } = useAuth();
   const { data: property, isLoading, error, refetch } = useFetch(
@@ -69,7 +72,7 @@ export function PropertyDetailScreen() {
   const [viewerOpen, setViewerOpen] = useState(false);
   const c = useThemeColors();
 
-  const galleryHeight = Math.round(width * 0.78);
+  const galleryHeight = Math.min(620, Math.round(detailWidth * (isTablet ? 0.68 : 0.78)));
 
   // Sticky header: fades in once the gallery scrolls away; the floating
   // circles fade out in lockstep. `stuck` flips pointerEvents so only the
@@ -100,6 +103,7 @@ export function PropertyDetailScreen() {
   if (isLoading) {
     return (
       <View className="flex-1 bg-background">
+        <ResponsivePage size="content">
         <Skeleton className="w-full" style={{ height: galleryHeight }} />
         <View className="px-5 pt-5 gap-3 items-end">
           <Skeleton className="h-6 w-3/4 rounded-full" />
@@ -109,6 +113,7 @@ export function PropertyDetailScreen() {
           <Skeleton className="h-4 w-2/3 rounded-full" />
           <Skeleton className="h-4 w-1/2 rounded-full" />
         </View>
+        </ResponsivePage>
       </View>
     );
   }
@@ -116,11 +121,13 @@ export function PropertyDetailScreen() {
   if (error || !property) {
     return (
       <View className="flex-1 items-center justify-center bg-background gap-3 px-8">
-        <Text className="text-lg font-cairo-bold text-foreground">{S.errorTitle}</Text>
-        <Text className="text-sm text-muted-foreground font-cairo text-center">{S.errorDesc}</Text>
-        <PressableScale haptic onPress={refetch} className="bg-primary rounded-full px-7 h-11 items-center justify-center">
-          <Text className="text-primary-foreground font-cairo-semibold">{S.retry}</Text>
-        </PressableScale>
+        <ResponsivePage size="compact" style={{ justifyContent: 'center', alignItems: 'center', gap: 12 }}>
+          <Text className="text-lg font-cairo-bold text-foreground">{S.errorTitle}</Text>
+          <Text className="text-sm text-muted-foreground font-cairo text-center">{S.errorDesc}</Text>
+          <PressableScale haptic onPress={refetch} className="bg-primary rounded-full px-7 h-11 items-center justify-center">
+            <Text className="text-primary-foreground font-cairo-semibold">{S.retry}</Text>
+          </PressableScale>
+        </ResponsivePage>
       </View>
     );
   }
@@ -167,6 +174,7 @@ export function PropertyDetailScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
+      <ResponsivePage size="content">
       <Animated.ScrollView
         onScroll={onScroll}
         scrollEventThrottle={16}
@@ -179,14 +187,14 @@ export function PropertyDetailScreen() {
               horizontal
               pagingEnabled
               showsHorizontalScrollIndicator={false}
-              onMomentumScrollEnd={(e) => setImgIndex(Math.round(e.nativeEvent.contentOffset.x / width))}>
+              onMomentumScrollEnd={(e) => setImgIndex(Math.round(e.nativeEvent.contentOffset.x / detailWidth))}>
               {images.map((img) => (
                 <Pressable key={img.publicId} onPress={() => setViewerOpen(true)}>
                   <Image
                     source={{ uri: img.url }}
                     placeholder={blurPlaceholder(img.url) ? { uri: blurPlaceholder(img.url) } : undefined}
                     placeholderContentFit="cover"
-                    style={{ width, height: galleryHeight }}
+                    style={{ width: detailWidth, height: galleryHeight }}
                     contentFit="cover"
                     transition={250}
                   />
@@ -486,6 +494,7 @@ export function PropertyDetailScreen() {
         onClose={() => setViewerOpen(false)}
       />
       <ReportSheet visible={reportOpen} onClose={() => setReportOpen(false)} propertyId={property._id} />
+      </ResponsivePage>
     </SafeAreaView>
   );
 }

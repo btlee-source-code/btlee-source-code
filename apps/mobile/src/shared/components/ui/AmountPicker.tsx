@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { S } from '@/config/strings';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import { AppTextInput } from './AppTextInput';
 
 /** Thousands separators without relying on Intl (Hermes-safe). */
@@ -95,6 +96,7 @@ export function AmountPicker({
 
       <Modal visible={open} animationType="slide" presentationStyle="pageSheet" onRequestClose={close}>
         <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
+          <ResponsivePage size="compact">
           {/* Header */}
           <View className="flex-row items-center justify-between px-5 py-3 border-b border-border">
             <Pressable onPress={close} hitSlop={8}>
@@ -158,6 +160,7 @@ export function AmountPicker({
               );
             }}
           />
+          </ResponsivePage>
         </SafeAreaView>
       </Modal>
     </>

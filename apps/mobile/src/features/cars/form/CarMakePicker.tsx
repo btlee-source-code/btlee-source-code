@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { S } from '@/config/strings';
 import { useLocale } from '@/features/i18n/hooks/useLocale';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
+import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
 import { AppTextInput } from '@/shared/components/ui/AppTextInput';
 import { shadows } from '@/shared/lib/shadows';
 import {
@@ -126,6 +127,7 @@ export function CarMakePicker({
         presentationStyle="pageSheet"
         onRequestClose={close}>
         <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
+          <ResponsivePage size="form">
           <View className="flex-row items-center border-b border-border px-4 py-3">
             <Pressable
               accessibilityRole="button"
@@ -280,6 +282,7 @@ export function CarMakePicker({
               );
             }}
           />
+          </ResponsivePage>
         </SafeAreaView>
       </Modal>
     </>

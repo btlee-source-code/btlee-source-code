@@ -26,7 +26,10 @@ export function EmptyState({
 }) {
   const c = useThemeColors();
   return (
-    <Animated.View entering={FadeInDown.springify().damping(15)} className="items-center px-8 py-14">
+    <Animated.View
+      entering={FadeInDown.springify().damping(15)}
+      className="items-center px-8 py-14"
+      style={{ width: '100%', maxWidth: 560, alignSelf: 'center' }}>
       {/* Blob + playful dots */}
       <View className="mb-4">
         <View className="h-28 w-28 rounded-full bg-primary/10 items-center justify-center">
