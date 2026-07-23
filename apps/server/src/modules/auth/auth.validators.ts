@@ -74,5 +74,9 @@ export const resetPasswordSchema = z.object({
     .regex(/[0-9]/),
 });
 
+export const oauthMobileExchangeSchema = z.object({
+  code: z.string().trim().min(32).max(128),
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;

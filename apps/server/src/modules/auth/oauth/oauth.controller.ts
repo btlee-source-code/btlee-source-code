@@ -12,6 +12,7 @@ import type { Request, Response } from 'express';
 import { env } from '../../../config/env.js';
 import { setAuthCookies, USER_COOKIES } from '../../../shared/utils/cookies.js';
 import { AppError } from '../../../shared/errors/AppError.js';
+import { ok } from '../../../shared/utils/apiResponse.js';
 import * as google from './google.provider.js';
 import * as oauthService from './oauth.service.js';
 import {
@@ -33,8 +34,8 @@ const CALLBACK_PATH = '/oauth/callback';
 // `?client=mobile&returnUrl=<app deep link>`. We reuse the SAME Google callback
 // (so no OAuth-console change is needed). The return deep-link is SIGNED into the
 // `state` param (cookie-free — cookies don't survive the in-app-browser round
-// trip), and at the end we redirect the browser back to the app with tokens in
-// the URL instead of setting web cookies. The web flow is completely unaffected.
+// trip), and at the end we redirect the browser back to the app with a short-
+// lived handoff code. The web flow is completely unaffected.
 
 /** Append query params to a URL of any scheme (avoids URL()'s custom-scheme quirks). */
 function withParams(url: string, params: Record<string, string>): string {
@@ -60,9 +61,10 @@ function startFlow(name: 'google') {
   return (req: Request, res: Response): void => {
     const mobile = req.query.client === 'mobile';
     const returnUrl = mobile ? safeReturnUrl(req.query.returnUrl) : null;
+    const useCodeExchange = req.query.flow === 'code';
     // Mobile with a valid return link → sign it into the state (cookie-free).
     // Everything else → plain random state validated against a cookie (web).
-    const state = returnUrl ? createMobileState(returnUrl) : createState();
+    const state = returnUrl ? createMobileState(returnUrl, useCodeExchange) : createState();
     let authUrl: string;
     try {
       authUrl = PROVIDERS[name].getAuthUrl(state);
@@ -117,22 +119,35 @@ function handleCallback(name: 'google') {
 
     try {
       const profile = await PROVIDERS[name].getProfile(code);
-      const { accessToken, refreshToken, isNewUser } = await oauthService.loginWithOAuth(profile);
-      if (mobile && returnUrl) {
-        // Hand the app its tokens via the deep link (no web cookies).
+      if (mobile && returnUrl && signed?.useCodeExchange) {
+        // Give the app a short-lived one-time code. Session tokens are returned
+        // only from the subsequent HTTPS exchange and never appear in the URL.
+        const handoffCode = await oauthService.createMobileHandoff(profile);
         res.redirect(
           withParams(returnUrl, {
             status: 'success',
-            accessToken,
-            refreshToken,
-            ...(isNewUser ? { onboarding: '1' } : {}),
+            code: handoffCode,
           })
         );
       } else {
-        setAuthCookies(res, { accessToken, refreshToken }, USER_COOKIES);
-        res.redirect(
-          clientRedirect(isNewUser ? { status: 'success', onboarding: '1' } : { status: 'success' })
-        );
+        const { accessToken, refreshToken, isNewUser } = await oauthService.loginWithOAuth(profile);
+        if (mobile && returnUrl) {
+          // Compatibility for an older installed bundle during a rolling
+          // deployment. New bundles always request the one-time-code flow.
+          res.redirect(
+            withParams(returnUrl, {
+              status: 'success',
+              accessToken,
+              refreshToken,
+              ...(isNewUser ? { onboarding: '1' } : {}),
+            })
+          );
+        } else {
+          setAuthCookies(res, { accessToken, refreshToken }, USER_COOKIES);
+          res.redirect(
+            clientRedirect(isNewUser ? { status: 'success', onboarding: '1' } : { status: 'success' })
+          );
+        }
       }
     } catch (err) {
       const reason =
@@ -148,3 +163,9 @@ function handleCallback(name: 'google') {
 
 export const googleRedirect = startFlow('google');
 export const googleCallback = handleCallback('google');
+
+/** Native app: exchange the single-use deep-link code for a normal session. */
+export async function exchangeMobileCode(req: Request, res: Response): Promise<void> {
+  const result = await oauthService.exchangeMobileHandoff(req.body.code);
+  res.json(ok(result));
+}

@@ -12,6 +12,7 @@ import {
   loginSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
+  oauthMobileExchangeSchema,
 } from './auth.validators.js';
 
 // Stricter limit for auth endpoints — protects against brute force
@@ -42,6 +43,12 @@ authRouter.post(
 // `state` cookie+param pair is what protects this flow against login-CSRF.
 authRouter.get('/google', oauthController.googleRedirect);
 authRouter.get('/google/callback', asyncHandler(oauthController.googleCallback));
+authRouter.post(
+  '/google/mobile-exchange',
+  authLimiter,
+  validate({ body: oauthMobileExchangeSchema }),
+  asyncHandler(oauthController.exchangeMobileCode)
+);
 
 // Refresh + logout read the token from the httpOnly cookie — no body needed.
 // Rate-limited too, so a stolen/guessed cookie can't be hammered.

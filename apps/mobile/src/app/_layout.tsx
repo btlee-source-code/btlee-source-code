@@ -53,6 +53,7 @@ function RootNavigator() {
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="(auth)" options={{ animation: 'slide_from_bottom' }} />
       <Stack.Screen name="(main)" />
+      <Stack.Screen name="oauth" options={{ animation: 'fade' }} />
     </Stack>
   );
 }

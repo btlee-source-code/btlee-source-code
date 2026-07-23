@@ -2,10 +2,14 @@ import { get, post } from '@/shared/api/httpClient';
 import type { User } from '@/shared/types/user';
 
 /** Auth responses carry the tokens in the body (backend sends them for X-Client: mobile). */
-interface AuthResponse {
+export interface AuthResponse {
   user: User;
   accessToken: string;
   refreshToken: string;
+}
+
+export interface GoogleAuthResponse extends AuthResponse {
+  isNewUser: boolean;
 }
 
 export interface RegisterInput {
@@ -21,6 +25,9 @@ export const authApi = {
 
   login: (identifier: string, password: string) =>
     post<AuthResponse>('/auth/login', { identifier, password }, { skipAuth: true }),
+
+  exchangeGoogleCode: (code: string) =>
+    post<GoogleAuthResponse>('/auth/google/mobile-exchange', { code }, { skipAuth: true }),
 
   logout: (refreshToken: string) => post<{ message: string }>('/auth/logout', { refreshToken }),
 

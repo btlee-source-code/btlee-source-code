@@ -57,9 +57,13 @@ function signPayload(payload: string): string {
  * The HMAC proves we minted it (CSRF protection), and a random nonce keeps every
  * state unique. Google echoes `state` back verbatim, so this survives reliably.
  */
-export function createMobileState(returnUrl: string): string {
+export function createMobileState(returnUrl: string, useCodeExchange = false): string {
   const payload = Buffer.from(
-    JSON.stringify({ r: returnUrl, n: crypto.randomBytes(16).toString('hex') })
+    JSON.stringify({
+      r: returnUrl,
+      n: crypto.randomBytes(16).toString('hex'),
+      ...(useCodeExchange ? { v: 2 } : {}),
+    })
   ).toString('base64url');
   return `${MOBILE_STATE_PREFIX}${payload}.${signPayload(payload)}`;
 }
@@ -68,7 +72,9 @@ export function createMobileState(returnUrl: string): string {
  * Verify a signed mobile state and return its (validated) return URL, or null if
  * the state isn't a well-formed, correctly-signed mobile state.
  */
-export function readMobileState(state: unknown): { returnUrl: string } | null {
+export function readMobileState(
+  state: unknown
+): { returnUrl: string; useCodeExchange: boolean } | null {
   if (!isMobileState(state)) return null;
   const body = (state as string).slice(MOBILE_STATE_PREFIX.length);
   const dot = body.lastIndexOf('.');
@@ -79,9 +85,12 @@ export function readMobileState(state: unknown): { returnUrl: string } | null {
   if (mac.length !== expected.length) return null;
   if (!crypto.timingSafeEqual(Buffer.from(mac), Buffer.from(expected))) return null;
   try {
-    const parsed = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as { r?: unknown };
+    const parsed = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as {
+      r?: unknown;
+      v?: unknown;
+    };
     const returnUrl = safeReturnUrl(parsed.r);
-    return returnUrl ? { returnUrl } : null;
+    return returnUrl ? { returnUrl, useCodeExchange: parsed.v === 2 } : null;
   } catch {
     return null;
   }
@@ -116,11 +125,44 @@ export function clearStateCookie(res: Response): void {
  * flow and read on the callback so we can hand the browser back to the app deep
  * link. Only the app's own schemes are accepted (prevents an open redirect).
  */
-const ALLOWED_RETURN_SCHEMES = ['btlee://', 'exp://', 'exps://'];
-
 export function safeReturnUrl(url: unknown): string | null {
   if (typeof url !== 'string') return null;
-  return ALLOWED_RETURN_SCHEMES.some((s) => url.startsWith(s)) ? url : null;
+  try {
+    const parsed = new URL(url);
+
+    // Release builds must return only to this app's dedicated OAuth route.
+    if (parsed.protocol === 'btlee:') {
+      const isOAuthRoute =
+        (parsed.hostname === 'oauth' && (parsed.pathname === '' || parsed.pathname === '/')) ||
+        (parsed.hostname === '' && parsed.pathname === '/oauth');
+      return isOAuthRoute ? url : null;
+    }
+
+    // Expo Go uses exp(s)://<local-dev-host>/--/oauth. Limit it to loopback or
+    // private LAN hosts so Expo Go can test against the deployed API without
+    // turning the endpoint into an open redirect to an arbitrary Expo project.
+    const host = parsed.hostname.toLowerCase();
+    const octets = host.split('.').map(Number);
+    const isPrivateIpv4 =
+      octets.length === 4 &&
+      octets.every((part) => Number.isInteger(part) && part >= 0 && part <= 255) &&
+      (octets[0] === 10 ||
+        octets[0] === 127 ||
+        (octets[0] === 192 && octets[1] === 168) ||
+        (octets[0] === 172 && octets[1] >= 16 && octets[1] <= 31));
+    const isLocalDevHost = host === 'localhost' || host === '[::1]' || isPrivateIpv4;
+    if (
+      (parsed.protocol === 'exp:' || parsed.protocol === 'exps:') &&
+      isLocalDevHost &&
+      parsed.pathname === '/--/oauth'
+    ) {
+      return url;
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 export function setReturnCookie(res: Response, url: string): void {

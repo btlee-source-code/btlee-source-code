@@ -9,7 +9,56 @@ import { authActions } from '@/features/auth/store/auth.slice';
 import { useAppDispatch, useAppSelector } from '@/shared/store/hooks';
 import type { User } from '@/shared/types/user';
 import { accountApi } from '@/features/account/api/account.api';
-import { authApi, type RegisterInput } from '../api/auth.api';
+import { authApi, type GoogleAuthResponse, type RegisterInput } from '../api/auth.api';
+
+// Required by expo-web-browser on web and harmless on native. It closes an
+// OAuth popup that returns to this application.
+WebBrowser.maybeCompleteAuthSession();
+
+// Android may deliver the same deep link both to openAuthSessionAsync and to
+// Expo Router. Dedupe the one-time exchange so both consumers share one result.
+const googleExchangeRequests = new Map<string, Promise<GoogleAuthResponse>>();
+
+function exchangeGoogleCodeOnce(code: string): Promise<GoogleAuthResponse> {
+  const existing = googleExchangeRequests.get(code);
+  if (existing) return existing;
+
+  const request = authApi.exchangeGoogleCode(code).catch((error) => {
+    googleExchangeRequests.delete(code);
+    throw error;
+  });
+  googleExchangeRequests.set(code, request);
+  void request.then(
+    () => {
+      setTimeout(() => {
+        if (googleExchangeRequests.get(code) === request) googleExchangeRequests.delete(code);
+      }, 15_000);
+    },
+    () => undefined
+  );
+  return request;
+}
+
+function readQueryString(value: string | string[] | undefined): string | null {
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value) && typeof value[0] === 'string') return value[0];
+  return null;
+}
+
+async function completeLegacyGoogleExchange(
+  accessToken: string,
+  refreshToken: string,
+  isNewUser: boolean
+): Promise<GoogleAuthResponse> {
+  await setTokens(accessToken, refreshToken);
+  try {
+    const user = await authApi.me();
+    return { accessToken, refreshToken, user, isNewUser };
+  } catch (error) {
+    await clearTokens();
+    throw error;
+  }
+}
 
 /**
  * High-level auth actions (mirrors the web `useAuth`). Persists tokens to
@@ -39,29 +88,47 @@ export function useAuth() {
     [dispatch]
   );
 
+  const completeGoogleSignIn = useCallback(async (callbackUrl: string) => {
+    const { queryParams } = Linking.parse(callbackUrl);
+    const status = readQueryString(queryParams?.status);
+    const code = readQueryString(queryParams?.code);
+    if (status !== 'success') {
+      throw new HttpError(readQueryString(queryParams?.reason) ?? 'failed', 400);
+    }
+
+    // Temporary backwards compatibility if the mobile update reaches a device
+    // before the server deployment. The updated server returns only `code`.
+    const legacyAccessToken = readQueryString(queryParams?.accessToken);
+    const legacyRefreshToken = readQueryString(queryParams?.refreshToken);
+    const result = code
+      ? await exchangeGoogleCodeOnce(code)
+      : legacyAccessToken && legacyRefreshToken
+        ? await completeLegacyGoogleExchange(
+            legacyAccessToken,
+            legacyRefreshToken,
+            readQueryString(queryParams?.onboarding) === '1'
+          )
+        : null;
+    if (!result) throw new HttpError('failed', 400);
+
+    await setTokens(result.accessToken, result.refreshToken);
+    dispatch(authActions.setAuth(result.user));
+    return { user: result.user, isNewUser: result.isNewUser };
+  }, [dispatch]);
+
   /**
    * Google sign-in via the backend OAuth flow (reuses the web Google client).
-   * Opens the consent screen in an in-app browser; the backend hands the tokens
-   * back through the app deep link. Returns null if the user cancels.
+   * The browser returns only a short-lived one-time code; the real session is
+   * exchanged over HTTPS. Returns null if the user cancels.
    */
   const loginWithGoogle = useCallback(async (): Promise<{ user: User; isNewUser: boolean } | null> => {
     const returnUrl = Linking.createURL('oauth');
-    const startUrl = `${API_URL}/auth/google?client=mobile&returnUrl=${encodeURIComponent(returnUrl)}`;
+    const startUrl = `${API_URL}/auth/google?client=mobile&flow=code&returnUrl=${encodeURIComponent(returnUrl)}`;
     const result = await WebBrowser.openAuthSessionAsync(startUrl, returnUrl);
     if (result.type !== 'success' || !result.url) return null; // cancelled / dismissed
 
-    const { queryParams } = Linking.parse(result.url);
-    const accessToken = queryParams?.accessToken;
-    const refreshToken = queryParams?.refreshToken;
-    if (queryParams?.status !== 'success' || typeof accessToken !== 'string' || typeof refreshToken !== 'string') {
-      throw new HttpError(typeof queryParams?.reason === 'string' ? queryParams.reason : 'failed', 400);
-    }
-
-    await setTokens(accessToken, refreshToken);
-    const user = await authApi.me();
-    dispatch(authActions.setAuth(user));
-    return { user, isNewUser: queryParams?.onboarding === '1' };
-  }, [dispatch]);
+    return completeGoogleSignIn(result.url);
+  }, [completeGoogleSignIn]);
 
   const logout = useCallback(async (): Promise<void> => {
     const refreshToken = await getRefreshToken();
@@ -91,6 +158,7 @@ export function useAuth() {
     login,
     register,
     loginWithGoogle,
+    completeGoogleSignIn,
     logout,
     deleteAccount,
     setUser,
