@@ -276,7 +276,8 @@
       "chalet": "Chalet",
       "shop": "Shop",
       "building": "Building",
-      "factory": "Factory"
+      "factory": "Factory",
+      "land": "Land"
     },
     "listingTypes": {
       "sale": "For Sale",
@@ -394,10 +395,30 @@
     "uploadHint": "Min 1 image, max 15 images (PNG, JPG)",
     "pinLocation": "Pin property location on map",
     "imageRequired": "At least one image is required",
+    "maxImagesToast": "The maximum is {max} images — you can add only {available} more",
+    "imagesUploaded": "{count} image(s) uploaded",
+    "imagesUploadFailed": "Image upload failed. Please try again",
+    "removeImage": "Remove image",
+    "addImages": "Add images",
+    "imagesCount": "{count}/{max} images",
+    "imageFormats": "PNG or JPG (maximum 5 MB per image)",
     "locationRequired": "Please pin the property location on the map",
+    "fieldErrorToast": "Please enter or select {field}",
+    "invalidField": "The value entered for {field} is invalid",
+    "durationOption": "{days} days",
     "underReviewNotice": "Your listing will be reviewed by our team before going live — review usually takes 24 hours",
+    "locationSearch": {
+      "placeholder": "Search in Arabic or English... e.g. المعادي or Maadi",
+      "button": "Search",
+      "minimum": "Enter at least two characters to search",
+      "failed": "Location search is unavailable right now. Please try again",
+      "empty": "No results found for “{query}”",
+      "clear": "Clear",
+      "mapHint": "Click the map to select the property location",
+      "selected": "Location selected"
+    },
     "fields": {
-      "buildingType": "Building Type",
+      "buildingType": "Property Type",
       "selectType": "Select type",
       "listingType": "Listing Type",
       "category": "Category",

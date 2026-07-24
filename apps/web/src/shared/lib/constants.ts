@@ -2,8 +2,27 @@
  * Domain constants — kept in sync with the server.
  */
 
-export const PROPERTY_TYPES = ['apartment', 'villa', 'chalet', 'shop', 'building', 'factory'] as const;
+export const PROPERTY_TYPES = [
+  'apartment',
+  'villa',
+  'chalet',
+  'shop',
+  'building',
+  'factory',
+  'land',
+] as const;
 export type PropertyType = (typeof PROPERTY_TYPES)[number];
+
+const PROPERTY_TYPES_WITHOUT_ROOMS = new Set<PropertyType>(['shop', 'factory', 'land']);
+const PROPERTY_TYPES_WITHOUT_FINISHING = new Set<PropertyType>(['factory', 'land']);
+
+export function propertyTypeHasRooms(type: string): boolean {
+  return type !== '' && !PROPERTY_TYPES_WITHOUT_ROOMS.has(type as PropertyType);
+}
+
+export function propertyTypeHasFinishing(type: string): boolean {
+  return type !== '' && !PROPERTY_TYPES_WITHOUT_FINISHING.has(type as PropertyType);
+}
 
 export const LISTING_TYPES = ['sale', 'rent'] as const;
 export type ListingType = (typeof LISTING_TYPES)[number];

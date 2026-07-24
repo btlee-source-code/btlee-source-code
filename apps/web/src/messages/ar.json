@@ -275,7 +275,8 @@
       "chalet": "شاليه",
       "shop": "محل",
       "building": "مبنى",
-      "factory": "مصنع"
+      "factory": "مصنع",
+      "land": "أرض"
     },
     "listingTypes": {
       "sale": "للبيع",
@@ -393,10 +394,30 @@
     "uploadHint": "حد أدنى صورة واحدة وحد أقصى 15 صورة (PNG, JPG)",
     "pinLocation": "حدد موقع العقار على الخريطة",
     "imageRequired": "يجب إضافة صورة واحدة على الأقل",
+    "maxImagesToast": "الحد الأقصى {max} صورة — يمكنك إضافة {available} فقط",
+    "imagesUploaded": "تم رفع {count} صورة",
+    "imagesUploadFailed": "فشل رفع الصور، حاول مرة أخرى",
+    "removeImage": "حذف الصورة",
+    "addImages": "إضافة صور",
+    "imagesCount": "{count}/{max} صور",
+    "imageFormats": "PNG أو JPG (بحد أقصى 5 ميجابايت للصورة)",
     "locationRequired": "يجب تحديد موقع العقار على الخريطة",
+    "fieldErrorToast": "يرجى إدخال أو اختيار {field}",
+    "invalidField": "القيمة المدخلة في {field} غير صحيحة",
+    "durationOption": "{days} يوم",
     "underReviewNotice": "سيتم مراجعة إعلانك من قبل فريقنا قبل نشره — تستغرق المراجعة عادةً 24 ساعة",
+    "locationSearch": {
+      "placeholder": "ابحث بالعربي أو الإنجليزي... مثال: المعادي أو Maadi",
+      "button": "بحث",
+      "minimum": "اكتب حرفين على الأقل للبحث",
+      "failed": "تعذر البحث عن المنطقة الآن، حاول مرة أخرى",
+      "empty": "لا توجد نتائج لـ «{query}»",
+      "clear": "مسح",
+      "mapHint": "اضغط على الخريطة لتحديد موقع العقار",
+      "selected": "تم تحديد الموقع"
+    },
     "fields": {
-      "buildingType": "نوع المبنى",
+      "buildingType": "نوع العقار",
       "selectType": "اختر النوع",
       "listingType": "نوع الصفقة",
       "category": "التصنيف",

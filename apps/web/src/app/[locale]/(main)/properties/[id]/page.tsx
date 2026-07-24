@@ -7,6 +7,7 @@
  * client view.
  */
 import { notFound } from 'next/navigation';
+import { cookies } from 'next/headers';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { serverApiBase, SITE_URL } from '@/config/site';
@@ -23,8 +24,18 @@ interface PageParams {
 async function getProperty(id: string): Promise<Property | null> {
   if (!/^[0-9a-fA-F]{24}$/.test(id)) return null;
   try {
+    // The public detail endpoint also allows the listing owner to preview
+    // pending/rejected/expired listings. Server Components do not forward the
+    // browser's cookies automatically, so pass only the user access cookie.
+    // Authenticated responses must never enter the shared Next.js cache.
+    const accessToken = (await cookies()).get('access_token')?.value;
     const res = await fetch(`${serverApiBase()}/properties/${id}`, {
-      next: { revalidate: 300 },
+      ...(accessToken
+        ? {
+            headers: { Cookie: `access_token=${accessToken}` },
+            cache: 'no-store' as const,
+          }
+        : { next: { revalidate: 300 } }),
     });
     if (!res.ok) return null;
     const json: { data?: Property } = await res.json();
