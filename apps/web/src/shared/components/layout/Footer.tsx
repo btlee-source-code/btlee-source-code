@@ -2,7 +2,7 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/config/navigation';
 import { Logo } from './Logo';
-import { Facebook, Instagram, Twitter, MessageCircle, Code2 } from 'lucide-react';
+import { Facebook, MessageCircle, Code2, Sparkles } from 'lucide-react';
 
 export function Footer() {
   const t = useTranslations();
@@ -94,6 +94,13 @@ export function Footer() {
 
         {/* Developer credit */}
         <div className="mt-6 border-t border-border pt-5 flex flex-col items-center gap-2.5 text-center text-xs text-muted-foreground">
+          <p className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-4 py-2 text-sm shadow-sm">
+            <Sparkles className="size-4 text-accent" />
+            <span>
+              {t('footer.patronage')}{' '}
+              <span className="font-bold text-foreground">{t('footer.clientName')}</span>
+            </span>
+          </p>
           <p className="inline-flex items-center gap-1.5">
             <Code2 className="size-3.5 text-primary" />
             <span>
