@@ -483,6 +483,13 @@
     "markAllRead": "Mark all as read",
     "viewAll": "View all"
   },
+  "deletedListing": {
+    "eyebrow": "Listing unavailable",
+    "title": "This listing was deleted",
+    "description": "This listing has been deleted and is no longer available. You can return to your listings or continue browsing the platform.",
+    "myListings": "Back to My Listings",
+    "home": "Home"
+  },
   "errors": {
     "required": "This field is required",
     "selectOption": "Please select an option",
