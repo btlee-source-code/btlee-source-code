@@ -354,6 +354,8 @@
     "new": "جديد",
     "rateThis": "قيّم هذا العقار",
     "yourRating": "تقييمك",
+    "ratingChooseMethod": "أو قيّم باستخدام رقم",
+    "ratingSubmitted": "تم تسجيل تقييمك: {value} من 5",
     "ratingThanks": "شكراً لتقييمك",
     "ratingsCount": "تقييم",
     "noRatings": "لا توجد تقييمات بعد"

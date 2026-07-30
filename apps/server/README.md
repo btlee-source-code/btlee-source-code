@@ -40,7 +40,7 @@ src/
 ## API Endpoints
 
 All routes are prefixed with `/api`. Example base URL in production:
-`https://btlee-api.up.railway.app/api`.
+`https://api.btlee-eg.com/api`.
 
 **Authentication** — access + refresh JWTs are stored in `httpOnly` cookies that the
 server sets on login/register, so the browser sends them automatically. Send requests

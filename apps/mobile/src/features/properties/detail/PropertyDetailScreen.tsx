@@ -35,8 +35,10 @@ import { ReportSheet } from '@/features/reports/components/ReportSheet';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { WhatsAppIcon } from '@/shared/components/icons/WhatsAppIcon';
 import { ResponsivePage } from '@/shared/components/layout/ResponsivePage';
+import { DeletedListingState } from '@/shared/components/layout/DeletedListingState';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
 import { Skeleton } from '@/shared/components/ui/Skeleton';
+import { HttpError } from '@/shared/api/httpClient';
 import { useFetch } from '@/shared/hooks/useFetch';
 import { RESPONSIVE_MAX_WIDTH, useResponsiveLayout } from '@/shared/hooks/useResponsiveLayout';
 import {
@@ -118,6 +120,10 @@ export function PropertyDetailScreen() {
         </ResponsivePage>
       </View>
     );
+  }
+
+  if (error instanceof HttpError && error.status === 404) {
+    return <DeletedListingState kind="property" />;
   }
 
   if (error || !property) {

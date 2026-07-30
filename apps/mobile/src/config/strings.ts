@@ -125,6 +125,12 @@ const ar = {
   errorTitle: 'حصل خطأ',
   errorDesc: 'تعذّر تحميل العقارات، حاول تاني',
   retry: 'إعادة المحاولة',
+  deletedListingEyebrow: 'الإعلان غير متاح',
+  deletedListingTitle: 'تم حذف الإعلان',
+  deletedListingDescription:
+    'هذا الإعلان تم حذفه ولم يعد متاحًا للعرض. يمكنك الرجوع إلى إعلاناتك أو متابعة تصفح المنصة.',
+  deletedListingMyListings: 'الرجوع إلى إعلاناتي',
+  deletedListingHome: 'الصفحة الرئيسية',
 
   // Detail
   contactOwner: 'تواصل مع صاحب العقار',
@@ -555,6 +561,12 @@ const en: Partial<Strings> = {
   errorTitle: 'Something went wrong',
   errorDesc: 'Could not load properties, please try again',
   retry: 'Try again',
+  deletedListingEyebrow: 'Listing unavailable',
+  deletedListingTitle: 'This listing was deleted',
+  deletedListingDescription:
+    'This listing has been deleted and is no longer available. You can return to your listings or continue browsing the platform.',
+  deletedListingMyListings: 'Back to My Listings',
+  deletedListingHome: 'Home',
 
   contactOwner: 'Contact the owner',
   viewOnMap: 'View on map',

@@ -355,6 +355,8 @@
     "new": "New",
     "rateThis": "Rate this property",
     "yourRating": "Your rating",
+    "ratingChooseMethod": "Or rate with a number",
+    "ratingSubmitted": "Your rating is saved: {value} of 5",
     "ratingThanks": "Thanks for your rating",
     "ratingsCount": "ratings",
     "noRatings": "No ratings yet"

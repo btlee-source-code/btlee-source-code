@@ -1,4 +1,4 @@
-'use client';
+"use client";
 /**
  * Star rating primitives.
  *
@@ -11,9 +11,9 @@
  * Both use the gold `accent` token for fills, so they look at home in light
  * and dark mode without any per-theme overrides.
  */
-import { useState } from 'react';
-import { Star } from 'lucide-react';
-import { cn } from '@/shared/lib/utils';
+import { useState } from "react";
+import { Star } from "lucide-react";
+import { cn } from "@/shared/lib/utils";
 
 function StarRow({
   size,
@@ -33,7 +33,11 @@ function StarRow({
           key={i}
           style={{ width: size, height: size }}
           strokeWidth={1.5}
-          className={filled ? 'fill-accent text-accent' : 'fill-transparent text-muted-foreground/35'}
+          className={
+            filled
+              ? "fill-accent text-accent"
+              : "fill-transparent text-muted-foreground/35"
+          }
         />
       ))}
     </div>
@@ -51,12 +55,12 @@ export function StarRating({
   gap?: number;
   className?: string;
 }) {
-  const pct = Math.max(0, Math.min(5, value)) / 5 * 100;
+  const pct = (Math.max(0, Math.min(5, value)) / 5) * 100;
   const fullWidth = size * 5 + gap * 4;
 
   return (
     <div
-      className={cn('relative inline-flex', className)}
+      className={cn("relative inline-flex", className)}
       role="img"
       aria-label={`${value.toFixed(1)} / 5`}
     >
@@ -91,7 +95,7 @@ export function StarRatingInput({
 
   return (
     <div
-      className={cn('inline-flex', className)}
+      className={cn("inline-flex", className)}
       style={{ gap }}
       onMouseLeave={() => setHover(0)}
     >
@@ -107,21 +111,102 @@ export function StarRatingInput({
             onClick={() => !disabled && onRate(idx)}
             aria-label={`${idx} / 5`}
             className={cn(
-              'transition-transform',
-              disabled ? 'cursor-default' : 'cursor-pointer hover:scale-110 active:scale-95'
+              "transition-transform",
+              disabled
+                ? "cursor-default"
+                : "cursor-pointer hover:scale-110 active:scale-95",
             )}
           >
             <Star
               style={{ width: size, height: size }}
               strokeWidth={1.5}
               className={cn(
-                'transition-colors',
-                on ? 'fill-accent text-accent' : 'fill-transparent text-muted-foreground/40'
+                "transition-colors",
+                on
+                  ? "fill-accent text-accent"
+                  : "fill-transparent text-muted-foreground/40",
               )}
             />
           </button>
         );
       })}
+    </div>
+  );
+}
+
+/**
+ * One 1–5 choice exposed through two synchronized controls: stars and numbered
+ * buttons. Picking from either row submits the same value, while `disabled`
+ * locks both controls together after a successful one-time rating.
+ */
+export function RatingInput({
+  value,
+  onRate,
+  methodLabel,
+  size = 30,
+  disabled = false,
+  className,
+}: {
+  value: number;
+  onRate: (value: number) => void;
+  methodLabel: string;
+  size?: number;
+  disabled?: boolean;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "w-full rounded-2xl border border-border bg-secondary/55 p-3 sm:p-4",
+        className,
+      )}
+      role="group"
+      aria-label={methodLabel}
+    >
+      <div className="flex justify-center">
+        <StarRatingInput
+          value={value}
+          onRate={onRate}
+          size={size}
+          disabled={disabled}
+        />
+      </div>
+
+      <div className="my-3 flex items-center gap-2.5">
+        <span className="h-px flex-1 bg-border" aria-hidden="true" />
+        <span className="shrink-0 text-xs font-medium text-muted-foreground">
+          {methodLabel}
+        </span>
+        <span className="h-px flex-1 bg-border" aria-hidden="true" />
+      </div>
+
+      <div className="grid grid-cols-5 gap-2">
+        {[1, 2, 3, 4, 5].map((number) => {
+          const selected = value === number;
+
+          return (
+            <button
+              key={number}
+              type="button"
+              disabled={disabled}
+              onClick={() => !disabled && onRate(number)}
+              aria-label={`${number} / 5`}
+              aria-pressed={selected}
+              className={cn(
+                "flex min-h-10 items-center justify-center rounded-xl border text-sm font-bold tabular-nums transition-all",
+                selected
+                  ? "border-accent bg-accent text-accent-foreground shadow-sm"
+                  : "border-border bg-card text-foreground",
+                disabled
+                  ? "cursor-default"
+                  : "cursor-pointer hover:-translate-y-0.5 hover:border-accent/70 hover:bg-accent/10 active:translate-y-0",
+              )}
+            >
+              {number}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

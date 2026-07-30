@@ -14,6 +14,7 @@ import { useAppDispatch, useAppSelector } from '@/shared/store/hooks';
 import type { Notification } from '@/shared/types/notification';
 import { notificationsActions } from '../store/notifications.slice';
 import { notificationsApi } from '../api/notifications.api';
+import { getNotificationRoute } from '../lib/notificationRoutes';
 
 export function NotificationsScreen() {
   const router = useRouter();
@@ -65,12 +66,8 @@ export function NotificationsScreen() {
       dispatch(notificationsActions.decrementUnread());
       notificationsApi.markRead(n._id).catch(() => {});
     }
-    // Map the web `link` path to a mobile route. `/saved-searches` and null
-    // links have no mobile target yet, so they only mark-read.
-    if (n.link?.startsWith('/properties/')) {
-      const id = n.link.split('/properties/')[1];
-      if (id) router.push(`/properties/${id}`);
-    }
+    const route = getNotificationRoute(n.link);
+    if (route) router.push(route as never);
   };
 
   if (authLoading) {

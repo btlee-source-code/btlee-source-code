@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 
 /** Live API — the safe default for any RELEASE build (preview/production). */
-const PRODUCTION_API_URL = 'https://btlee-api.up.railway.app/api';
+const PRODUCTION_API_URL = 'https://api.btlee-eg.com/api';
 
 /**
  * Resolves the backend API base URL for the current runtime.

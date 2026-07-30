@@ -10,6 +10,7 @@ import {
   registerPushTokenAsync,
   unregisterPushTokenAsync,
 } from '../lib/push';
+import { getNotificationRoute } from '../lib/notificationRoutes';
 
 /**
  * Keeps the header bell badge in sync and wires device push:
@@ -59,9 +60,8 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
       const received = Notifications.addNotificationReceivedListener(() => refreshUnread());
       const response = Notifications.addNotificationResponseReceivedListener((r) => {
         const data = r.notification.request.content.data as { link?: unknown } | undefined;
-        const link =
-          typeof data?.link === 'string' && data.link.startsWith('/') ? data.link : null;
-        router.push(link ?? '/notifications');
+        const route = getNotificationRoute(data?.link);
+        router.push((route ?? '/notifications') as never);
       });
       cleanup = () => {
         received.remove();
