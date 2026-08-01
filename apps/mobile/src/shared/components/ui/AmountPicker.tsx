@@ -174,10 +174,11 @@ export const PRICE_OPTIONS = [
   6_000_000, 8_000_000, 10_000_000, 15_000_000, 20_000_000, 30_000_000, 50_000_000,
 ];
 
-/** Preset area steps (m²) offered in the area picker. */
-export const AREA_OPTIONS = [
-  50, 60, 70, 80, 90, 100, 120, 150, 180, 200, 250, 300, 350, 400, 500, 600, 800, 1000, 1500, 2000,
-];
+/** Every 5 m² from 5 through 2,000 for property forms and search filters. */
+export const AREA_OPTIONS = Array.from(
+  { length: 400 },
+  (_, index) => (index + 1) * 5
+);
 
 /** Preset small counts (bedrooms, bathrooms, …). */
 export const COUNT_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
