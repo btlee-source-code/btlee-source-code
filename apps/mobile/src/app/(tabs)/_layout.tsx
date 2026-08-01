@@ -39,16 +39,17 @@ export default function TabsLayout() {
           borderTopRightRadius: isTablet ? 22 : 0,
         },
         tabBarItemStyle: isTablet ? { maxWidth: 136 } : undefined,
+        tabBarIconStyle: { marginTop: -3 },
         tabBarLabelStyle: { fontFamily: 'Cairo_600SemiBold', fontSize: 11 },
         tabBarAllowFontScaling: false,
       }}>
       <Tabs.Screen
         name="index"
-        options={{ title: S.tabHome, tabBarIcon: ({ color }) => <House color={color} size={23} /> }}
+        options={{ title: S.tabHome, tabBarIcon: ({ color }) => <House color={color} size={25} /> }}
       />
       <Tabs.Screen
         name="properties"
-        options={{ title: isCars ? S.sectionCars : S.tabProperties, tabBarIcon: ({ color }) => <Search color={color} size={23} /> }}
+        options={{ title: isCars ? S.sectionCars : S.tabProperties, tabBarIcon: ({ color }) => <Search color={color} size={25} /> }}
       />
       <Tabs.Screen
         name="add"
@@ -57,11 +58,11 @@ export default function TabsLayout() {
       />
       <Tabs.Screen
         name="wishlist"
-        options={{ title: S.tabWishlist, tabBarIcon: ({ color }) => <Heart color={color} size={23} /> }}
+        options={{ title: S.tabWishlist, tabBarIcon: ({ color }) => <Heart color={color} size={25} /> }}
       />
       <Tabs.Screen
         name="profile"
-        options={{ title: S.tabProfile, tabBarIcon: ({ color }) => <User color={color} size={23} /> }}
+        options={{ title: S.tabProfile, tabBarIcon: ({ color }) => <User color={color} size={25} /> }}
       />
     </Tabs>
   );
