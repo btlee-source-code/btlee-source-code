@@ -73,11 +73,11 @@ export async function generateMetadata({
       follow: true,
       googleBot: { index: true, follow: true, 'max-image-preview': 'large' },
     },
-    // Favicon served from public/favicon.png, referenced explicitly so it is the
+    // Favicon served from public/favicon.ico, referenced explicitly so it is the
     // single source (no competing app/icon.* file-convention icon).
     icons: {
-      icon: '/favicon.png',
-      shortcut: '/favicon.png',
+      icon: '/favicon.ico',
+      shortcut: '/favicon.ico',
       apple: '/favicon.png',
     },
     other: {
