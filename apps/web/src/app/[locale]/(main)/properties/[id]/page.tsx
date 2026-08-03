@@ -10,7 +10,7 @@ import { notFound } from 'next/navigation';
 import { cookies } from 'next/headers';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { serverApiBase, SITE_URL } from '@/config/site';
+import { localizedAlternates, serverApiBase, SITE_URL } from '@/config/site';
 import { JsonLd } from '@/shared/components/seo/JsonLd';
 import { PropertyDetailView } from '@/features/properties/detail/components/PropertyDetailView';
 import type { Property } from '@/shared/types/property';
@@ -61,10 +61,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   return {
     title,
     description,
-    alternates: {
-      canonical: url,
-      languages: { ar: `/ar/properties/${id}`, en: `/en/properties/${id}` },
-    },
+    alternates: localizedAlternates(locale, `/properties/${id}`),
     openGraph: {
       type: 'article',
       title,

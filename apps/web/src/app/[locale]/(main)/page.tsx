@@ -1,6 +1,7 @@
 /**
  * Home Page — composes all marketing sections in their intended order.
  */
+import type { Metadata } from 'next';
 import { HeroSection } from '@/features/home/components/HeroSection';
 import { StatsSection } from '@/features/home/components/StatsSection';
 import { CategoriesSection } from '@/features/home/components/CategoriesSection';
@@ -15,7 +16,17 @@ import {
   SITE_NAME_EN,
   SITE_DESCRIPTION,
   SITE_SOCIALS,
+  localizedAlternates,
 } from '@/config/site';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return { alternates: localizedAlternates(locale) };
+}
 
 export default function HomePage() {
   return (

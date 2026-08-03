@@ -26,6 +26,26 @@ export const OG_IMAGE = ogLogo.src;
 export const SITE_SOCIALS = ['https://www.facebook.com/share/1CuGDB45iY/'];
 
 /**
+ * Canonical and hreflang links for a public localized route.
+ *
+ * Keep this route-specific instead of defining it in the locale root layout;
+ * otherwise every child page would incorrectly claim the locale homepage as
+ * its canonical URL.
+ */
+export function localizedAlternates(locale: string, path = '') {
+  const normalizedPath = path && !path.startsWith('/') ? `/${path}` : path;
+
+  return {
+    canonical: `/${locale}${normalizedPath}`,
+    languages: {
+      ar: `/ar${normalizedPath}`,
+      en: `/en${normalizedPath}`,
+      'x-default': `/ar${normalizedPath}`,
+    },
+  };
+}
+
+/**
  * Absolute API base for SERVER-side fetches (sitemap, server-rendered pages).
  * The browser uses a relative `/api` (proxied) but the server needs an absolute
  * origin: prefer API_PROXY_TARGET (the real backend), then an absolute

@@ -43,22 +43,11 @@ export async function generateMetadata({
     },
     description,
     applicationName: SITE_NAME_EN,
-    // hreflang + canonical so Google serves the right locale and doesn't treat
-    // ar/en as duplicate content.
-    alternates: {
-      canonical: `/${locale}`,
-      languages: {
-        ar: '/ar',
-        en: '/en',
-        'x-default': '/ar',
-      },
-    },
     openGraph: {
       type: 'website',
       siteName: SITE_NAME_EN,
       title,
       description,
-      url: `/${locale}`,
       locale: isAr ? 'ar_EG' : 'en_US',
       images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: SITE_NAME }],
     },
