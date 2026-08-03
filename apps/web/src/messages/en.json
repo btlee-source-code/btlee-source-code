@@ -361,6 +361,10 @@
     "ratingsCount": "ratings",
     "noRatings": "No ratings yet"
   },
+  "propertiesPage": {
+    "title": "Properties for Sale and Rent in Egypt",
+    "description": "Browse the latest apartments, villas, shops, and land listings across Egypt. Search by price, area, and location to find the right property and contact the advertiser directly."
+  },
   "filters": {
     "title": "Filter Results",
     "type": "Property Type",
