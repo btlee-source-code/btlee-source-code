@@ -112,16 +112,6 @@ export default async function PropertyDetailPage({ params }: PageParams) {
           },
         }
       : {}),
-    ...((property.ratingCount ?? 0) > 0
-      ? {
-          aggregateRating: {
-            '@type': 'AggregateRating',
-            ratingValue: property.ratingAvg,
-            ratingCount: property.ratingCount,
-            bestRating: 5,
-          },
-        }
-      : {}),
   };
 
   return (
