@@ -1,5 +1,6 @@
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
+import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
 import { notificationsApi } from '../api/notifications.api';
@@ -28,8 +29,27 @@ const projectId: string | undefined =
   Constants.easConfig?.projectId;
 
 // Remember the device token so we can unregister exactly it on logout.
+const PUSH_TOKEN_KEY = 'btlee_expo_push_token';
 let cachedToken: string | null = null;
 let handlerConfigured = false;
+
+export async function getStoredPushTokenAsync(): Promise<string | null> {
+  if (cachedToken) return cachedToken;
+  cachedToken = await SecureStore.getItemAsync(PUSH_TOKEN_KEY);
+  return cachedToken;
+}
+
+export async function clearStoredPushTokenAsync(): Promise<void> {
+  cachedToken = null;
+  await SecureStore.deleteItemAsync(PUSH_TOKEN_KEY);
+}
+
+/** Persist a freshly issued/rotated Expo token and attach it to this account. */
+export async function syncPushTokenAsync(token: string): Promise<void> {
+  cachedToken = token;
+  await SecureStore.setItemAsync(PUSH_TOKEN_KEY, token);
+  await notificationsApi.registerPushToken(token);
+}
 
 /**
  * Dynamically import expo-notifications and configure the foreground handler
@@ -82,8 +102,7 @@ export async function registerPushTokenAsync(): Promise<string | null> {
 
   try {
     const { data: token } = await Notifications.getExpoPushTokenAsync({ projectId });
-    cachedToken = token;
-    await notificationsApi.registerPushToken(token);
+    await syncPushTokenAsync(token);
     return token;
   } catch (err) {
     console.warn('[push] token registration failed', err);
@@ -92,13 +111,18 @@ export async function registerPushTokenAsync(): Promise<string | null> {
 }
 
 /** Detach this device's token from the account (called on logout). */
-export async function unregisterPushTokenAsync(): Promise<void> {
-  if (!cachedToken) return;
-  const token = cachedToken;
-  cachedToken = null;
+export async function unregisterPushTokenAsync(): Promise<boolean> {
+  const token = await getStoredPushTokenAsync();
+  if (!token) return true;
   try {
     await notificationsApi.unregisterPushToken(token);
-  } catch {
-    // Logout must proceed regardless of network.
+    await clearStoredPushTokenAsync();
+    return true;
+  } catch (err) {
+    // Keep the token locally so a later app resume can retry the cleanup. The
+    // server endpoint intentionally accepts this device-scoped operation even
+    // after the user session has been cleared.
+    console.warn('[push] token removal failed; will retry later', err);
+    return false;
   }
 }

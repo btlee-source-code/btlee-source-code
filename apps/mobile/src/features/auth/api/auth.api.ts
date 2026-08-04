@@ -29,7 +29,8 @@ export const authApi = {
   exchangeGoogleCode: (code: string) =>
     post<GoogleAuthResponse>('/auth/google/mobile-exchange', { code }, { skipAuth: true }),
 
-  logout: (refreshToken: string) => post<{ message: string }>('/auth/logout', { refreshToken }),
+  logout: (refreshToken: string, pushToken?: string | null) =>
+    post<{ message: string }>('/auth/logout', { refreshToken, pushToken }),
 
   me: () => get<User>('/users/me'),
 

@@ -41,7 +41,9 @@ export async function registerPushToken(req: Request, res: Response): Promise<vo
 }
 
 export async function unregisterPushToken(req: Request, res: Response): Promise<void> {
-  if (!req.user) throw new UnauthorizedError();
-  await service.unregisterPushToken(req.user.userId, req.body.token);
+  // Device-scoped cleanup deliberately works after the access token has been
+  // cleared/expired. Possessing the exact high-entropy Expo token is required,
+  // and this operation can only stop notifications for that device.
+  await service.unregisterPushTokenEverywhere(req.body.token);
   res.json(ok({ message: 'Push token removed' }));
 }

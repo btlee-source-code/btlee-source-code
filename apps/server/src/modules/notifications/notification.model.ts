@@ -12,6 +12,9 @@ const notificationSchema = new Schema(
     title: { type: String, required: true },
     message: { type: String, required: true },
     link: { type: String, default: null },
+    // Optional event id used by retryable jobs (for example listing expiry) to
+    // guarantee that the same business event creates at most one notification.
+    dedupeKey: { type: String, sparse: true, unique: true, select: false },
     isRead: { type: Boolean, default: false, index: true },
   },
   { timestamps: true }

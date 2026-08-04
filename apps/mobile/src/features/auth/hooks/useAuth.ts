@@ -9,6 +9,11 @@ import { authActions } from '@/features/auth/store/auth.slice';
 import { useAppDispatch, useAppSelector } from '@/shared/store/hooks';
 import type { User } from '@/shared/types/user';
 import { accountApi } from '@/features/account/api/account.api';
+import {
+  clearStoredPushTokenAsync,
+  getStoredPushTokenAsync,
+  unregisterPushTokenAsync,
+} from '@/features/notifications/lib/push';
 import { authApi, type GoogleAuthResponse, type RegisterInput } from '../api/auth.api';
 
 // Required by expo-web-browser on web and harmless on native. It closes an
@@ -131,8 +136,20 @@ export function useAuth() {
   }, [completeGoogleSignIn]);
 
   const logout = useCallback(async (): Promise<void> => {
-    const refreshToken = await getRefreshToken();
-    if (refreshToken) await authApi.logout(refreshToken).catch(() => {});
+    const [refreshToken, pushToken] = await Promise.all([
+      getRefreshToken(),
+      getStoredPushTokenAsync(),
+    ]);
+
+    // The backend removes this device token in the same operation that revokes
+    // the refresh token. The standalone device endpoint is a fallback and also
+    // works after the local session has already expired.
+    const loggedOutRemotely = refreshToken
+      ? await authApi.logout(refreshToken, pushToken).then(() => true).catch(() => false)
+      : false;
+    if (loggedOutRemotely) await clearStoredPushTokenAsync();
+    else await unregisterPushTokenAsync();
+
     await clearTokens();
     dispatch(authActions.clearAuth());
   }, [dispatch]);
@@ -144,6 +161,7 @@ export function useAuth() {
    */
   const deleteAccount = useCallback(async (): Promise<void> => {
     await accountApi.deleteAccount();
+    await clearStoredPushTokenAsync();
     await clearTokens();
     dispatch(authActions.clearAuth());
   }, [dispatch]);

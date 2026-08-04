@@ -1,10 +1,12 @@
-/**
- * Notifications Service
- */
+/** Notifications service: in-app records plus durable device delivery queue. */
 import { Types } from 'mongoose';
 import { Notification } from './notification.model.js';
 import { User } from '../users/user.model.js';
-import { sendExpoPush } from '../../shared/utils/pushNotifications.js';
+import {
+  cancelPushDeliveriesForToken,
+  enqueueNotificationPush,
+  processPushDeliveriesTick,
+} from './pushDelivery.service.js';
 import type { NotificationType } from '../../config/constants.js';
 
 interface CreateNotificationInput {
@@ -13,54 +15,45 @@ interface CreateNotificationInput {
   title: string;
   message: string;
   link?: string | null;
+  dedupeKey?: string;
 }
 
 export async function createNotification(input: CreateNotificationInput) {
-  const notification = await Notification.create({
+  const data = {
     user: new Types.ObjectId(input.userId),
     type: input.type,
     title: input.title,
     message: input.message,
     link: input.link ?? null,
-  });
-  // Also fire a device push — fire-and-forget so it never blocks/breaks the
-  // in-app notification write (the source of truth).
-  void pushToUserDevices(input);
+    ...(input.dedupeKey ? { dedupeKey: input.dedupeKey } : {}),
+  };
+  const notification = input.dedupeKey
+    ? await Notification.findOneAndUpdate(
+        { dedupeKey: input.dedupeKey },
+        { $setOnInsert: data },
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      )
+    : await Notification.create(data);
+
+  // Persist one delivery per registered device before kicking the asynchronous
+  // worker. A server restart cannot lose queued pushes, while the in-app record
+  // remains available even if queue creation unexpectedly fails.
+  try {
+    const queued = await enqueueNotificationPush(String(notification._id), input.userId);
+    if (queued > 0) void processPushDeliveriesTick();
+  } catch (error) {
+    console.error('[push] failed to queue notification', notification._id, error);
+  }
+
   return notification;
 }
 
-/** Best-effort device push for a notification; prunes tokens Expo rejects. */
-async function pushToUserDevices(input: CreateNotificationInput): Promise<void> {
-  try {
-    const user = await User.findById(input.userId).select('+expoPushTokens').lean();
-    const tokens = user?.expoPushTokens ?? [];
-    if (!tokens.length) return;
-
-    const invalid = await sendExpoPush(
-      tokens.map((to) => ({
-        to,
-        title: input.title,
-        body: input.message,
-        data: { type: input.type, link: input.link ?? null },
-      }))
-    );
-    if (invalid.length) {
-      await User.updateOne(
-        { _id: input.userId },
-        { $pull: { expoPushTokens: { $in: invalid } } }
-      );
-    }
-  } catch (err) {
-    console.error('[push] notification push failed', err);
-  }
-}
-
 /**
- * Register a device's Expo push token to a user. First detaches the token from
- * any other account (device re-used by a different login) so pushes always reach
- * the currently signed-in user, then adds it (deduped) to this user.
+ * Register a device token to exactly one account. Pending deliveries belonging
+ * to a previous account on the same device are cancelled before reassignment.
  */
 export async function registerPushToken(userId: string, token: string): Promise<void> {
+  await cancelPushDeliveriesForToken(token, userId);
   await User.updateMany(
     { _id: { $ne: userId }, expoPushTokens: token },
     { $pull: { expoPushTokens: token } }
@@ -69,7 +62,18 @@ export async function registerPushToken(userId: string, token: string): Promise<
 }
 
 export async function unregisterPushToken(userId: string, token: string): Promise<void> {
-  await User.updateOne({ _id: userId }, { $pull: { expoPushTokens: token } });
+  await Promise.all([
+    User.updateOne({ _id: userId }, { $pull: { expoPushTokens: token } }),
+    cancelPushDeliveriesForToken(token),
+  ]);
+}
+
+/** Device-scoped cleanup used after an access token has expired or been cleared. */
+export async function unregisterPushTokenEverywhere(token: string): Promise<void> {
+  await Promise.all([
+    User.updateMany({ expoPushTokens: token }, { $pull: { expoPushTokens: token } }),
+    cancelPushDeliveriesForToken(token),
+  ]);
 }
 
 export async function getMyNotifications(userId: string, limit = 30) {

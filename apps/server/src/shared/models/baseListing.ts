@@ -54,6 +54,10 @@ export const baseListingFields = {
   // Listing duration (days the owner requested) + expiry timestamp
   durationDays: { type: Number, required: true, min: 30, max: 365 },
   expiresAt: { type: Date, required: true, index: true },
+  // Set only after the expiry notification has been durably created. Keeping
+  // this separate from status lets the job safely retry after a server restart.
+  expiryNotificationSentAt: { type: Date, default: null, index: true, select: false },
+  expiryNotificationPending: { type: Boolean, default: false, index: true, select: false },
 
   // Admin flags
   isFeatured: { type: Boolean, default: false, index: true },

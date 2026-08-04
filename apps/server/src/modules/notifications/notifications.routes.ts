@@ -38,7 +38,6 @@ notificationsRouter.post(
 );
 notificationsRouter.delete(
   '/push-token',
-  protect,
   validate({ body: pushTokenBody }),
   asyncHandler(controller.unregisterPushToken)
 );

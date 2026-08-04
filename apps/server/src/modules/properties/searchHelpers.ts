@@ -16,24 +16,24 @@ import {
   type PropertyCategory,
   type FinishingType,
   type FurnishingStatus,
-} from '../../config/constants.js';
-import { LOCATION_GROUPS } from './locationSynonyms.js';
+} from "../../config/constants.js";
+import { LOCATION_GROUPS } from "./locationSynonyms.js";
 
 /** Strip Arabic diacritics and normalize ا/أ/إ/آ → ا, ى → ي, ة → ه. */
 export function normalizeArabic(input: string): string {
   return input
-    .replace(/[ً-ٰٟ]/g, '') // diacritics
-    .replace(/[أإآ]/g, 'ا')
-    .replace(/ى/g, 'ي')
-    .replace(/ة/g, 'ه')
-    .replace(/\s+/g, ' ')
+    .replace(/[ً-ٰٟ]/g, "") // diacritics
+    .replace(/[أإآ]/g, "ا")
+    .replace(/ى/g, "ي")
+    .replace(/ة/g, "ه")
+    .replace(/\s+/g, " ")
     .trim()
     .toLowerCase();
 }
 
 /** Escape a string for safe use inside a RegExp. */
 export function escapeRegex(s: string): string {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 /**
@@ -47,18 +47,18 @@ export function escapeRegex(s: string): string {
  * substituting each Arabic letter with the equivalent character class.
  */
 export function arabicTolerantPattern(input: string): string {
-  const stripped = input.replace(/[ً-ٰٟ]/g, ''); // drop diacritics
+  const stripped = input.replace(/[ً-ٰٟ]/g, ""); // drop diacritics
   const parts: string[] = [];
 
   for (const ch of stripped) {
-    if ('اأإآ'.includes(ch)) {
-      parts.push('[اأإآ]');
-    } else if ('ةه'.includes(ch)) {
-      parts.push('[ةه]');
-    } else if ('ىي'.includes(ch)) {
-      parts.push('[ىي]');
+    if ("اأإآ".includes(ch)) {
+      parts.push("[اأإآ]");
+    } else if ("ةه".includes(ch)) {
+      parts.push("[ةه]");
+    } else if ("ىي".includes(ch)) {
+      parts.push("[ىي]");
     } else if (/[.*+?^${}()|[\]\\]/.test(ch)) {
-      parts.push('\\' + ch);
+      parts.push("\\" + ch);
     } else {
       parts.push(ch);
     }
@@ -67,7 +67,7 @@ export function arabicTolerantPattern(input: string): string {
   // Allow optional Arabic diacritics between letters in the haystack.
   // PCRE2 (MongoDB) doesn't support \u escapes, so embed the literal
   // diacritic characters (U+064B–U+0652 + U+0670 superscript alef).
-  const diacritics = '[ًٌٍَُِّْٰ]*';
+  const diacritics = "[ًٌٍَُِّْٰ]*";
   return parts.join(diacritics);
 }
 
@@ -76,42 +76,52 @@ export function arabicTolerantPattern(input: string): string {
  * Each enum value can be matched by any of its synonyms.
  */
 const TYPE_SYNONYMS: Record<PropertyType, string[]> = {
-  apartment: ['شقه', 'شقق', 'apartment', 'apartments', 'flat', 'flats'],
-  villa: ['فيلا', 'فلل', 'فيلات', 'villa', 'villas'],
-  chalet: ['شاليه', 'شاليهات', 'chalet', 'chalets'],
-  shop: ['محل', 'محلات', 'shop', 'shops', 'store'],
-  building: ['مبني', 'مباني', 'عماره', 'عمارات', 'building', 'buildings'],
-  factory: ['مصنع', 'مصانع', 'factory', 'factories'],
-  land: ['ارض', 'اراضي', 'قطعه', 'قطعة ارض', 'land', 'plot', 'lands'],
+  apartment: ["شقه", "شقق", "apartment", "apartments", "flat", "flats"],
+  villa: ["فيلا", "فلل", "فيلات", "villa", "villas"],
+  chalet: ["شاليه", "شاليهات", "chalet", "chalets"],
+  shop: ["محل", "محلات", "shop", "shops", "store"],
+  building: ["مبني", "مباني", "عماره", "عمارات", "building", "buildings"],
+  factory: ["مصنع", "مصانع", "factory", "factories"],
+  land: ["ارض", "اراضي", "قطعه", "قطعة ارض", "land", "plot", "lands"],
 };
 
 const LISTING_SYNONYMS: Record<ListingType, string[]> = {
-  sale: ['للبيع', 'بيع', 'sale', 'sell', 'buying', 'buy'],
-  rent: ['للايجار', 'ايجار', 'rent', 'renting', 'lease'],
+  sale: ["للبيع", "بيع", "sale", "sell", "buying", "buy"],
+  rent: ["للايجار", "ايجار", "rent", "renting", "lease"],
 };
 
 const CATEGORY_SYNONYMS: Record<PropertyCategory, string[]> = {
-  residential: ['سكني', 'سكنيه', 'residential'],
-  commercial: ['تجاري', 'تجاريه', 'commercial'],
-  industrial: ['صناعي', 'صناعيه', 'industrial'],
-  agricultural: ['زراعي', 'زراعيه', 'agricultural'],
+  residential: ["سكني", "سكنيه", "residential"],
+  commercial: ["تجاري", "تجاريه", "commercial"],
+  industrial: ["صناعي", "صناعيه", "industrial"],
+  agricultural: ["زراعي", "زراعيه", "agricultural"],
 };
 
 const FINISHING_SYNONYMS: Record<FinishingType, string[]> = {
-  unfinished: ['بدون تشطيب', 'على الطوب', 'عالطوب', 'unfinished'],
-  'semi-finished': ['نص تشطيب', 'نصف تشطيب', 'semi finished', 'semi-finished'],
-  'standard-finished': ['تشطيب عادي', 'عادي', 'standard finishing', 'standard-finished'],
-  lux: ['لوكس', 'lux'],
-  'super-lux': ['سوبر لوكس', 'super lux', 'super-lux'],
-  'high-lux': ['هاي لوكس', 'high lux', 'high-lux'],
-  'ultra-lux': ['الترا لوكس', 'ألترا لوكس', 'ultra lux', 'ultra-lux'],
+  unfinished: ["بدون تشطيب", "على الطوب", "عالطوب", "unfinished"],
+  "semi-finished": ["نص تشطيب", "نصف تشطيب", "semi finished", "semi-finished"],
+  "standard-finished": [
+    "تشطيب عادي",
+    "عادي",
+    "standard finishing",
+    "standard-finished",
+  ],
+  lux: ["لوكس", "lux"],
+  "super-lux": ["سوبر لوكس", "super lux", "super-lux"],
+  "high-lux": ["هاي لوكس", "high lux", "high-lux"],
+  "ultra-lux": ["الترا لوكس", "ألترا لوكس", "ultra lux", "ultra-lux"],
 };
 
 const FURNISHING_SYNONYMS: Record<FurnishingStatus, string[]> = {
-  unfurnished: ['غير مفروش', 'بدون فرش', 'unfurnished'],
-  'semi-furnished': ['نصف مفروش', 'نص مفروش', 'semi furnished', 'semi-furnished'],
-  furnished: ['مفروش', 'مفروشه', 'furnished'],
-  'fully-furnished': ['مفروش بالكامل', 'fully furnished', 'fully-furnished'],
+  unfurnished: ["غير مفروش", "بدون فرش", "unfurnished"],
+  "semi-furnished": [
+    "نصف مفروش",
+    "نص مفروش",
+    "semi furnished",
+    "semi-furnished",
+  ],
+  furnished: ["مفروش", "مفروشه", "furnished"],
+  "fully-furnished": ["مفروش بالكامل", "fully furnished", "fully-furnished"],
 };
 
 interface ResolvedTerms {
@@ -146,10 +156,10 @@ export function resolveSearchTerms(rawSearch: string): ResolvedTerms {
   // Walk tokens left-to-right; some synonyms are multi-word (غير مفروش)
   for (let i = 0; i < tokens.length; i++) {
     const tok = tokens[i];
-    const twoWord = i + 1 < tokens.length ? `${tok} ${tokens[i + 1]}` : '';
+    const twoWord = i + 1 < tokens.length ? `${tok} ${tokens[i + 1]}` : "";
 
     // Number? — store and skip
-    const num = parseFloat(tok.replace(/,/g, ''));
+    const num = parseFloat(tok.replace(/,/g, ""));
     if (!Number.isNaN(num) && /^\d/.test(tok)) {
       numbers.push(num);
       continue;
@@ -167,6 +177,7 @@ export function resolveSearchTerms(rawSearch: string): ResolvedTerms {
           break;
         }
       }
+
       if (!matched) {
         for (const [key, syns] of Object.entries(FURNISHING_SYNONYMS)) {
           if (syns.some((s) => normalizeArabic(s) === twoWord)) {
@@ -187,6 +198,7 @@ export function resolveSearchTerms(rawSearch: string): ResolvedTerms {
         break;
       }
     }
+
     if (matched) continue;
 
     for (const [key, syns] of Object.entries(LISTING_SYNONYMS)) {
@@ -236,7 +248,7 @@ export function resolveSearchTerms(rawSearch: string): ResolvedTerms {
     finishings: [...finishings],
     furnishings: [...furnishings],
     numbers,
-    freeText: leftover.join(' ').trim(),
+    freeText: leftover.join(" ").trim(),
   };
 }
 
@@ -244,13 +256,17 @@ export function resolveSearchTerms(rawSearch: string): ResolvedTerms {
  * Find every bilingual location group whose name appears in the query.
  * Single-word terms match a whole token; multi-word terms match as a phrase.
  */
-function findLocationGroups(normalizedQuery: string, tokens: string[]): string[][] {
+function findLocationGroups(
+  normalizedQuery: string,
+  tokens: string[],
+): string[][] {
   const tokenSet = new Set(tokens);
   const matched: string[][] = [];
+
   for (const group of LOCATION_GROUPS) {
     const hit = group.some((term) => {
       const nt = normalizeArabic(term);
-      return nt.includes(' ') ? normalizedQuery.includes(nt) : tokenSet.has(nt);
+      return nt.includes(" ") ? normalizedQuery.includes(nt) : tokenSet.has(nt);
     });
     if (hit) matched.push(group);
   }
@@ -275,7 +291,9 @@ function locationWords(groups: string[][]): Set<string> {
  * their other-language equivalents so "Maadi" and "المعادي" return the same
  * listings (see locationSynonyms.ts).
  */
-export function buildTextSearchClause(freeText: string): Record<string, unknown> | null {
+export function buildTextSearchClause(
+  freeText: string,
+): Record<string, unknown> | null {
   if (!freeText) return null;
   const normalized = normalizeArabic(freeText);
   const tokens = normalized.split(/\s+/).filter((t) => t.length >= 2);
@@ -283,9 +301,9 @@ export function buildTextSearchClause(freeText: string): Record<string, unknown>
 
   const fieldsMatch = (pattern: string) => ({
     $or: [
-      { description: { $regex: pattern, $options: 'i' } },
-      { area_name: { $regex: pattern, $options: 'i' } },
-      { governorate: { $regex: pattern, $options: 'i' } },
+      { description: { $regex: pattern, $options: "i" } },
+      { area_name: { $regex: pattern, $options: "i" } },
+      { governorate: { $regex: pattern, $options: "i" } },
     ],
   });
 
@@ -294,7 +312,9 @@ export function buildTextSearchClause(freeText: string): Record<string, unknown>
   // 1) Location terms → match ANY language variant of each detected place.
   const groups = findLocationGroups(normalized, tokens);
   for (const group of groups) {
-    const combined = group.map((variant) => arabicTolerantPattern(variant)).join('|');
+    const combined = group
+      .map((variant) => arabicTolerantPattern(variant))
+      .join("|");
     clauses.push(fieldsMatch(combined));
   }
 
@@ -330,9 +350,4 @@ export const ARABIC_LISTING_SYNONYMS = LISTING_SYNONYMS;
 export const ARABIC_CATEGORY_SYNONYMS = CATEGORY_SYNONYMS;
 export const ARABIC_FINISHING_SYNONYMS = FINISHING_SYNONYMS;
 export const ARABIC_FURNISHING_SYNONYMS = FURNISHING_SYNONYMS;
-export {
-  PROPERTY_TYPES,
-  LISTING_TYPES,
-  PROPERTY_CATEGORIES,
-  FINISHING_TYPES,
-};
+export { PROPERTY_TYPES, LISTING_TYPES, PROPERTY_CATEGORIES, FINISHING_TYPES };

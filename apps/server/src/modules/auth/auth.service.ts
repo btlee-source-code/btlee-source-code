@@ -23,6 +23,7 @@ import {
 import { env } from '../../config/env.js';
 import { isEmailIdentifier, normalizePhone } from './auth.validators.js';
 import type { RegisterInput, LoginInput } from './auth.validators.js';
+import { cancelPushDeliveriesForToken } from '../notifications/pushDelivery.service.js';
 
 interface AuthTokens {
   accessToken: string;
@@ -149,10 +150,14 @@ export async function refreshTokens(refreshToken: string): Promise<AuthTokens> {
   return newTokens;
 }
 
-export async function logoutUser(refreshToken: string): Promise<void> {
+export async function logoutUser(refreshToken: string, pushToken?: string): Promise<void> {
   const hashed = hashToken(refreshToken);
   // Revoke this specific session wherever it lives — no need to trust a userId.
-  await User.updateOne({ refreshTokens: hashed }, { $pull: { refreshTokens: hashed } });
+  const pull = pushToken
+    ? { refreshTokens: hashed, expoPushTokens: pushToken }
+    : { refreshTokens: hashed };
+  await User.updateOne({ refreshTokens: hashed }, { $pull: pull });
+  if (pushToken) await cancelPushDeliveriesForToken(pushToken);
 }
 
 export async function requestPasswordReset(email: string): Promise<void> {

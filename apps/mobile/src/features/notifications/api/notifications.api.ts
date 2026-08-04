@@ -15,5 +15,8 @@ export const notificationsApi = {
   registerPushToken: (token: string) =>
     post<{ message: string }>('/notifications/push-token', { token }),
   unregisterPushToken: (token: string) =>
-    del<{ message: string }>('/notifications/push-token', { data: { token } }),
+    del<{ message: string }>('/notifications/push-token', {
+      data: { token },
+      skipAuth: true,
+    }),
 };
