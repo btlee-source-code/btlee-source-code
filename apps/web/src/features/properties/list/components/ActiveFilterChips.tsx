@@ -77,6 +77,12 @@ export function ActiveFilterChips({
       label: tProp(`finishing.${filters.finishing}` as never),
     });
   }
+  if (filters.furnishing) {
+    chips.push({
+      key: 'furnishing',
+      label: tProp(`furnishing.${filters.furnishing}` as never),
+    });
+  }
 
   if (chips.length === 0) return null;
 

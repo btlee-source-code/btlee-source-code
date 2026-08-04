@@ -19,6 +19,7 @@ import {
   PROPERTY_TYPES,
   PROPERTY_CATEGORIES,
   FINISHING_TYPES,
+  FURNISHING_STATUS_TYPES,
   LISTING_TYPES,
   GOVERNORATES,
 } from '@/shared/lib/constants';
@@ -33,6 +34,7 @@ export interface FilterState {
   minBedrooms?: string;
   minArea?: string;
   finishing?: string;
+  furnishing?: string;
 }
 
 interface PropertyFiltersProps {
@@ -205,6 +207,26 @@ export function PropertyFilters({ value, onChange, onClear }: PropertyFiltersPro
               {FINISHING_TYPES.map((f) => (
                 <SelectItem key={f} value={f}>
                   {tProp(`finishing.${f}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label>{t('furnishing')}</Label>
+          <Select
+            value={value.furnishing ?? ANY}
+            onValueChange={(v) => update('furnishing', v)}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ANY}>{anyLabel}</SelectItem>
+              {FURNISHING_STATUS_TYPES.map((f) => (
+                <SelectItem key={f} value={f}>
+                  {tProp(`furnishing.${f}`)}
                 </SelectItem>
               ))}
             </SelectContent>

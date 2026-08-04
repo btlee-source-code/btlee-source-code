@@ -8,6 +8,7 @@ import {
   LISTING_TYPES,
   PROPERTY_CATEGORIES,
   FINISHING_TYPES,
+  FURNISHING_STATUS_TYPES,
   PROPERTY_SERVICES,
   DEPOSIT_OPTIONS,
   PROPERTY_STATUS,
@@ -32,7 +33,17 @@ const imageSchema = z.object({
  * version for PATCH. The cross-field "floor required for apartments" rule
  * is applied via .refine() on the create schema below.
  */
-const propertyBaseSchema = z.object({
+function normalizeLegacyFinishingInput(input: unknown): unknown {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return input;
+  const value = { ...(input as Record<string, unknown>) };
+  if (value.finishing === 'furnished' || value.finishing === 'unfurnished') {
+    if (value.furnishing === undefined) value.furnishing = value.finishing;
+    value.finishing = 'standard-finished';
+  }
+  return value;
+}
+
+const propertyBaseObject = z.object({
   type: z.enum(PROPERTY_TYPES),
   listingType: z.enum(LISTING_TYPES),
   category: z.enum(PROPERTY_CATEGORIES),
@@ -42,6 +53,8 @@ const propertyBaseSchema = z.object({
   // Area and price are optional; `null` represents an intentionally omitted value.
   area: z.coerce.number().positive().nullable().optional(),
   finishing: z.enum(FINISHING_TYPES),
+  // Default keeps older installed app builds compatible during rollout.
+  furnishing: z.enum(FURNISHING_STATUS_TYPES).default('unfurnished'),
   services: z.array(z.enum(PROPERTY_SERVICES)).optional(),
   hasElevator: z.boolean().optional(),
   hasGarage: z.boolean().optional(),
@@ -67,7 +80,9 @@ const propertyBaseSchema = z.object({
     .max(MAX_LISTING_DURATION_DAYS),
 });
 
-export const createPropertySchema = propertyBaseSchema.superRefine((data, ctx) => {
+export const createPropertySchema = z
+  .preprocess(normalizeLegacyFinishingInput, propertyBaseObject)
+  .superRefine((data, ctx) => {
   if (data.type === 'apartment' && (data.floor === null || data.floor === undefined)) {
     ctx.addIssue({
       code: 'custom',
@@ -141,9 +156,12 @@ export const createPropertySchema = propertyBaseSchema.superRefine((data, ctx) =
       });
     }
   }
-});
+  });
 
-export const updatePropertySchema = propertyBaseSchema.partial();
+export const updatePropertySchema = z.preprocess(
+  normalizeLegacyFinishingInput,
+  propertyBaseObject.partial()
+);
 
 export const propertyListQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -159,6 +177,7 @@ export const propertyListQuerySchema = z.object({
   minBedrooms: z.coerce.number().int().optional(),
   minArea: z.coerce.number().optional(),
   finishing: z.enum(FINISHING_TYPES).optional(),
+  furnishing: z.enum(FURNISHING_STATUS_TYPES).optional(),
   sort: z.enum(['newest', 'oldest', 'price_asc', 'price_desc']).default('newest'),
   featured: z.coerce.boolean().optional(),
 });

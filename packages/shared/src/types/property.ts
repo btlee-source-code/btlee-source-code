@@ -7,6 +7,7 @@
 import type {
   DepositOption,
   FinishingType,
+  FurnishingStatus,
   ListingType,
   PropertyCategory,
   PropertyService,
@@ -46,6 +47,7 @@ export interface Property {
   floor: number | null;
   area: number | null; // m²; null if undisclosed
   finishing: FinishingType;
+  furnishing?: FurnishingStatus;
   services: PropertyService[];
   hasElevator: boolean;
   hasGarage: boolean;

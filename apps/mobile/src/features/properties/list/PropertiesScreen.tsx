@@ -14,7 +14,7 @@ import { PressableScale } from '@/shared/components/ui/PressableScale';
 import { SkeletonPropertyCard } from '@/shared/components/ui/Skeleton';
 import { useResponsiveLayout } from '@/shared/hooks/useResponsiveLayout';
 import { useTabPressScrollToTop } from '@/shared/hooks/useTabPressScrollToTop';
-import { CATEGORY_LABELS, FINISHING_LABELS, LISTING_TYPE_LABELS, SORT_OPTIONS, TYPE_LABELS } from '@/shared/lib/constants';
+import { CATEGORY_LABELS, FINISHING_LABELS, FURNISHING_LABELS, LISTING_TYPE_LABELS, SORT_OPTIONS, TYPE_LABELS } from '@/shared/lib/constants';
 import { formatPrice } from '@/shared/lib/format';
 import { shadows } from '@/shared/lib/shadows';
 import type { Property } from '@/shared/types/property';
@@ -33,6 +33,7 @@ function chipsFromFilters(f: Filters): { key: keyof Filters; label: string }[] {
   if (f.type) chips.push({ key: 'type', label: TYPE_LABELS[f.type as keyof typeof TYPE_LABELS] });
   if (f.category) chips.push({ key: 'category', label: CATEGORY_LABELS[f.category as keyof typeof CATEGORY_LABELS] });
   if (f.finishing) chips.push({ key: 'finishing', label: FINISHING_LABELS[f.finishing as keyof typeof FINISHING_LABELS] });
+  if (f.furnishing) chips.push({ key: 'furnishing', label: FURNISHING_LABELS[f.furnishing as keyof typeof FURNISHING_LABELS] });
   if (f.governorate) chips.push({ key: 'governorate', label: f.governorate });
   if (f.minBedrooms) chips.push({ key: 'minBedrooms', label: S.chipMinBedrooms(f.minBedrooms) });
   if (f.minArea) chips.push({ key: 'minArea', label: S.chipMinArea(f.minArea) });
@@ -48,6 +49,7 @@ export function PropertiesScreen() {
     category?: string;
     governorate?: string;
     finishing?: string;
+    furnishing?: string;
     minPrice?: string;
     maxPrice?: string;
     minBedrooms?: string;
@@ -93,6 +95,7 @@ export function PropertiesScreen() {
     if (params.category) p.category = params.category;
     if (params.governorate) p.governorate = params.governorate;
     if (params.finishing) p.finishing = params.finishing;
+    if (params.furnishing) p.furnishing = params.furnishing;
     const minP = num(params.minPrice);
     if (minP != null) p.minPrice = minP;
     const maxP = num(params.maxPrice);
@@ -110,6 +113,7 @@ export function PropertiesScreen() {
     params.category,
     params.governorate,
     params.finishing,
+    params.furnishing,
     params.minPrice,
     params.maxPrice,
     params.minBedrooms,

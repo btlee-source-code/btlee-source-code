@@ -8,6 +8,7 @@ import type { ReportReason } from '@btlee/shared';
 import type {
   DepositOption,
   FinishingType,
+  FurnishingStatus,
   ListingType,
   PropertyCategory,
   PropertyService,
@@ -19,7 +20,9 @@ import type {
 // (`@/shared/lib/constants`) stays unchanged while the source of truth is single.
 export {
   DEPOSIT_OPTIONS,
+  FINISHING_CONDITION_TYPES,
   FINISHING_TYPES,
+  FURNISHING_STATUS_TYPES,
   GOVERNORATES,
   LISTING_TYPES,
   MAX_DESCRIPTION_LENGTH,
@@ -68,9 +71,57 @@ export const CATEGORY_LABELS = localeMap<PropertyCategory>(
 );
 
 export const FINISHING_LABELS = localeMap<FinishingType>(
-  { furnished: 'مفروش', unfurnished: 'غير مفروش', 'semi-finished': 'نص تشطيب' },
-  { furnished: 'Furnished', unfurnished: 'Unfurnished', 'semi-finished': 'Semi-finished' }
+  {
+    unfinished: 'بدون تشطيب',
+    'semi-finished': 'نصف تشطيب',
+    'standard-finished': 'تشطيب عادي',
+    lux: 'لوكس',
+    'super-lux': 'سوبر لوكس',
+    'high-lux': 'هاي لوكس',
+    'ultra-lux': 'ألترا لوكس',
+  },
+  {
+    unfinished: 'Unfinished',
+    'semi-finished': 'Semi-finished',
+    'standard-finished': 'Standard finishing',
+    lux: 'Lux',
+    'super-lux': 'Super Lux',
+    'high-lux': 'High Lux',
+    'ultra-lux': 'Ultra Lux',
+  }
 );
+
+export const FURNISHING_LABELS = localeMap<FurnishingStatus>(
+  {
+    unfurnished: 'غير مفروش',
+    'semi-furnished': 'نصف مفروش',
+    furnished: 'مفروش',
+    'fully-furnished': 'مفروش بالكامل',
+  },
+  {
+    unfurnished: 'Unfurnished',
+    'semi-furnished': 'Semi-furnished',
+    furnished: 'Furnished',
+    'fully-furnished': 'Fully furnished',
+  }
+);
+
+/** Keep edit/detail screens safe while legacy listings are migrated. */
+export function normalizeFinishing(value?: string): FinishingType {
+  return (['unfinished', 'semi-finished', 'standard-finished', 'lux', 'super-lux', 'high-lux', 'ultra-lux'] as string[]).includes(value ?? '')
+    ? (value as FinishingType)
+    : 'standard-finished';
+}
+
+export function resolveFurnishing(
+  finishing?: string,
+  furnishing?: string
+): FurnishingStatus {
+  if ((['unfurnished', 'semi-furnished', 'furnished', 'fully-furnished'] as string[]).includes(furnishing ?? '')) {
+    return furnishing as FurnishingStatus;
+  }
+  return finishing === 'furnished' ? 'furnished' : 'unfurnished';
+}
 
 export const SERVICE_LABELS = localeMap<PropertyService>(
   { gas: 'غاز', water: 'مياه', electricity: 'كهرباء', wifi: 'واي فاي' },

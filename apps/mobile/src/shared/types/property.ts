@@ -6,6 +6,7 @@
 export type {
   DepositOption,
   FinishingType,
+  FurnishingStatus,
   GeoPoint,
   ListingType,
   Property,

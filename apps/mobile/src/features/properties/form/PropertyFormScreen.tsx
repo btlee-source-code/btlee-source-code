@@ -23,6 +23,8 @@ import {
   DEPOSIT_OPTIONS,
   FINISHING_LABELS,
   FINISHING_TYPES,
+  FURNISHING_LABELS,
+  FURNISHING_STATUS_TYPES,
   LISTING_TYPE_LABELS,
   LISTING_TYPES,
   MAX_IMAGES,
@@ -34,12 +36,15 @@ import {
   TYPE_LABELS,
   propertyTypeHasFinishing,
   propertyTypeHasRooms,
+  normalizeFinishing,
+  resolveFurnishing,
 } from '@/shared/lib/constants';
 import { AmountPicker, AREA_OPTIONS, COUNT_OPTIONS } from '@/shared/components/ui/AmountPicker';
 import { DividedStack } from '@/shared/components/ui/DividedStack';
 import { toast } from '@/shared/components/ui/Toast';
 import { GovernoratePicker } from '@/shared/components/ui/GovernoratePicker';
 import { AppTextInput } from '@/shared/components/ui/AppTextInput';
+import { ChoicePicker } from '@/shared/components/ui/ChoicePicker';
 import { FormField as Field } from '@/shared/components/ui/FormField';
 import { ResponsiveFieldRow } from '@/shared/components/ui/ResponsiveFieldRow';
 import { useFormErrorScroll } from '@/shared/hooks/useFormErrorScroll';
@@ -74,6 +79,7 @@ type PropertyFieldKey =
   | 'area'
   | 'price'
   | 'finishing'
+  | 'furnishing'
   | 'governorate'
   | 'areaName'
   | 'description'
@@ -92,6 +98,7 @@ const PROPERTY_FIELD_ORDER: readonly PropertyFieldKey[] = [
   'area',
   'price',
   'finishing',
+  'furnishing',
   'governorate',
   'areaName',
   'description',
@@ -109,6 +116,7 @@ const PROPERTY_SERVER_FIELD_MAP: Record<string, PropertyFieldKey> = {
   area: 'area',
   price: 'price',
   finishing: 'finishing',
+  furnishing: 'furnishing',
   governorate: 'governorate',
   area_name: 'areaName',
   description: 'description',
@@ -153,6 +161,7 @@ function propertyFieldLabel(key: PropertyFieldKey): string {
     area: S.fAreaM,
     price: S.fPriceOne,
     finishing: S.fFinishing,
+    furnishing: S.fFurnishingStatus,
     governorate: S.fGovernorate,
     areaName: S.fAreaName,
     description: S.fDescription,
@@ -170,7 +179,10 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
   const [category, setCategory] = useState(
     initial ? fixedCategoryForPropertyType(initial.type) ?? initial.category : ''
   );
-  const [finishing, setFinishing] = useState(initial?.finishing ?? '');
+  const [finishing, setFinishing] = useState(initial ? normalizeFinishing(initial.finishing) : '');
+  const [furnishing, setFurnishing] = useState(
+    initial ? resolveFurnishing(initial.finishing, initial.furnishing) : ''
+  );
   const [governorate, setGovernorate] = useState(initial?.governorate ?? '');
   const [areaName, setAreaName] = useState(initial?.area_name ?? '');
   const [coordinates, setCoordinates] = useState<[number, number] | undefined>(
@@ -264,6 +276,9 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
     if (area != null && area <= 0) errors.area = S.positiveNumberError(S.fAreaM);
     if (price != null && price <= 0) errors.price = S.positiveNumberError(S.fPriceOne);
     if (hasFinishing && !finishing) errors.finishing = S.selectFieldError(S.fFinishing);
+    if (hasFinishing && !furnishing) {
+      errors.furnishing = S.selectFieldError(S.fFurnishingStatus);
+    }
     if (!governorate) errors.governorate = S.selectFieldError(S.fGovernorate);
 
     if (!trimmedAreaName) errors.areaName = S.enterFieldError(S.fAreaName);
@@ -330,7 +345,8 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
         bathrooms: hasRoomCounts ? bathrooms! : 0,
         floor: type === 'apartment' ? floor ?? null : null,
         area: area ?? null,
-        finishing: hasFinishing ? finishing : 'unfurnished',
+        finishing: hasFinishing ? finishing : 'unfinished',
+        furnishing: hasFinishing ? furnishing : 'unfurnished',
         services: hasServicesAndAmenities
           ? type === 'shop'
             ? services.filter((service) => service !== 'wifi')
@@ -476,7 +492,9 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
                     }
                     if (!propertyTypeHasFinishing(v)) {
                       setFinishing('');
+                      setFurnishing('');
                       clearFieldError('finishing');
+                      clearFieldError('furnishing');
                     }
                     if (v === 'land') {
                       setServices([]);
@@ -608,24 +626,41 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
           </Field>
 
           {hasFinishing && (
-            <Field
-              ref={(node) => setFieldRef('finishing', node)}
-              label={S.fFinishing}
-              error={fieldErrors.finishing}>
-              <View className="flex-row flex-wrap gap-2 justify-end">
-                {FINISHING_TYPES.map((v) => (
-                  <Chip
-                    key={v}
-                    label={FINISHING_LABELS[v]}
-                    active={finishing === v}
-                    onPress={() => {
-                      setFinishing(v);
-                      clearFieldError('finishing');
-                    }}
-                  />
-                ))}
-              </View>
-            </Field>
+            <>
+              <Field
+                ref={(node) => setFieldRef('finishing', node)}
+                label={S.fFinishing}
+                error={fieldErrors.finishing}>
+                <ChoicePicker
+                  value={finishing}
+                  onChange={(value) => {
+                    setFinishing(value);
+                    clearFieldError('finishing');
+                  }}
+                  options={FINISHING_TYPES}
+                  labels={FINISHING_LABELS}
+                  placeholder={S.finishingPickerPlaceholder}
+                  title={S.finishingPickerTitle}
+                />
+              </Field>
+
+              <Field
+                ref={(node) => setFieldRef('furnishing', node)}
+                label={S.fFurnishingStatus}
+                error={fieldErrors.furnishing}>
+                <ChoicePicker
+                  value={furnishing}
+                  onChange={(value) => {
+                    setFurnishing(value);
+                    clearFieldError('furnishing');
+                  }}
+                  options={FURNISHING_STATUS_TYPES}
+                  labels={FURNISHING_LABELS}
+                  placeholder={S.furnishingPickerPlaceholder}
+                  title={S.furnishingPickerTitle}
+                />
+              </Field>
+            </>
           )}
 
           {listingType === 'rent' && (

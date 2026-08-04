@@ -63,6 +63,7 @@ function readFiltersFromUrl(params: URLSearchParams): FilterState {
     minBedrooms: params.get('minBedrooms') ?? undefined,
     minArea: params.get('minArea') ?? undefined,
     finishing: params.get('finishing') ?? undefined,
+    furnishing: params.get('furnishing') ?? undefined,
   };
 }
 
@@ -144,6 +145,7 @@ function PropertiesContent({
       category: filters.category,
       governorate: filters.governorate,
       finishing: filters.finishing,
+      furnishing: filters.furnishing,
       featured: featured || undefined,
       minPrice: filters.minPrice ? Number(filters.minPrice) : undefined,
       maxPrice: filters.maxPrice ? Number(filters.maxPrice) : undefined,

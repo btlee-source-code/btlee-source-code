@@ -12,6 +12,8 @@ import {
   CATEGORY_LABELS,
   FINISHING_LABELS,
   FINISHING_TYPES,
+  FURNISHING_LABELS,
+  FURNISHING_STATUS_TYPES,
   GOVERNORATES,
   LISTING_TYPE_LABELS,
   LISTING_TYPES,
@@ -24,7 +26,7 @@ import type { PropertyQuery } from '../api/properties.api';
 /** The subset of the query that the filter sheet edits (search + sort live elsewhere). */
 export type Filters = Pick<
   PropertyQuery,
-  'type' | 'listingType' | 'category' | 'governorate' | 'finishing' | 'minPrice' | 'maxPrice' | 'minBedrooms' | 'minArea'
+  'type' | 'listingType' | 'category' | 'governorate' | 'finishing' | 'furnishing' | 'minPrice' | 'maxPrice' | 'minBedrooms' | 'minArea'
 >;
 
 const toNum = (t: string): number | undefined => {
@@ -119,6 +121,13 @@ export function PropertyFilters({
             <Chip label={S.all} active={!draft.finishing} onPress={() => set({ finishing: undefined })} />
             {FINISHING_TYPES.map((v) => (
               <Chip key={v} label={FINISHING_LABELS[v]} active={draft.finishing === v} onPress={() => set({ finishing: v })} />
+            ))}
+          </Section>
+
+          <Section title={S.fFurnishingStatus}>
+            <Chip label={S.all} active={!draft.furnishing} onPress={() => set({ furnishing: undefined })} />
+            {FURNISHING_STATUS_TYPES.map((v) => (
+              <Chip key={v} label={FURNISHING_LABELS[v]} active={draft.furnishing === v} onPress={() => set({ furnishing: v })} />
             ))}
           </Section>
 

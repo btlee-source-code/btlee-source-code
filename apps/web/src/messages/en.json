@@ -292,9 +292,19 @@
       "agricultural": "Agricultural"
     },
     "finishing": {
-      "furnished": "Furnished",
+      "unfinished": "Unfinished",
+      "semi-finished": "Semi-finished",
+      "standard-finished": "Standard finishing",
+      "lux": "Lux",
+      "super-lux": "Super Lux",
+      "high-lux": "High Lux",
+      "ultra-lux": "Ultra Lux"
+    },
+    "furnishing": {
       "unfurnished": "Unfurnished",
-      "semi-finished": "Semi-finished"
+      "semi-furnished": "Semi-furnished",
+      "furnished": "Furnished",
+      "fully-furnished": "Fully furnished"
     },
     "services": {
       "gas": "Gas",
@@ -327,6 +337,7 @@
     "no": "No",
     "area": "Area",
     "finishingLabel": "Finishing",
+    "furnishingLabel": "Furnishing",
     "categoryLabel": "Category",
     "listingNumber": "Listing Number",
     "areaUnit": "m²",
@@ -377,6 +388,7 @@
     "minBedrooms": "Min Bedrooms",
     "minArea": "Min Area",
     "finishing": "Finishing",
+    "furnishing": "Furnishing status",
     "sort": "Sort",
     "newest": "Newest",
     "oldest": "Oldest",
@@ -438,6 +450,8 @@
       "optionalPlaceholder": "Optional",
       "finishing": "Finishing",
       "selectFinishing": "Select finishing",
+      "furnishing": "Furnishing status",
+      "selectFurnishing": "Select furnishing status",
       "services": "Available Services",
       "elevator": "Elevator",
       "garage": "Garage",

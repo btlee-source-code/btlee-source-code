@@ -15,6 +15,7 @@ import {
   type ListingType,
   type PropertyCategory,
   type FinishingType,
+  type FurnishingStatus,
 } from '../../config/constants.js';
 import { LOCATION_GROUPS } from './locationSynonyms.js';
 
@@ -97,9 +98,20 @@ const CATEGORY_SYNONYMS: Record<PropertyCategory, string[]> = {
 };
 
 const FINISHING_SYNONYMS: Record<FinishingType, string[]> = {
-  furnished: ['مفروش', 'مفروشه', 'furnished'],
-  unfurnished: ['غير مفروش', 'بدون فرش', 'unfurnished'],
+  unfinished: ['بدون تشطيب', 'على الطوب', 'عالطوب', 'unfinished'],
   'semi-finished': ['نص تشطيب', 'نصف تشطيب', 'semi finished', 'semi-finished'],
+  'standard-finished': ['تشطيب عادي', 'عادي', 'standard finishing', 'standard-finished'],
+  lux: ['لوكس', 'lux'],
+  'super-lux': ['سوبر لوكس', 'super lux', 'super-lux'],
+  'high-lux': ['هاي لوكس', 'high lux', 'high-lux'],
+  'ultra-lux': ['الترا لوكس', 'ألترا لوكس', 'ultra lux', 'ultra-lux'],
+};
+
+const FURNISHING_SYNONYMS: Record<FurnishingStatus, string[]> = {
+  unfurnished: ['غير مفروش', 'بدون فرش', 'unfurnished'],
+  'semi-furnished': ['نصف مفروش', 'نص مفروش', 'semi furnished', 'semi-furnished'],
+  furnished: ['مفروش', 'مفروشه', 'furnished'],
+  'fully-furnished': ['مفروش بالكامل', 'fully furnished', 'fully-furnished'],
 };
 
 interface ResolvedTerms {
@@ -108,6 +120,7 @@ interface ResolvedTerms {
   listingTypes: ListingType[];
   categories: PropertyCategory[];
   finishings: FinishingType[];
+  furnishings: FurnishingStatus[];
   /** Numeric values mentioned in the query — used for price / area / rooms. */
   numbers: number[];
   /** Whatever the user typed minus the recognized synonyms — used for regex. */
@@ -126,6 +139,7 @@ export function resolveSearchTerms(rawSearch: string): ResolvedTerms {
   const listingTypes = new Set<ListingType>();
   const categories = new Set<PropertyCategory>();
   const finishings = new Set<FinishingType>();
+  const furnishings = new Set<FurnishingStatus>();
   const numbers: number[] = [];
   const leftover: string[] = [];
 
@@ -143,16 +157,25 @@ export function resolveSearchTerms(rawSearch: string): ResolvedTerms {
 
     let matched = false;
 
-    // Try two-word match first
+    // Try multi-word finishing/furnishing matches first.
     if (twoWord) {
-      if (FINISHING_SYNONYMS.unfurnished.some((s) => normalizeArabic(s) === twoWord)) {
-        finishings.add('unfurnished');
-        i++;
-        matched = true;
-      } else if (FINISHING_SYNONYMS['semi-finished'].some((s) => normalizeArabic(s) === twoWord)) {
-        finishings.add('semi-finished');
-        i++;
-        matched = true;
+      for (const [key, syns] of Object.entries(FINISHING_SYNONYMS)) {
+        if (syns.some((s) => normalizeArabic(s) === twoWord)) {
+          finishings.add(key as FinishingType);
+          i++;
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) {
+        for (const [key, syns] of Object.entries(FURNISHING_SYNONYMS)) {
+          if (syns.some((s) => normalizeArabic(s) === twoWord)) {
+            furnishings.add(key as FurnishingStatus);
+            i++;
+            matched = true;
+            break;
+          }
+        }
       }
     }
     if (matched) continue;
@@ -193,6 +216,15 @@ export function resolveSearchTerms(rawSearch: string): ResolvedTerms {
     }
     if (matched) continue;
 
+    for (const [key, syns] of Object.entries(FURNISHING_SYNONYMS)) {
+      if (syns.some((s) => normalizeArabic(s) === tok)) {
+        furnishings.add(key as FurnishingStatus);
+        matched = true;
+        break;
+      }
+    }
+    if (matched) continue;
+
     // Unrecognized — keep for fuzzy text match
     if (tok.length >= 2) leftover.push(tok);
   }
@@ -202,6 +234,7 @@ export function resolveSearchTerms(rawSearch: string): ResolvedTerms {
     listingTypes: [...listingTypes],
     categories: [...categories],
     finishings: [...finishings],
+    furnishings: [...furnishings],
     numbers,
     freeText: leftover.join(' ').trim(),
   };
@@ -296,6 +329,7 @@ export const ARABIC_TYPE_SYNONYMS = TYPE_SYNONYMS;
 export const ARABIC_LISTING_SYNONYMS = LISTING_SYNONYMS;
 export const ARABIC_CATEGORY_SYNONYMS = CATEGORY_SYNONYMS;
 export const ARABIC_FINISHING_SYNONYMS = FINISHING_SYNONYMS;
+export const ARABIC_FURNISHING_SYNONYMS = FURNISHING_SYNONYMS;
 export {
   PROPERTY_TYPES,
   LISTING_TYPES,

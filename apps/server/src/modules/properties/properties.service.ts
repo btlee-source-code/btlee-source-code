@@ -44,7 +44,30 @@ function buildPublicFilter(query: PropertyListQuery) {
     // Governorate from filters: exact match against the stored Arabic name.
     filter.governorate = query.governorate;
   }
-  if (query.finishing) filter.finishing = query.finishing;
+  if (query.finishing) {
+    filter.finishing = query.finishing === 'standard-finished'
+      ? { $in: ['standard-finished', 'furnished', 'unfurnished'] }
+      : query.finishing;
+  }
+  if (query.furnishing) {
+    if (query.furnishing === 'furnished') {
+      andClauses.push({
+        $or: [
+          { furnishing: 'furnished' },
+          { furnishing: { $exists: false }, finishing: 'furnished' },
+        ],
+      });
+    } else if (query.furnishing === 'unfurnished') {
+      andClauses.push({
+        $or: [
+          { furnishing: 'unfurnished' },
+          { furnishing: { $exists: false }, finishing: { $ne: 'furnished' } },
+        ],
+      });
+    } else {
+      filter.furnishing = query.furnishing;
+    }
+  }
   if (query.minBedrooms !== undefined) filter.bedrooms = { $gte: query.minBedrooms };
   if (query.minArea !== undefined) filter.area = { $gte: query.minArea };
   if (query.featured) filter.isFeatured = true;
@@ -75,6 +98,9 @@ function buildPublicFilter(query: PropertyListQuery) {
     if (resolved.finishings.length && !query.finishing) {
       andClauses.push({ finishing: { $in: resolved.finishings } });
     }
+    if (resolved.furnishings.length && !query.furnishing) {
+      andClauses.push({ furnishing: { $in: resolved.furnishings } });
+    }
 
     // Free-text regex over description / area_name / governorate
     const textClause = buildTextSearchClause(resolved.freeText);
@@ -84,7 +110,8 @@ function buildPublicFilter(query: PropertyListQuery) {
       !resolved.types.length &&
       !resolved.listingTypes.length &&
       !resolved.categories.length &&
-      !resolved.finishings.length
+      !resolved.finishings.length &&
+      !resolved.furnishings.length
     ) {
       // Nothing parsed and no leftover text — fall back to an Arabic-tolerant regex over the raw input
       const pattern = arabicTolerantPattern(query.search.trim());
@@ -332,6 +359,7 @@ export async function createProperty(ownerId: string, input: CreatePropertyInput
     floor: input.type === 'apartment' ? input.floor : null,
     area: input.area,
     finishing: input.finishing,
+    furnishing: input.furnishing,
     services:
       input.type === 'land'
         ? []
@@ -393,6 +421,7 @@ export async function updateProperty(
     ...(input.bathrooms !== undefined && { bathrooms: input.bathrooms }),
     ...(input.area !== undefined && { area: input.area }),
     ...(input.finishing !== undefined && { finishing: input.finishing }),
+    ...(input.furnishing !== undefined && { furnishing: input.furnishing }),
     ...(input.services !== undefined && { services: input.services }),
     ...(input.hasElevator !== undefined && { hasElevator: input.hasElevator }),
     ...(input.hasGarage !== undefined && { hasGarage: input.hasGarage }),

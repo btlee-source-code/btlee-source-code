@@ -31,6 +31,7 @@ import {
   PROPERTY_SERVICES,
   DEPOSIT_OPTIONS,
   FINISHING_TYPES,
+  FURNISHING_STATUS_TYPES,
   GOVERNORATES,
   LISTING_TYPES,
   MAX_DESCRIPTION_LENGTH,
@@ -126,6 +127,7 @@ function buildPropertySchema(
         .preprocess(blankToUndefined, z.coerce.number().positive().optional())
         .transform((value) => value ?? null),
       finishing: z.enum(FINISHING_TYPES).optional(),
+      furnishing: z.enum(FURNISHING_STATUS_TYPES).optional(),
       services: z.array(z.enum(PROPERTY_SERVICES)).default([]),
       hasElevator: z.boolean().default(false),
       hasGarage: z.boolean().default(false),
@@ -193,6 +195,13 @@ function buildPropertySchema(
           path: ['finishing'],
         });
       }
+      if (propertyTypeHasFinishing(data.type) && !data.furnishing) {
+        ctx.addIssue({
+          code: 'custom',
+          message: tErr('required'),
+          path: ['furnishing'],
+        });
+      }
       if (data.type === 'land') {
         if (data.services.length > 0) {
           ctx.addIssue({
@@ -252,6 +261,7 @@ const PROPERTY_FIELD_ORDER: readonly PropertyErrorField[] = [
   'area',
   'price',
   'finishing',
+  'furnishing',
   'services',
   'hasElevator',
   'hasGarage',
@@ -274,6 +284,7 @@ const PROPERTY_SERVER_FIELD_MAP: Record<string, PropertyErrorField> = {
   area: 'area',
   price: 'price',
   finishing: 'finishing',
+  furnishing: 'furnishing',
   services: 'services',
   hasElevator: 'hasElevator',
   hasGarage: 'hasGarage',
@@ -366,6 +377,7 @@ export function PropertyForm({
     floor: t('fields.floor'),
     area: t('fields.area'),
     finishing: t('fields.finishing'),
+    furnishing: t('fields.furnishing'),
     services: t('fields.services'),
     hasElevator: t('fields.elevator'),
     hasGarage: t('fields.garage'),
@@ -446,7 +458,8 @@ export function PropertyForm({
         bedrooms: hasRoomCounts ? values.bedrooms : 0,
         bathrooms: hasRoomCounts ? values.bathrooms : 0,
         floor: watchType === 'apartment' ? values.floor ?? null : null,
-        finishing: hasFinishing ? values.finishing : 'unfurnished',
+        finishing: hasFinishing ? values.finishing : 'unfinished',
+        furnishing: hasFinishing ? values.furnishing : 'unfurnished',
         services: hasServicesAndAmenities
           ? watchType === 'shop'
             ? values.services.filter((service) => service !== 'wifi')
@@ -512,7 +525,8 @@ export function PropertyForm({
                     }
                     if (!propertyTypeHasFinishing(value)) {
                       setValue('finishing', undefined, { shouldValidate: true });
-                      clearErrors('finishing');
+                      setValue('furnishing', undefined, { shouldValidate: true });
+                      clearErrors(['finishing', 'furnishing']);
                     }
                     if (value !== 'apartment') {
                       setValue('floor', null, { shouldValidate: true });
@@ -716,6 +730,37 @@ export function PropertyForm({
             />
             {errors.finishing && (
               <p className="text-xs text-destructive">{errors.finishing.message}</p>
+            )}
+          </div>}
+
+          {hasFinishing && <div className="space-y-1.5" data-field="furnishing">
+            <Label>{t('fields.furnishing')}</Label>
+            <Controller
+              control={control}
+              name="furnishing"
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                    clearErrors('furnishing');
+                  }}
+                >
+                  <SelectTrigger className={errors.furnishing ? ERROR_CONTROL_CLASS : undefined}>
+                    <SelectValue placeholder={t('fields.selectFurnishing')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {FURNISHING_STATUS_TYPES.map((f) => (
+                      <SelectItem key={f} value={f}>
+                        {tProp(`furnishing.${f}`)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors.furnishing && (
+              <p className="text-xs text-destructive">{errors.furnishing.message}</p>
             )}
           </div>}
 

@@ -291,9 +291,19 @@
       "agricultural": "زراعي"
     },
     "finishing": {
-      "furnished": "مفروش",
+      "unfinished": "بدون تشطيب",
+      "semi-finished": "نصف تشطيب",
+      "standard-finished": "تشطيب عادي",
+      "lux": "لوكس",
+      "super-lux": "سوبر لوكس",
+      "high-lux": "هاي لوكس",
+      "ultra-lux": "ألترا لوكس"
+    },
+    "furnishing": {
       "unfurnished": "غير مفروش",
-      "semi-finished": "نص تشطيب"
+      "semi-furnished": "نصف مفروش",
+      "furnished": "مفروش",
+      "fully-furnished": "مفروش بالكامل"
     },
     "services": {
       "gas": "غاز",
@@ -326,6 +336,7 @@
     "no": "لا يوجد",
     "area": "المساحة",
     "finishingLabel": "التشطيب",
+    "furnishingLabel": "الفرش",
     "categoryLabel": "الفئة",
     "listingNumber": "رقم الإعلان",
     "areaUnit": "م²",
@@ -376,6 +387,7 @@
     "minBedrooms": "غرف النوم (أقل من)",
     "minArea": "المساحة (أقل من)",
     "finishing": "حالة التشطيب",
+    "furnishing": "حالة الفرش",
     "sort": "الترتيب",
     "newest": "الأحدث",
     "oldest": "الأقدم",
@@ -437,6 +449,8 @@
       "optionalPlaceholder": "اختياري",
       "finishing": "حالة التشطيب",
       "selectFinishing": "اختر التشطيب",
+      "furnishing": "حالة الفرش",
+      "selectFurnishing": "اختر حالة الفرش",
       "services": "الخدمات المتوفرة",
       "elevator": "أسانسير",
       "garage": "جراج",

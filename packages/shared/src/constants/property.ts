@@ -24,8 +24,26 @@ export const PROPERTY_CATEGORIES = [
 ] as const;
 export type PropertyCategory = (typeof PROPERTY_CATEGORIES)[number];
 
-export const FINISHING_TYPES = ['furnished', 'unfurnished', 'semi-finished'] as const;
+export const FINISHING_CONDITION_TYPES = [
+  'unfinished',
+  'semi-finished',
+  'standard-finished',
+  'lux',
+  'super-lux',
+  'high-lux',
+  'ultra-lux',
+] as const;
+
+export const FINISHING_TYPES = FINISHING_CONDITION_TYPES;
 export type FinishingType = (typeof FINISHING_TYPES)[number];
+
+export const FURNISHING_STATUS_TYPES = [
+  'unfurnished',
+  'semi-furnished',
+  'furnished',
+  'fully-furnished',
+] as const;
+export type FurnishingStatus = (typeof FURNISHING_STATUS_TYPES)[number];
 
 // Utilities the owner can flag as available (gas / water / electricity / wifi).
 export const PROPERTY_SERVICES = ['gas', 'water', 'electricity', 'wifi'] as const;

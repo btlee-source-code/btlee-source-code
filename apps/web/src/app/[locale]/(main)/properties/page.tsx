@@ -11,6 +11,7 @@ const STRING_FILTERS = [
   'category',
   'governorate',
   'finishing',
+  'furnishing',
 ] as const;
 const NUMBER_FILTERS = ['minPrice', 'maxPrice', 'minBedrooms', 'minArea'] as const;
 const SORT_OPTIONS = new Set(['newest', 'oldest', 'price_asc', 'price_desc']);

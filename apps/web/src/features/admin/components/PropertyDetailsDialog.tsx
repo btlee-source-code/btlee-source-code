@@ -12,7 +12,7 @@ import {
   MapPin, Eye, Check, X, Loader2, BedDouble, Bath, Maximize2,
   Building2, Paintbrush, Tag, Layers, Calendar, Clock, Hash,
   User, Mail, Phone, ExternalLink, MessageCircle,
-  Flame, Droplets, Zap, ArrowUpDown, Car, Wallet, Wifi,
+  Flame, Droplets, Zap, ArrowUpDown, Car, Wallet, Wifi, Sofa,
 } from 'lucide-react';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
@@ -27,6 +27,7 @@ import { adminApi } from '@/features/admin/api/admin.api';
 import { formatPrice, formatDate, whatsappLink } from '@/shared/lib/utils';
 import { toast } from 'sonner';
 import type { Property } from '@/shared/types/property';
+import { normalizeFinishing, propertyTypeHasFinishing, resolveFurnishing } from '@/shared/lib/constants';
 
 const statusVariant: Record<string, 'pending' | 'approved' | 'rejected' | 'sold' | 'default'> = {
   pending: 'pending',
@@ -99,7 +100,12 @@ export function PropertyDetailsDialog({
       label: tProp('floor'),
       value: property.floor != null ? property.floor : '—',
     },
-    { icon: Paintbrush, label: tProp('finishingLabel'), value: tProp(`finishing.${property.finishing}`) },
+    ...(propertyTypeHasFinishing(property.type)
+      ? [
+          { icon: Paintbrush, label: tProp('finishingLabel'), value: tProp(`finishing.${normalizeFinishing(property.finishing)}`) },
+          { icon: Sofa, label: tProp('furnishingLabel'), value: tProp(`furnishing.${resolveFurnishing(property.finishing, property.furnishing)}`) },
+        ]
+      : []),
     { icon: Building2, label: 'النوع', value: tProp(`types.${property.type}`) },
     { icon: Tag, label: 'نوع الصفقة', value: tProp(`listingTypes.${property.listingType}`) },
     { icon: Tag, label: tProp('categoryLabel'), value: tProp(`categories.${property.category}`) },

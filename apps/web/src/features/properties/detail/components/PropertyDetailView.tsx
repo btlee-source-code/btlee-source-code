@@ -40,6 +40,7 @@ import { Avatar, AvatarFallback } from '@/shared/components/ui/avatar';
 import { Separator } from '@/shared/components/ui/separator';
 import { Link } from '@/config/navigation';
 import { formatPrice, formatDate, whatsappLink } from '@/shared/lib/utils';
+import { normalizeFinishing, propertyTypeHasFinishing, resolveFurnishing } from '@/shared/lib/constants';
 import type { Property } from '@/shared/types/property';
 
 const SERVICE_ICONS = {
@@ -155,7 +156,12 @@ export function PropertyDetailView({ property }: { property: Property }) {
             </div>
             <Separator className="my-4" />
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
-              <KeyValue label={t('finishingLabel')} value={t(`finishing.${property.finishing}`)} />
+              {propertyTypeHasFinishing(property.type) && (
+                <>
+                  <KeyValue label={t('finishingLabel')} value={t(`finishing.${normalizeFinishing(property.finishing)}`)} />
+                  <KeyValue label={t('furnishingLabel')} value={t(`furnishing.${resolveFurnishing(property.finishing, property.furnishing)}`)} />
+                </>
+              )}
               <KeyValue label={t('categoryLabel')} value={t(`categories.${property.category}`)} />
               <KeyValue label={t('publishedOn')} value={formatDate(property.createdAt)} />
               <KeyValue

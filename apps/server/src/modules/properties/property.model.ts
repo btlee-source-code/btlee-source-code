@@ -9,6 +9,7 @@ import {
   LISTING_TYPES,
   PROPERTY_CATEGORIES,
   FINISHING_TYPES,
+  FURNISHING_STATUS_TYPES,
   PROPERTY_SERVICES,
   DEPOSIT_OPTIONS,
   PROPERTY_STATUS,
@@ -46,6 +47,12 @@ const propertySchema = new Schema(
     floor: { type: Number, default: null, min: -5, max: 200 }, // required only when type=apartment (enforced in service)
     area: { type: Number, default: null, min: 1 }, // m² — optional
     finishing: { type: String, enum: FINISHING_TYPES, required: true },
+    furnishing: {
+      type: String,
+      enum: FURNISHING_STATUS_TYPES,
+      required: true,
+      default: 'unfurnished',
+    },
 
     // Available utilities (gas / water / electricity) — any subset.
     services: { type: [String], enum: PROPERTY_SERVICES, default: [] },

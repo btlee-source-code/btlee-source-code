@@ -18,6 +18,7 @@ export interface PropertyListParams {
   minBedrooms?: number;
   minArea?: number;
   finishing?: string;
+  furnishing?: string;
   sort?: 'newest' | 'oldest' | 'price_asc' | 'price_desc';
   featured?: boolean;
 }

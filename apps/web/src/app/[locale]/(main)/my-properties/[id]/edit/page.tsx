@@ -10,6 +10,7 @@ import { useFetch } from '@/shared/hooks/useFetch';
 import { usePageTitle } from '@/shared/hooks/usePageTitle';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { toast } from 'sonner';
+import { normalizeFinishing, resolveFurnishing } from '@/shared/lib/constants';
 
 export default function EditPropertyPage() {
   const router = useRouter();
@@ -50,7 +51,8 @@ export default function EditPropertyPage() {
             bathrooms: property.bathrooms,
             floor: property.floor ?? undefined,
             area: property.area ?? undefined,
-            finishing: property.finishing,
+            finishing: normalizeFinishing(property.finishing),
+            furnishing: resolveFurnishing(property.finishing, property.furnishing),
             services: property.services ?? [],
             hasElevator: property.hasElevator ?? false,
             hasGarage: property.hasGarage ?? false,

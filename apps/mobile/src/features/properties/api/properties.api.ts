@@ -44,6 +44,7 @@ export interface PropertyQuery {
   category?: string;
   governorate?: string;
   finishing?: string;
+  furnishing?: string;
   minPrice?: number;
   maxPrice?: number;
   minBedrooms?: number;
@@ -70,6 +71,7 @@ export interface PropertyInput {
   floor?: number | null;
   area?: number | null;
   finishing: string;
+  furnishing: string;
   services?: string[];
   hasElevator?: boolean;
   hasGarage?: boolean;

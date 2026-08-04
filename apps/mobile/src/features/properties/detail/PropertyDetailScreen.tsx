@@ -14,6 +14,7 @@ import {
   Maximize2,
   MoveVertical,
   Paintbrush,
+  Sofa,
   Star,
 } from 'lucide-react-native';
 import { useCallback, useState } from 'react';
@@ -44,9 +45,12 @@ import { RESPONSIVE_MAX_WIDTH, useResponsiveLayout } from '@/shared/hooks/useRes
 import {
   DEPOSIT_LABELS,
   FINISHING_LABELS,
+  FURNISHING_LABELS,
   LISTING_TYPE_LABELS,
   SERVICE_LABELS,
   TYPE_LABELS,
+  normalizeFinishing,
+  resolveFurnishing,
   propertyTypeHasFinishing,
   propertyTypeHasRooms,
 } from '@/shared/lib/constants';
@@ -186,7 +190,13 @@ export function PropertyDetailScreen() {
       key: 'finishing',
       icon: <Paintbrush size={19} color={c.muted} />,
       label: S.finishingLabel,
-      value: FINISHING_LABELS[property.finishing],
+      value: FINISHING_LABELS[normalizeFinishing(property.finishing)],
+    },
+    {
+      key: 'furnishing',
+      icon: <Sofa size={19} color={c.muted} />,
+      label: S.furnishingLabel,
+      value: FURNISHING_LABELS[resolveFurnishing(property.finishing, property.furnishing)],
     });
   }
   if (property.deposit)

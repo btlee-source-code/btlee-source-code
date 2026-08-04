@@ -16,6 +16,8 @@ import {
   CATEGORY_LABELS,
   FINISHING_LABELS,
   FINISHING_TYPES,
+  FURNISHING_LABELS,
+  FURNISHING_STATUS_TYPES,
   LISTING_TYPE_LABELS,
   LISTING_TYPES,
   PROPERTY_CATEGORIES,
@@ -202,6 +204,14 @@ export function SearchModal({
             <View className="flex-row flex-wrap gap-2 justify-end">
               {FINISHING_TYPES.map((v) => (
                 <Chip key={v} label={FINISHING_LABELS[v]} active={f.finishing === v} onPress={() => set('finishing', v)} />
+              ))}
+            </View>
+          </Section>
+
+          <Section title={S.fFurnishingStatus}>
+            <View className="flex-row flex-wrap gap-2 justify-end">
+              {FURNISHING_STATUS_TYPES.map((v) => (
+                <Chip key={v} label={FURNISHING_LABELS[v]} active={f.furnishing === v} onPress={() => set('furnishing', v)} />
               ))}
             </View>
           </Section>

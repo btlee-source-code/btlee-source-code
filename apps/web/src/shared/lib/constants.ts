@@ -35,8 +35,43 @@ export const PROPERTY_CATEGORIES = [
 ] as const;
 export type PropertyCategory = (typeof PROPERTY_CATEGORIES)[number];
 
-export const FINISHING_TYPES = ['furnished', 'unfurnished', 'semi-finished'] as const;
+export const FINISHING_CONDITION_TYPES = [
+  'unfinished',
+  'semi-finished',
+  'standard-finished',
+  'lux',
+  'super-lux',
+  'high-lux',
+  'ultra-lux',
+] as const;
+
+export const FINISHING_TYPES = FINISHING_CONDITION_TYPES;
 export type FinishingType = (typeof FINISHING_TYPES)[number];
+
+export const FURNISHING_STATUS_TYPES = [
+  'unfurnished',
+  'semi-furnished',
+  'furnished',
+  'fully-furnished',
+] as const;
+export type FurnishingStatus = (typeof FURNISHING_STATUS_TYPES)[number];
+
+/** Normalize records created before furnishing became an independent field. */
+export function normalizeFinishing(value?: string): FinishingType {
+  return FINISHING_TYPES.includes(value as FinishingType)
+    ? (value as FinishingType)
+    : 'standard-finished';
+}
+
+export function resolveFurnishing(
+  finishing?: string,
+  furnishing?: string
+): FurnishingStatus {
+  if (FURNISHING_STATUS_TYPES.includes(furnishing as FurnishingStatus)) {
+    return furnishing as FurnishingStatus;
+  }
+  return finishing === 'furnished' ? 'furnished' : 'unfurnished';
+}
 
 // Utilities the owner can flag as available (gas / water / electricity / wifi).
 export const PROPERTY_SERVICES = ['gas', 'water', 'electricity', 'wifi'] as const;
