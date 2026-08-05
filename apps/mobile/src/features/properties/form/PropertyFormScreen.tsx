@@ -26,11 +26,7 @@ import {
   FURNISHING_LABELS,
   FURNISHING_STATUS_TYPES,
   LISTING_TYPE_LABELS,
-  LISTING_TYPES,
   MAX_IMAGES,
-  PROPERTY_CATEGORIES,
-  PROPERTY_SERVICES,
-  PROPERTY_TYPES,
   SERVICE_LABELS,
   CATEGORY_LABELS,
   TYPE_LABELS,
@@ -55,11 +51,18 @@ import { ImagePickerRow } from './ImagePickerRow';
 import { LocationPicker } from './LocationPicker';
 
 const DURATIONS = [30, 60, 90, 180, 365];
-const ADVERTISABLE_PROPERTY_TYPES = PROPERTY_TYPES.filter((value) => value !== 'building');
-const GENERAL_PROPERTY_CATEGORIES = PROPERTY_CATEGORIES.filter(
-  (value) => value !== 'industrial' && value !== 'agricultural'
-);
-const SHOP_SERVICES = PROPERTY_SERVICES.filter((service) => service !== 'wifi');
+const FORM_LISTING_TYPES = ['sale', 'rent'] as const;
+const ADVERTISABLE_PROPERTY_TYPES = [
+  'apartment',
+  'villa',
+  'chalet',
+  'shop',
+  'land',
+  'factory',
+] as const;
+const GENERAL_PROPERTY_CATEGORIES = ['residential', 'commercial'] as const;
+const ORDERED_PROPERTY_SERVICES = ['water', 'electricity', 'gas', 'wifi'] as const;
+const SHOP_SERVICES = ORDERED_PROPERTY_SERVICES.filter((service) => service !== 'wifi');
 
 function fixedCategoryForPropertyType(type: string) {
   if (type === 'shop') return 'commercial' as const;
@@ -211,7 +214,7 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
   const fixedCategory = fixedCategoryForPropertyType(type);
   const categoryOptions = fixedCategory ? [fixedCategory] : GENERAL_PROPERTY_CATEGORIES;
   const hasServicesAndAmenities = type !== 'land';
-  const serviceOptions = type === 'shop' ? SHOP_SERVICES : PROPERTY_SERVICES;
+  const serviceOptions = type === 'shop' ? SHOP_SERVICES : ORDERED_PROPERTY_SERVICES;
   const c = useThemeColors();
   const { scrollRef, setFieldRef, handleScroll, scrollToFirstError } =
     useFormErrorScroll<PropertyFieldKey>();
@@ -448,8 +451,8 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
             ref={(node) => setFieldRef('listingType', node)}
             label={S.fListingType}
             error={fieldErrors.listingType}>
-            <View className="flex-row flex-wrap gap-2 justify-end">
-              {LISTING_TYPES.map((v) => (
+            <View className="flex-row-reverse flex-wrap gap-2 justify-start">
+              {FORM_LISTING_TYPES.map((v) => (
                 <Chip
                   key={v}
                   label={LISTING_TYPE_LABELS[v]}
@@ -467,7 +470,7 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
             ref={(node) => setFieldRef('type', node)}
             label={S.fType}
             error={fieldErrors.type}>
-            <View className="flex-row flex-wrap gap-2 justify-end">
+            <View className="flex-row-reverse flex-wrap gap-2 justify-start">
               {ADVERTISABLE_PROPERTY_TYPES.map((v) => (
                 <Chip
                   key={v}
@@ -516,7 +519,7 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
             ref={(node) => setFieldRef('category', node)}
             label={S.fCategory}
             error={fieldErrors.category}>
-            <View className="flex-row flex-wrap gap-2 justify-end">
+            <View className="flex-row-reverse flex-wrap gap-2 justify-start">
               {categoryOptions.map((v) => (
                 <Chip
                   key={v}
@@ -676,7 +679,7 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
           {hasServicesAndAmenities && (
             <>
               <Field label={`${S.fServices} ${S.optional}`}>
-                <View className="flex-row flex-wrap gap-2 justify-end">
+                <View className="flex-row-reverse flex-wrap gap-2 justify-start">
                   {serviceOptions.map((v) => (
                     <Chip key={v} label={SERVICE_LABELS[v]} active={services.includes(v)} onPress={() => toggleService(v)} />
                   ))}

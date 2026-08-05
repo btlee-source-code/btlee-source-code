@@ -17,11 +17,9 @@ import { S } from '@/config/strings';
 import { carsApi, type CarInput } from '@/features/cars/api/cars.api';
 import type { Car, CarImage } from '@/shared/types/car';
 import {
-  CAR_BODY_TYPES,
   CAR_BODY_TYPE_LABELS,
   CAR_CONDITIONS,
   CAR_CONDITION_LABELS,
-  CAR_FUEL_TYPES,
   CAR_FUEL_TYPE_LABELS,
   CAR_TRANSMISSIONS,
   CAR_TRANSMISSION_LABELS,
@@ -50,6 +48,22 @@ import { CarMakePicker } from './CarMakePicker';
 
 const DURATIONS = [30, 60, 90, 180, 365];
 const CURRENT_YEAR = new Date().getFullYear();
+const ORDERED_CAR_FUEL_TYPES = [
+  'petrol',
+  'diesel',
+  'natural_gas',
+  'electric',
+  'hybrid',
+] as const;
+const ORDERED_CAR_BODY_TYPES = [
+  'sedan',
+  'suv',
+  'pickup',
+  'crossover',
+  'hatchback',
+  'coupe',
+  'minivan',
+] as const;
 
 type CarFieldKey =
   | 'images'
@@ -529,8 +543,8 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
             ref={(node) => setFieldRef('fuelType', node)}
             label={S.fFuel}
             error={fieldErrors.fuelType}>
-            <View className="flex-row flex-wrap gap-2 justify-end">
-              {CAR_FUEL_TYPES.map((v) => (
+            <View className="flex-row-reverse flex-wrap gap-2 justify-start">
+              {ORDERED_CAR_FUEL_TYPES.map((v) => (
                 <Chip
                   key={v}
                   label={CAR_FUEL_TYPE_LABELS[v]}
@@ -548,8 +562,8 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
             ref={(node) => setFieldRef('bodyType', node)}
             label={S.fBodyType}
             error={fieldErrors.bodyType}>
-            <View className="flex-row flex-wrap gap-2 justify-end">
-              {CAR_BODY_TYPES.map((v) => (
+            <View className="flex-row-reverse flex-wrap gap-2 justify-start">
+              {ORDERED_CAR_BODY_TYPES.map((v) => (
                 <Chip
                   key={v}
                   label={CAR_BODY_TYPE_LABELS[v]}
