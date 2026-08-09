@@ -13,10 +13,12 @@ export function ImagePickerRow({
   value,
   onChange,
   existingCount = 0,
+  fullWidth = false,
 }: {
   value: LocalImage[];
   onChange: (imgs: LocalImage[]) => void;
   existingCount?: number;
+  fullWidth?: boolean;
 }) {
   const c = useThemeColors();
   const pick = async () => {
@@ -37,34 +39,56 @@ export function ImagePickerRow({
     onChange([...value, ...picked].slice(0, Math.max(0, MAX_IMAGES - existingCount)));
   };
 
+  const pickerButton = (
+    <Pressable
+      onPress={pick}
+      className="h-24 rounded-xl border border-dashed border-border bg-secondary items-center justify-center gap-1 active:opacity-80"
+      style={{ width: fullWidth ? '100%' : 96 }}>
+      <ImagePlus size={22} color={c.primary} />
+      <Text className="text-[11px] font-cairo-medium text-primary">
+        {S.addImages} {existingCount + value.length}/{MAX_IMAGES}
+      </Text>
+    </Pressable>
+  );
+
+  const previews = value.map((img, i) => (
+    <View key={img.uri} className="h-24 w-24 rounded-xl overflow-hidden">
+      <Image source={{ uri: img.uri }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
+      <Pressable
+        onPress={() => onChange(value.filter((_, idx) => idx !== i))}
+        hitSlop={6}
+        className="absolute top-1 left-1 h-6 w-6 rounded-full items-center justify-center"
+        style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
+        <X size={14} color="#FFFFFF" />
+      </Pressable>
+      {i === 0 && (
+        <View className="absolute bottom-0 left-0 right-0 py-0.5 items-center" style={{ backgroundColor: 'rgba(26,60,52,0.85)' }}>
+          <Text className="text-[10px] text-white font-cairo-medium">الغلاف</Text>
+        </View>
+      )}
+    </View>
+  ));
+
+  if (fullWidth) {
+    return (
+      <View className="w-full gap-2.5">
+        {pickerButton}
+        {value.length > 0 && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: 10 }}>
+            {previews}
+          </ScrollView>
+        )}
+      </View>
+    );
+  }
+
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
-      <Pressable
-        onPress={pick}
-        className="h-24 w-24 rounded-xl border border-dashed border-border bg-secondary items-center justify-center gap-1 active:opacity-80">
-        <ImagePlus size={22} color={c.primary} />
-        <Text className="text-[11px] font-cairo-medium text-primary">
-          {S.addImages} {existingCount + value.length}/{MAX_IMAGES}
-        </Text>
-      </Pressable>
-
-      {value.map((img, i) => (
-        <View key={img.uri} className="h-24 w-24 rounded-xl overflow-hidden">
-          <Image source={{ uri: img.uri }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
-          <Pressable
-            onPress={() => onChange(value.filter((_, idx) => idx !== i))}
-            hitSlop={6}
-            className="absolute top-1 left-1 h-6 w-6 rounded-full items-center justify-center"
-            style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
-            <X size={14} color="#FFFFFF" />
-          </Pressable>
-          {i === 0 && (
-            <View className="absolute bottom-0 left-0 right-0 py-0.5 items-center" style={{ backgroundColor: 'rgba(26,60,52,0.85)' }}>
-              <Text className="text-[10px] text-white font-cairo-medium">الغلاف</Text>
-            </View>
-          )}
-        </View>
-      ))}
+      {pickerButton}
+      {previews}
     </ScrollView>
   );
 }

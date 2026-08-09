@@ -440,6 +440,7 @@ export function PropertyFormScreen({ initial }: { initial?: Property }) {
             <ImagePickerRow
               value={newImages}
               existingCount={keptImages.length}
+              fullWidth
               onChange={(images) => {
                 setNewImages(images);
                 clearFieldError('images');
