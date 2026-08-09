@@ -2,7 +2,7 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/config/navigation';
 import { Logo } from './Logo';
-import { Facebook, MessageCircle, Code2, Sparkles } from 'lucide-react';
+import { Facebook, MessageCircle, Code2 } from 'lucide-react';
 
 export function Footer() {
   const t = useTranslations();
@@ -94,13 +94,6 @@ export function Footer() {
 
         {/* Developer credit */}
         <div className="mt-6 border-t border-border pt-5 flex flex-col items-center gap-2.5 text-center text-xs text-muted-foreground">
-          <p className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-4 py-2 text-sm shadow-sm">
-            <Sparkles className="size-4 text-accent" />
-            <span>
-              {t('footer.patronage')}{' '}
-              <span className="font-bold text-foreground">{t('footer.clientName')}</span>
-            </span>
-          </p>
           <p className="inline-flex items-center gap-1.5">
             <Code2 className="size-3.5 text-primary" />
             <span>
@@ -108,16 +101,26 @@ export function Footer() {
               <span className="font-semibold text-foreground">{t('footer.developerName')}</span>
             </span>
           </p>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
             <a
-              href="https://wa.me/201066001035"
+              href="https://wa.me/201070010209"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 hover:text-primary transition-colors"
               dir="ltr"
             >
               <MessageCircle className="size-3.5" />
-              01066001035
+              01070010209
+            </a>
+            <a
+              href="https://wa.me/201010060446"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 hover:text-primary transition-colors"
+              dir="ltr"
+            >
+              <MessageCircle className="size-3.5" />
+              01010060446
             </a>
           </div>
         </div>
