@@ -76,7 +76,7 @@ export function PropertyDetailView({ property }: { property: Property }) {
               {property.isFeatured && (
                 <Badge className="gap-1 border-transparent bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
                   <Star className="size-3 fill-amber-500 text-amber-500" />
-                  مميز
+                  {t('featured')}
                 </Badge>
               )}
               <Badge className="border-transparent bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
@@ -91,7 +91,10 @@ export function PropertyDetailView({ property }: { property: Property }) {
             </div>
 
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-              {t(`types.${property.type}`)} في {property.area_name}
+              {t('listingTitle', {
+                type: t(`types.${property.type}`),
+                area: property.area_name,
+              })}
             </h1>
 
             <div className="flex items-center gap-1.5 text-muted-foreground">
@@ -107,7 +110,7 @@ export function PropertyDetailView({ property }: { property: Property }) {
                   </span>
                   <span className="text-base text-muted-foreground">{t('currency')}</span>
                   {property.listingType === 'rent' && (
-                    <span className="text-sm text-muted-foreground">/ شهرياً</span>
+                    <span className="text-sm text-muted-foreground">/ {t('perMonth')}</span>
                   )}
                 </>
               ) : (
@@ -121,7 +124,13 @@ export function PropertyDetailView({ property }: { property: Property }) {
           {/* Quick actions */}
           <div className="flex flex-wrap items-center gap-2">
             <WishlistButton propertyId={property._id} />
-            <ShareButton url={siteUrl} title={`${t(`types.${property.type}`)} في ${property.area_name}`} />
+            <ShareButton
+              url={siteUrl}
+              title={t('listingTitle', {
+                type: t(`types.${property.type}`),
+                area: property.area_name,
+              })}
+            />
             <ReportDialog propertyId={property._id} />
             <div className="flex-1" />
             <span className="text-xs text-muted-foreground flex items-center gap-1">
@@ -254,7 +263,7 @@ export function PropertyDetailView({ property }: { property: Property }) {
               <a
                 href={whatsappLink(
                   property.whatsappNumber,
-                  `مرحباً، أنا مهتم بـ ${property.area_name}`
+                  t('whatsappInterest', { area: property.area_name }),
                 )}
                 target="_blank"
                 rel="noopener noreferrer"

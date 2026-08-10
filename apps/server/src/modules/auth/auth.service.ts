@@ -3,27 +3,27 @@
  * Business logic for registration, login, token refresh, logout, password reset.
  * Returns plain data — no Express coupling here.
  */
-import crypto from 'node:crypto';
-import { User } from '../users/user.model.js';
-import { hashPassword, comparePassword } from '../../shared/utils/password.js';
+import crypto from "node:crypto";
+import { User } from "../users/user.model.js";
+import { hashPassword, comparePassword } from "../../shared/utils/password.js";
 import {
   issueTokens,
   verifyRefreshToken,
   hashToken,
   pushRefreshTokenUpdate,
   rotateRefreshTokenPipeline,
-} from '../../shared/utils/jwt.js';
-import { sendEmail } from '../../shared/utils/email.js';
+} from "../../shared/utils/jwt.js";
+import { sendEmail } from "../../shared/utils/email.js";
 import {
   ConflictError,
   UnauthorizedError,
   NotFoundError,
   ForbiddenError,
-} from '../../shared/errors/AppError.js';
-import { env } from '../../config/env.js';
-import { isEmailIdentifier, normalizePhone } from './auth.validators.js';
-import type { RegisterInput, LoginInput } from './auth.validators.js';
-import { cancelPushDeliveriesForToken } from '../notifications/pushDelivery.service.js';
+} from "../../shared/errors/AppError.js";
+import { env } from "../../config/env.js";
+import { isEmailIdentifier, normalizePhone } from "./auth.validators.js";
+import type { RegisterInput, LoginInput } from "./auth.validators.js";
+import { cancelPushDeliveriesForToken } from "../notifications/pushDelivery.service.js";
 
 interface AuthTokens {
   accessToken: string;
@@ -73,8 +73,8 @@ export async function registerUser(input: RegisterInput): Promise<AuthResult> {
     const emailTaken = existing.email != null && existing.email === email;
     throw new ConflictError(
       emailTaken
-        ? 'An account with this email already exists'
-        : 'An account with this phone number already exists'
+        ? "An account with this email already exists"
+        : "An account with this phone number already exists",
     );
   }
 
@@ -86,10 +86,13 @@ export async function registerUser(input: RegisterInput): Promise<AuthResult> {
     password: hashed,
   });
 
-  const tokens = issueTokens({ userId: String(user._id), role: 'user' });
+  const tokens = issueTokens({ userId: String(user._id), role: "user" });
 
   // Whitelist the refresh token (stored hashed) so it can be invalidated on logout
-  await User.updateOne({ _id: user._id }, pushRefreshTokenUpdate(hashToken(tokens.refreshToken)));
+  await User.updateOne(
+    { _id: user._id },
+    pushRefreshTokenUpdate(hashToken(tokens.refreshToken)),
+  );
 
   return { ...tokens, user: toPublicUser(user) };
 }
@@ -99,27 +102,33 @@ export async function loginUser(input: LoginInput): Promise<AuthResult> {
   const query = isEmailIdentifier(id)
     ? { email: id.toLowerCase() }
     : { phone: normalizePhone(id) };
-  const user = await User.findOne(query).select('+password');
-  if (!user) throw new UnauthorizedError('Invalid credentials');
+
+  const user = await User.findOne(query).select("+password");
+  if (!user) throw new UnauthorizedError("Invalid credentials");
 
   if (user.isBlocked) {
-    throw new ForbiddenError('This account has been blocked. Please contact support.');
+    throw new ForbiddenError(
+      "This account has been blocked. Please contact support.",
+    );
   }
 
   // OAuth-only accounts have no password — guide the user to the right button
   // instead of returning a misleading "invalid credentials".
   if (!user.password) {
     throw new UnauthorizedError(
-      'This account uses social sign-in. Please continue with Google.'
+      "This account uses social sign-in. Please continue with Google.",
     );
   }
 
   const ok = await comparePassword(input.password, user.password);
-  if (!ok) throw new UnauthorizedError('Invalid credentials');
+  if (!ok) throw new UnauthorizedError("Invalid credentials");
 
-  const tokens = issueTokens({ userId: String(user._id), role: 'user' });
+  const tokens = issueTokens({ userId: String(user._id), role: "user" });
 
-  await User.updateOne({ _id: user._id }, pushRefreshTokenUpdate(hashToken(tokens.refreshToken)));
+  await User.updateOne(
+    { _id: user._id },
+    pushRefreshTokenUpdate(hashToken(tokens.refreshToken)),
+  );
 
   return { ...tokens, user: toPublicUser(user) };
 }
@@ -129,28 +138,31 @@ export async function refreshTokens(refreshToken: string): Promise<AuthTokens> {
   try {
     payload = verifyRefreshToken(refreshToken);
   } catch {
-    throw new UnauthorizedError('Invalid or expired refresh token');
+    throw new UnauthorizedError("Invalid or expired refresh token");
   }
 
   // Confirm token is still whitelisted (wasn't logged out). Stored hashed.
   const hashed = hashToken(refreshToken);
-  const user = await User.findById(payload.userId).select('+refreshTokens');
+  const user = await User.findById(payload.userId).select("+refreshTokens");
   if (!user || !user.refreshTokens.includes(hashed)) {
-    throw new UnauthorizedError('Refresh token has been revoked');
+    throw new UnauthorizedError("Refresh token has been revoked");
   }
 
-  const newTokens = issueTokens({ userId: String(user._id), role: 'user' });
+  const newTokens = issueTokens({ userId: String(user._id), role: "user" });
 
   // Atomically rotate: drop the old hash, add the new one, cap the array — one write.
   await User.updateOne(
     { _id: user._id },
-    rotateRefreshTokenPipeline(hashed, hashToken(newTokens.refreshToken))
+    rotateRefreshTokenPipeline(hashed, hashToken(newTokens.refreshToken)),
   );
 
   return newTokens;
 }
 
-export async function logoutUser(refreshToken: string, pushToken?: string): Promise<void> {
+export async function logoutUser(
+  refreshToken: string,
+  pushToken?: string,
+): Promise<void> {
   const hashed = hashToken(refreshToken);
   // Revoke this specific session wherever it lives — no need to trust a userId.
   const pull = pushToken
@@ -165,22 +177,22 @@ export async function requestPasswordReset(email: string): Promise<void> {
   // Don't reveal whether the email exists — return silently
   if (!user || !user.email) return;
 
-  const token = crypto.randomBytes(32).toString('hex');
-  const hashed = crypto.createHash('sha256').update(token).digest('hex');
+  const token = crypto.randomBytes(32).toString("hex");
+  const hashed = crypto.createHash("sha256").update(token).digest("hex");
 
   await User.updateOne(
     { _id: user._id },
     {
       resetPasswordToken: hashed,
       resetPasswordExpires: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
-    }
+    },
   );
 
   const resetLink = `${env.CLIENT_URL}/reset-password?token=${token}`;
   // Fire-and-forget — don't block the response on SMTP. sendEmail logs failures.
   void sendEmail({
     to: user.email,
-    subject: 'إعادة تعيين كلمة المرور — بيت لي',
+    subject: "إعادة تعيين كلمة المرور — بيت لي",
     html: `
       <div dir="rtl" style="font-family: Arial, sans-serif;">
         <h2>إعادة تعيين كلمة المرور</h2>
@@ -193,15 +205,20 @@ export async function requestPasswordReset(email: string): Promise<void> {
   });
 }
 
-export async function resetPassword(token: string, newPassword: string): Promise<void> {
-  const hashed = crypto.createHash('sha256').update(token).digest('hex');
+export async function resetPassword(
+  token: string,
+  newPassword: string,
+): Promise<void> {
+  const hashed = crypto.createHash("sha256").update(token).digest("hex");
 
   const user = await User.findOne({
     resetPasswordToken: hashed,
     resetPasswordExpires: { $gt: new Date() },
-  }).select('+password +resetPasswordToken +resetPasswordExpires +refreshTokens');
+  }).select(
+    "+password +resetPasswordToken +resetPasswordExpires +refreshTokens",
+  );
 
-  if (!user) throw new NotFoundError('Invalid or expired reset token');
+  if (!user) throw new NotFoundError("Invalid or expired reset token");
 
   user.password = await hashPassword(newPassword);
   user.resetPasswordToken = null;

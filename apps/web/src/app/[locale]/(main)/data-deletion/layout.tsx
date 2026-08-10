@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import { localizedAlternates } from '@/config/site';
+import { getTranslations } from 'next-intl/server';
+import { localizedPageMetadata } from '@/config/site';
 
 export async function generateMetadata({
   params,
@@ -7,7 +8,13 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  return { alternates: localizedAlternates(locale, '/data-deletion') };
+  const t = await getTranslations({ locale, namespace: 'dataDeletion' });
+  return localizedPageMetadata({
+    locale,
+    path: '/data-deletion',
+    title: t('title'),
+    description: t('intro'),
+  });
 }
 
 export default function DataDeletionLayout({ children }: { children: React.ReactNode }) {

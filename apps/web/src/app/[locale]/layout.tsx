@@ -12,11 +12,8 @@ import { cookies } from 'next/headers';
 import { routing } from '@/config/routing';
 import {
   SITE_URL,
-  SITE_NAME,
-  SITE_NAME_EN,
-  SITE_DESCRIPTION,
-  SITE_DESCRIPTION_EN,
   OG_IMAGE,
+  localizedSiteInfo,
 } from '@/config/site';
 import { THEME_COOKIE } from '@/shared/components/layout/ThemeToggle';
 import { AuthHydrator } from '@/features/auth/components/AuthHydrator';
@@ -31,30 +28,29 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const isAr = locale === 'ar';
-  const description = isAr ? SITE_DESCRIPTION : SITE_DESCRIPTION_EN;
-  const title = isAr ? `${SITE_NAME} — ${SITE_NAME_EN}` : `${SITE_NAME_EN} — ${SITE_NAME}`;
+  const site = localizedSiteInfo(locale);
 
   return {
     metadataBase: new URL(SITE_URL),
     title: {
-      default: title,
-      template: `%s | ${isAr ? SITE_NAME : SITE_NAME_EN}`,
+      default: site.homeTitle,
+      template: `%s | ${site.name}`,
     },
-    description,
-    applicationName: SITE_NAME_EN,
+    description: site.description,
+    applicationName: site.name,
     openGraph: {
       type: 'website',
-      siteName: SITE_NAME_EN,
-      title,
-      description,
-      locale: isAr ? 'ar_EG' : 'en_US',
-      images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: SITE_NAME }],
+      siteName: site.name,
+      title: site.homeTitle,
+      description: site.description,
+      locale: site.openGraphLocale,
+      alternateLocale: site.alternateOpenGraphLocale,
+      images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: site.name }],
     },
     twitter: {
       card: 'summary_large_image',
-      title,
-      description,
+      title: site.homeTitle,
+      description: site.description,
       images: [OG_IMAGE],
     },
     robots: {

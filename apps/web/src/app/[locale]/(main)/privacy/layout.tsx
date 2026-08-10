@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import { localizedAlternates } from '@/config/site';
+import { getTranslations } from 'next-intl/server';
+import { localizedPageMetadata } from '@/config/site';
 
 export async function generateMetadata({
   params,
@@ -7,7 +8,13 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  return { alternates: localizedAlternates(locale, '/privacy') };
+  const t = await getTranslations({ locale, namespace: 'privacy' });
+  return localizedPageMetadata({
+    locale,
+    path: '/privacy',
+    title: t('title'),
+    description: t('intro'),
+  });
 }
 
 export default function PrivacyLayout({ children }: { children: React.ReactNode }) {

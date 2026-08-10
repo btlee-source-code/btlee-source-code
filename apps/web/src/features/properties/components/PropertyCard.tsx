@@ -87,7 +87,7 @@ export function PropertyCard({
               {property.isFeatured && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-white/95 backdrop-blur-sm px-3 py-1 text-xs font-semibold text-primary shadow-sm">
                   <Star className="size-3 fill-accent text-accent" />
-                  مميز
+                  {t('featured')}
                 </span>
               )}
             </div>
@@ -125,7 +125,7 @@ export function PropertyCard({
                     <span className="text-xl font-bold text-primary">{formatPrice(property.price)}</span>
                     <span className="text-xs text-muted-foreground">{t('currency')}</span>
                     {property.listingType === 'rent' && (
-                      <span className="text-xs text-muted-foreground">/ شهرياً</span>
+                      <span className="text-xs text-muted-foreground">/ {t('perMonth')}</span>
                     )}
                   </>
                 ) : (
@@ -151,7 +151,10 @@ export function PropertyCard({
             {/* Type + location */}
             <div>
               <h3 className="font-semibold text-foreground line-clamp-1">
-                {t(`types.${property.type}`)} في {property.area_name}
+                {t('listingTitle', {
+                  type: t(`types.${property.type}`),
+                  area: property.area_name,
+                })}
               </h3>
               <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
                 <MapPin className="size-3.5 shrink-0" />

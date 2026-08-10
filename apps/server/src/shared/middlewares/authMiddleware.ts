@@ -8,15 +8,15 @@
  * to an `Authorization: Bearer` header for non-browser API clients / tests.
  * User and admin sessions use separate cookie names so both can coexist.
  */
-import type { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import { env } from '../../config/env.js';
-import { UnauthorizedError, ForbiddenError } from '../errors/AppError.js';
-import { USER_COOKIES, ADMIN_COOKIES } from '../utils/cookies.js';
+import type { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import { env } from "../../config/env.js";
+import { UnauthorizedError, ForbiddenError } from "../errors/AppError.js";
+import { USER_COOKIES, ADMIN_COOKIES } from "../utils/cookies.js";
 
 export interface AuthPayload {
   userId: string;
-  role: 'user' | 'admin';
+  role: "user" | "admin";
 }
 
 declare global {
@@ -29,11 +29,13 @@ declare global {
 }
 
 function extractToken(req: Request, cookieName: string): string | null {
-  const fromCookie = (req.cookies as Record<string, string> | undefined)?.[cookieName];
+  const fromCookie = (req.cookies as Record<string, string> | undefined)?.[
+    cookieName
+  ];
   if (fromCookie) return fromCookie;
 
   const header = req.headers.authorization;
-  if (header && header.startsWith('Bearer ')) {
+  if (header && header.startsWith("Bearer ")) {
     return header.slice(7);
   }
   return null;
@@ -44,34 +46,48 @@ function verifyAccess(req: Request, cookieName: string): AuthPayload | null {
   if (!token) return null;
   try {
     // Pin HS256 — reject any other algorithm (defends against alg-confusion).
-    return jwt.verify(token, env.JWT_ACCESS_SECRET, { algorithms: ['HS256'] }) as AuthPayload;
+    return jwt.verify(token, env.JWT_ACCESS_SECRET, {
+      algorithms: ["HS256"],
+    }) as AuthPayload;
   } catch {
     return null;
   }
 }
 
-export function protect(req: Request, _res: Response, next: NextFunction): void {
+export function protect(
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+): void {
   const payload = verifyAccess(req, USER_COOKIES.access);
   if (!payload) {
-    return next(new UnauthorizedError('Authentication required'));
+    return next(new UnauthorizedError("Authentication required"));
   }
   req.user = payload;
   next();
 }
 
-export function adminProtect(req: Request, _res: Response, next: NextFunction): void {
+export function adminProtect(
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+): void {
   const payload = verifyAccess(req, ADMIN_COOKIES.access);
   if (!payload) {
-    return next(new UnauthorizedError('Authentication required'));
+    return next(new UnauthorizedError("Authentication required"));
   }
-  if (payload.role !== 'admin') {
-    return next(new ForbiddenError('Admin access required'));
+  if (payload.role !== "admin") {
+    return next(new ForbiddenError("Admin access required"));
   }
   req.user = payload;
   next();
 }
 
-export function optionalAuth(req: Request, _res: Response, next: NextFunction): void {
+export function optionalAuth(
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+): void {
   const payload = verifyAccess(req, USER_COOKIES.access);
   if (payload) req.user = payload;
   next();

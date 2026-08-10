@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { localizedAlternates } from '@/config/site';
+import { localizedPageMetadata } from '@/config/site';
 
 export async function generateMetadata({
   params,
@@ -9,11 +9,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'propertiesPage' });
-  return {
+  return localizedPageMetadata({
+    locale,
+    path: '/properties',
     title: t('title'),
     description: t('description'),
-    alternates: localizedAlternates(locale, '/properties'),
-  };
+  });
 }
 
 export default function PropertiesLayout({ children }: { children: React.ReactNode }) {

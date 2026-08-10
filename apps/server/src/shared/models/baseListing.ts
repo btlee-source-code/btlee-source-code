@@ -15,7 +15,7 @@
  *
  * See apps/server/src/ARCHITECTURE.md → "Adding a domain".
  */
-import { Schema } from 'mongoose';
+import { Schema } from "mongoose";
 
 /** Image sub-doc shared by any listing's gallery (images[0] is the cover). */
 export const imageSchema = new Schema(
@@ -23,7 +23,7 @@ export const imageSchema = new Schema(
     publicId: { type: String, required: true },
     url: { type: String, required: true },
   },
-  { _id: false }
+  { _id: false },
 );
 
 /**
@@ -39,14 +39,23 @@ export const baseListingFields = {
   seq: { type: Number, unique: true, sparse: true, index: true },
 
   // Owner
-  owner: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+    index: true,
+  },
 
   // Price — optional (owner may hide it; UI shows "price on request")
   price: { type: Number, default: null, min: 1 },
 
   // Content
   description: { type: String, required: true, maxlength: 500, trim: true },
-  images: { type: [imageSchema], required: true, validate: (v: unknown[]) => v.length >= 1 },
+  images: {
+    type: [imageSchema],
+    required: true,
+    validate: (v: unknown[]) => v.length >= 1,
+  },
 
   // Contact
   whatsappNumber: { type: String, required: true, trim: true },
@@ -56,8 +65,18 @@ export const baseListingFields = {
   expiresAt: { type: Date, required: true, index: true },
   // Set only after the expiry notification has been durably created. Keeping
   // this separate from status lets the job safely retry after a server restart.
-  expiryNotificationSentAt: { type: Date, default: null, index: true, select: false },
-  expiryNotificationPending: { type: Boolean, default: false, index: true, select: false },
+  expiryNotificationSentAt: {
+    type: Date,
+    default: null,
+    index: true,
+    select: false,
+  },
+  expiryNotificationPending: {
+    type: Boolean,
+    default: false,
+    index: true,
+    select: false,
+  },
 
   // Admin flags
   isFeatured: { type: Boolean, default: false, index: true },
