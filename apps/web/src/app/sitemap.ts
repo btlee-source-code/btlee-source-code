@@ -4,11 +4,13 @@ import { SITE_URL, serverApiBase } from '@/config/site';
 const LOCALES = ['ar', 'en'] as const;
 
 // Public static routes (per locale). Account/admin pages are intentionally left
-// out — they're disallowed in robots.ts. Auth pages (login/register) are also
-// excluded: they carry no SEO value and Google flags them as thin duplicates.
+// out. Login and registration are public discovery pages; password recovery and
+// OAuth callback routes remain noindex and are intentionally omitted.
 const STATIC_PATHS = [
   '',
   '/properties',
+  '/login',
+  '/register',
   '/privacy',
   '/disclaimer',
   '/data-deletion',

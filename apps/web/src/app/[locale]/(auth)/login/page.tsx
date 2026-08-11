@@ -14,7 +14,6 @@ import { Label } from '@/shared/components/ui/label';
 import { Logo } from '@/shared/components/layout/Logo';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { HttpError } from '@/shared/api/httpClient';
-import { usePageTitle } from '@/shared/hooks/usePageTitle';
 import { toast } from 'sonner';
 import { GoogleButton } from '@/features/auth/components/GoogleButton';
 
@@ -32,8 +31,6 @@ export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
   const [submitting, setSubmitting] = useState(false);
-
-  usePageTitle(t('loginTitle'));
 
   const {
     register,

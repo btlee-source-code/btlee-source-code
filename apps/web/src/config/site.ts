@@ -14,8 +14,8 @@ export const SITE_URL = (
 export const SITE_NAME = 'بيت لي';
 export const SITE_NAME_EN = 'Btlee';
 
-export const SITE_HOME_TITLE = 'بيت لي | عقارات للبيع والإيجار بدون عمولة في مصر';
-export const SITE_HOME_TITLE_EN = 'Btlee | Properties for Sale and Rent in Egypt';
+export const SITE_HOME_TITLE = 'بيت لي | منصة عقارات بدون وسيط وبدون عمولة في مصر';
+export const SITE_HOME_TITLE_EN = 'Btlee | Commission-Free Real Estate Platform in Egypt';
 
 export const SITE_DESCRIPTION =
   'منصة عقارية تربطك بصاحب العقار مباشرة بدون وسطاء — شقق وفيلات ومحلات للبيع والإيجار في مصر.';

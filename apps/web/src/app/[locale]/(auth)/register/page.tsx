@@ -20,7 +20,6 @@ import { Label } from '@/shared/components/ui/label';
 import { Logo } from '@/shared/components/layout/Logo';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { HttpError } from '@/shared/api/httpClient';
-import { usePageTitle } from '@/shared/hooks/usePageTitle';
 import { toast } from 'sonner';
 import { OnboardingDialog } from '@/features/auth/components/OnboardingDialog';
 import { GoogleButton } from '@/features/auth/components/GoogleButton';
@@ -65,8 +64,6 @@ export default function RegisterPage() {
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   const schema = useMemo(() => buildRegisterSchema(tErr), [tErr]);
-
-  usePageTitle(t('registerTitle'));
 
   const {
     register,

@@ -232,8 +232,12 @@
   "auth": {
     "loginTitle": "Welcome back",
     "loginSubtitle": "Sign in to your Btlee account",
+    "loginSeoTitle": "Sign In to Your Account",
+    "loginSeoDescription": "Sign in to Btlee to manage your property listings and saved properties and contact advertisers directly.",
     "registerTitle": "Create Account",
     "registerSubtitle": "Join Btlee and start your property journey",
+    "registerSeoTitle": "Create a Free Property Account",
+    "registerSeoDescription": "Create your free Btlee account to post property listings, save favorite properties, and contact advertisers directly.",
     "name": "Full Name",
     "email": "Email",
     "phone": "Phone number",
