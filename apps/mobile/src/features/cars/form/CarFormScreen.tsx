@@ -404,6 +404,7 @@ export function CarFormScreen({ initial }: { initial?: Car } = {}) {
             <ImagePickerRow
               value={newImages}
               existingCount={keptImages.length}
+              fullWidth
               onChange={(images) => {
                 setNewImages(images);
                 clearFieldError('images');

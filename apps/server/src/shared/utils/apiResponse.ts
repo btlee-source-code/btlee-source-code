@@ -3,13 +3,16 @@
  */
 
 export interface SuccessResponse<T> {
-  status: 'success';
+  status: "success";
   data: T;
   meta?: Record<string, unknown>;
 }
 
-export function ok<T>(data: T, meta?: Record<string, unknown>): SuccessResponse<T> {
-  const response: SuccessResponse<T> = { status: 'success', data };
+export function ok<T>(
+  data: T,
+  meta?: Record<string, unknown>,
+): SuccessResponse<T> {
+  const response: SuccessResponse<T> = { status: "success", data };
   if (meta) response.meta = meta;
   return response;
 }
