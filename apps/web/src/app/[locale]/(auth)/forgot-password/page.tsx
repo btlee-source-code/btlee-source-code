@@ -73,12 +73,12 @@ export default function ForgotPasswordPage() {
           {done ? (
             <div className="py-6 text-center">
               <CheckCircle2 className="size-12 text-emerald-600 mx-auto mb-3" />
-              <p className="text-foreground font-medium">تم إرسال الرابط</p>
+              <p className="text-foreground font-medium">{t('resetLinkSentTitle')}</p>
               <p className="text-sm text-muted-foreground mt-2">
-                لو الإيميل ده مسجل عندنا، هتلاقي رسالة في بريدك خلال دقائق
+                {t('resetLinkSentDescription')}
               </p>
               <Button asChild className="mt-5">
-                <Link href="/login">العودة لتسجيل الدخول</Link>
+                <Link href="/login">{t('backToLogin')}</Link>
               </Button>
             </div>
           ) : (
@@ -98,7 +98,7 @@ export default function ForgotPasswordPage() {
 
               <p className="text-center text-sm text-muted-foreground">
                 <Link href="/login" className="text-primary hover:underline">
-                  العودة لتسجيل الدخول
+                  {t('backToLogin')}
                 </Link>
               </p>
             </form>

@@ -253,6 +253,8 @@
     "resetPasswordTitle": "Reset Password",
     "resetPasswordDesc": "Enter your email and we'll send you a reset link",
     "sendResetLink": "Send Link",
+    "resetLinkSentTitle": "Reset link sent",
+    "resetLinkSentDescription": "If this email is registered with us, you'll receive a reset link within a few minutes.",
     "newPasswordTitle": "Set a new password",
     "newPasswordSubtitle": "Choose a strong password for your account",
     "newPassword": "New password",

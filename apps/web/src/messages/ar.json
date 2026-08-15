@@ -252,6 +252,8 @@
     "resetPasswordTitle": "إعادة تعيين كلمة المرور",
     "resetPasswordDesc": "أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين",
     "sendResetLink": "إرسال الرابط",
+    "resetLinkSentTitle": "تم إرسال الرابط",
+    "resetLinkSentDescription": "إذا كان هذا البريد الإلكتروني مسجلًا لدينا، ستصلك رسالة خلال دقائق.",
     "newPasswordTitle": "تعيين كلمة مرور جديدة",
     "newPasswordSubtitle": "اختر كلمة مرور قوية لحسابك",
     "newPassword": "كلمة المرور الجديدة",
