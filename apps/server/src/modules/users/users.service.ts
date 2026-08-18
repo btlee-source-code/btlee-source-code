@@ -12,7 +12,11 @@ import { Notification } from '../notifications/notification.model.js';
 import { hashPassword, comparePassword } from '../../shared/utils/password.js';
 import { issueTokens, hashToken } from '../../shared/utils/jwt.js';
 import { NotFoundError, BadRequestError } from '../../shared/errors/AppError.js';
-import { USER_GOALS, type UserGoal } from '../../config/constants.js';
+import {
+  USER_GOALS,
+  type UserGoal,
+  type UserLanguage,
+} from '../../config/constants.js';
 
 export async function getProfile(userId: string) {
   const user = await User.findById(userId);
@@ -25,17 +29,19 @@ export async function getProfile(userId: string) {
     avatar: user.avatar,
     goal: user.goal,
     hasCompletedOnboarding: user.hasCompletedOnboarding,
+    preferredLanguage: user.preferredLanguage ?? 'ar',
     createdAt: (user as { createdAt?: Date }).createdAt,
   };
 }
 
 export async function updateProfile(
   userId: string,
-  data: { name?: string; avatar?: string | null }
+  data: { name?: string; avatar?: string | null; preferredLanguage?: UserLanguage }
 ) {
   const update: Record<string, unknown> = {};
   if (data.name !== undefined) update.name = data.name.trim();
   if (data.avatar !== undefined) update.avatar = data.avatar;
+  if (data.preferredLanguage !== undefined) update.preferredLanguage = data.preferredLanguage;
 
   const user = await User.findByIdAndUpdate(userId, update, { new: true });
   if (!user) throw new NotFoundError('User not found');

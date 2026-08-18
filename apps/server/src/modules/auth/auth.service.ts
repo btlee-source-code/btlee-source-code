@@ -39,6 +39,7 @@ interface AuthResult extends AuthTokens {
     avatar: string | null;
     goal: string | null;
     hasCompletedOnboarding: boolean;
+    preferredLanguage: 'ar' | 'en';
   };
 }
 
@@ -50,6 +51,7 @@ function toPublicUser(user: {
   avatar?: string | null;
   goal?: string | null;
   hasCompletedOnboarding?: boolean;
+  preferredLanguage?: 'ar' | 'en';
 }) {
   return {
     id: String(user._id),
@@ -59,6 +61,7 @@ function toPublicUser(user: {
     avatar: user.avatar ?? null,
     goal: user.goal ?? null,
     hasCompletedOnboarding: Boolean(user.hasCompletedOnboarding),
+    preferredLanguage: user.preferredLanguage ?? 'ar',
   };
 }
 

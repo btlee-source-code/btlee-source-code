@@ -11,6 +11,7 @@ export interface User {
   avatar: string | null;
   goal: UserGoal | null;
   hasCompletedOnboarding: boolean;
+  preferredLanguage: 'ar' | 'en';
 }
 
 /**

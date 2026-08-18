@@ -86,6 +86,9 @@ export const DEFAULT_TARGET_TYPE: TargetType = 'property';
 export const USER_GOALS = ['buy', 'rent', 'sell', 'browse'] as const;
 export type UserGoal = (typeof USER_GOALS)[number];
 
+export const USER_LANGUAGES = ['ar', 'en'] as const;
+export type UserLanguage = (typeof USER_LANGUAGES)[number];
+
 export const NOTIFICATION_TYPES = [
   'listing_approved',
   'listing_rejected',

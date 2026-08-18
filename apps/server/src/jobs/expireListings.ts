@@ -9,6 +9,43 @@
 import { Car } from '../modules/cars/car.model.js';
 import { createNotification } from '../modules/notifications/notifications.service.js';
 import { Property } from '../modules/properties/property.model.js';
+import { User } from '../modules/users/user.model.js';
+import type { UserLanguage } from '../config/constants.js';
+
+async function getOwnerLanguages(ownerIds: unknown[]): Promise<Map<string, UserLanguage>> {
+  const ids = [...new Set(ownerIds.map(String))];
+  const users = await User.find({ _id: { $in: ids } }).select('preferredLanguage').lean();
+  return new Map(
+    users.map((user) => [
+      String(user._id),
+      user.preferredLanguage === 'en' ? 'en' : 'ar',
+    ])
+  );
+}
+
+function propertyExpiryCopy(language: UserLanguage, listingName: string) {
+  return language === 'en'
+    ? {
+        title: 'Your listing has expired',
+        message: `Your property listing "${listingName}" has expired. You can renew it from My Listings.`,
+      }
+    : {
+        title: 'انتهت مدة إعلانك',
+        message: `انتهت مدة إعلان عقارك "${listingName}". يمكنك تجديد الإعلان من صفحة إعلاناتي.`,
+      };
+}
+
+function carExpiryCopy(language: UserLanguage, listingName: string) {
+  return language === 'en'
+    ? {
+        title: 'Your listing has expired',
+        message: `Your car listing "${listingName}" has expired. You can renew it from My Listings.`,
+      }
+    : {
+        title: 'انتهت مدة إعلانك',
+        message: `انتهت مدة إعلان عربيتك "${listingName}". يمكنك تجديد الإعلان من صفحة إعلاناتي.`,
+      };
+}
 
 async function notifyExpiredProperties(): Promise<number> {
   const properties = await Property.find({
@@ -17,15 +54,21 @@ async function notifyExpiredProperties(): Promise<number> {
   })
     .select('_id owner area_name')
     .lean();
+  const ownerLanguages = await getOwnerLanguages(properties.map((property) => property.owner));
 
   let notified = 0;
   for (const property of properties) {
     try {
+      const userId = String(property.owner);
+      const copy = propertyExpiryCopy(
+        ownerLanguages.get(userId) ?? 'ar',
+        property.area_name
+      );
       await createNotification({
-        userId: String(property.owner),
+        userId,
         type: 'listing_expired',
-        title: 'انتهت مدة إعلانك',
-        message: `انتهت مدة إعلان عقارك "${property.area_name}". يمكنك تجديد الإعلان من صفحة إعلاناتي.`,
+        title: copy.title,
+        message: copy.message,
         link: `/properties/${property._id}`,
         dedupeKey: `property-expired:${property._id}`,
       });
@@ -53,16 +96,19 @@ async function notifyExpiredCars(): Promise<number> {
   })
     .select('_id owner make model')
     .lean();
+  const ownerLanguages = await getOwnerLanguages(cars.map((car) => car.owner));
 
   let notified = 0;
   for (const car of cars) {
     try {
+      const userId = String(car.owner);
       const label = `${car.make} ${car.model}`.trim();
+      const copy = carExpiryCopy(ownerLanguages.get(userId) ?? 'ar', label);
       await createNotification({
-        userId: String(car.owner),
+        userId,
         type: 'listing_expired',
-        title: 'انتهت مدة إعلانك',
-        message: `انتهت مدة إعلان عربيتك "${label}". يمكنك تجديد الإعلان من صفحة إعلاناتي.`,
+        title: copy.title,
+        message: copy.message,
         link: `/cars/${car._id}`,
         dedupeKey: `car-expired:${car._id}`,
       });

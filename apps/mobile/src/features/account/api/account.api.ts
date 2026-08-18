@@ -9,7 +9,11 @@ import type { User, UserGoal } from '@/shared/types/user';
  * mobile refresh token is dead afterwards — the caller must force a re-login.
  */
 export const accountApi = {
-  updateMe: (body: { name?: string; avatar?: string | null }) => patch<User>('/users/me', body),
+  updateMe: (body: {
+    name?: string;
+    avatar?: string | null;
+    preferredLanguage?: 'ar' | 'en';
+  }) => patch<User>('/users/me', body),
   changePassword: (currentPassword: string, newPassword: string) =>
     post<{ message: string }>('/users/me/change-password', { currentPassword, newPassword }),
   completeOnboarding: (goal: UserGoal) => post<User>('/users/me/onboarding', { goal }),

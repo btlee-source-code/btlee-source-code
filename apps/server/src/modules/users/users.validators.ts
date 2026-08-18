@@ -2,11 +2,12 @@
  * Users Validation Schemas
  */
 import { z } from 'zod';
-import { USER_GOALS } from '../../config/constants.js';
+import { USER_GOALS, USER_LANGUAGES } from '../../config/constants.js';
 
 export const updateProfileSchema = z.object({
   name: z.string().min(2).max(60).optional(),
   avatar: z.string().url().nullable().optional(),
+  preferredLanguage: z.enum(USER_LANGUAGES).optional(),
 });
 
 export const changePasswordSchema = z.object({

@@ -4,7 +4,7 @@
  * Used by auth, profile, wishlist, properties (as owner), etc.
  */
 import { Schema, model, type InferSchemaType, type Model } from 'mongoose';
-import { USER_GOALS } from '../../config/constants.js';
+import { USER_GOALS, USER_LANGUAGES } from '../../config/constants.js';
 
 const userSchema = new Schema(
   {
@@ -49,6 +49,10 @@ const userSchema = new Schema(
     // Onboarding goal — set after popup right after registration
     goal: { type: String, enum: USER_GOALS, default: null },
     hasCompletedOnboarding: { type: Boolean, default: false },
+
+    // Last language selected by the user on Btlee. Server-created notifications
+    // use it so background push messages arrive in the user's language too.
+    preferredLanguage: { type: String, enum: USER_LANGUAGES, default: 'ar' },
 
     // Account state
     isBlocked: { type: Boolean, default: false },

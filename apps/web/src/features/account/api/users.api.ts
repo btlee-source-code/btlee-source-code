@@ -6,7 +6,11 @@ import type { User } from '@/shared/types/user';
 
 export const usersApi = {
   me: () => http.get<User>('/users/me'),
-  updateMe: (input: { name?: string; avatar?: string | null }) =>
+  updateMe: (input: {
+    name?: string;
+    avatar?: string | null;
+    preferredLanguage?: 'ar' | 'en';
+  }) =>
     http.patch<User>('/users/me', input),
   changePassword: (currentPassword: string, newPassword: string) =>
     http.post('/users/me/change-password', { currentPassword, newPassword }),

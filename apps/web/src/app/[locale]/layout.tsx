@@ -17,6 +17,7 @@ import {
 } from '@/config/site';
 import { THEME_COOKIE } from '@/shared/components/layout/ThemeToggle';
 import { AuthHydrator } from '@/features/auth/components/AuthHydrator';
+import { LocalePreferenceSync } from '@/features/i18n/components/LocalePreferenceSync';
 import { ZodI18nSetup } from '@/shared/components/providers/ZodI18nSetup';
 import { ReduxProvider } from '@/shared/components/providers/ReduxProvider';
 import { Toaster } from '@/shared/components/ui/toaster';
@@ -120,6 +121,7 @@ export default async function LocaleLayout({
           <ReduxProvider>
             <ZodI18nSetup />
             <AuthHydrator />
+            <LocalePreferenceSync />
             {children}
             <Toaster />
           </ReduxProvider>
