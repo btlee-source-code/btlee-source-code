@@ -41,8 +41,8 @@ export function StarRating({ value, onChange, size = 22, disabled }: StarRatingP
 
 /**
  * One 1–5 choice exposed through two synchronized controls: stars and numbered
- * buttons. Either row submits the same value; `disabled` locks both together
- * after the user's first successful rating.
+ * buttons. Either row submits the same value; an existing choice stays selected
+ * and can be changed later.
  */
 export function RatingInput({ value, onChange, size = 28, disabled }: RatingInputProps) {
   const c = useThemeColors();

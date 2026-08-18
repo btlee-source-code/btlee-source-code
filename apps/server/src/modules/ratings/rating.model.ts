@@ -1,8 +1,8 @@
 /**
  * Rating Mongoose Model
- * One document per (user, listing) pair — a user has one immutable rating for
- * any given listing. The denormalized averages on listing documents are
- * recomputed from this collection after every new rating.
+ * One document per (user, listing) pair — users can update the value of their
+ * existing rating. The denormalized averages on listing documents are
+ * recomputed from this collection after every create or update.
  */
 import { Schema, model, type InferSchemaType, type Model } from 'mongoose';
 import { TARGET_TYPES } from '../../config/constants.js';
@@ -25,8 +25,8 @@ const ratingSchema = new Schema(
   { timestamps: true }
 );
 
-// One rating per user per property — rejects repeated POSTs and blocks ballot
-// stuffing. Partial (property exists) so rows for other
+// One row per user per property — repeated submissions update that row instead
+// of creating extra votes. Partial (property exists) so rows for other
 // domains (cars — which omit `property`) don't all collide on a null `property`.
 // NOTE: existing DBs carry the old NON-partial version of this index; run
 // `npm run migrate:ratings` once to drop + recreate it as partial.

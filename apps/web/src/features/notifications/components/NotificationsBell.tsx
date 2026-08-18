@@ -5,7 +5,7 @@
  */
 import { useEffect, useState } from 'react';
 import { Bell, CheckCheck } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,8 +18,17 @@ import { Link } from '@/config/navigation';
 import type { Notification } from '@/shared/types/api';
 import { formatDate } from '@/shared/lib/utils';
 
+function extractQuotedLabel(message: string): string | null {
+  return message.match(/["“”]([^"“”]+)["“”]/u)?.[1]?.trim() || null;
+}
+
+function extractRejectionReason(message: string): string | null {
+  return message.match(/(?:السبب|Reason):\s*(.+)$/iu)?.[1]?.trim() || null;
+}
+
 export function NotificationsBell() {
   const t = useTranslations('notifications');
+  const locale = useLocale();
   const [items, setItems] = useState<Notification[]>([]);
   const [unread, setUnread] = useState(0);
   const [open, setOpen] = useState(false);
@@ -46,6 +55,48 @@ export function NotificationsBell() {
     await notificationsApi.markAllRead();
     setItems((prev) => prev.map((n) => ({ ...n, isRead: true })));
     setUnread(0);
+  }
+
+  function localizedContent(notification: Notification) {
+    const label = extractQuotedLabel(notification.message);
+
+    switch (notification.type) {
+      case 'listing_approved':
+        return {
+          title: t('listingApprovedTitle'),
+          message: label
+            ? t('listingApprovedMessage', { listing: label })
+            : t('listingApprovedMessageGeneric'),
+        };
+      case 'listing_rejected': {
+        const reason = extractRejectionReason(notification.message);
+        return {
+          title: t('listingRejectedTitle'),
+          message: reason
+            ? t('listingRejectedMessageWithReason', { reason })
+            : t('listingRejectedMessage'),
+        };
+      }
+      case 'listing_expired':
+        return {
+          title: t('listingExpiredTitle'),
+          message: label
+            ? t('listingExpiredMessage', { listing: label })
+            : t('listingExpiredMessageGeneric'),
+        };
+      case 'saved_search_match':
+        return {
+          title: t('savedSearchMatchTitle'),
+          message: t('savedSearchMatchMessage'),
+        };
+      case 'listing_reported':
+        return {
+          title: t('listingReportedTitle'),
+          message: t('listingReportedMessage'),
+        };
+      default:
+        return { title: notification.title, message: notification.message };
+    }
   }
 
   return (
@@ -78,27 +129,32 @@ export function NotificationsBell() {
           {items.length === 0 ? (
             <div className="py-12 text-center text-sm text-muted-foreground">{t('empty')}</div>
           ) : (
-            items.map((n) => (
-              <Link
-                key={n._id}
-                href={(n.link as never) ?? '/'}
-                className={`block px-3 py-2.5 hover:bg-secondary transition-colors border-b border-border last:border-0 ${!n.isRead ? 'bg-secondary/50' : ''}`}
-                onClick={() => setOpen(false)}
-              >
-                <div className="flex items-start gap-2">
-                  {!n.isRead && (
-                    <span className="mt-1.5 size-2 shrink-0 rounded-full bg-accent" />
-                  )}
-                  <div className="flex-1">
-                    <p className="text-sm font-medium leading-tight">{n.title}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{n.message}</p>
-                    <p className="text-[10px] text-muted-foreground/70 mt-1">
-                      {formatDate(n.createdAt)}
-                    </p>
+            items.map((n) => {
+              const content = localizedContent(n);
+              return (
+                <Link
+                  key={n._id}
+                  href={(n.link as never) ?? '/'}
+                  className={`block px-3 py-2.5 hover:bg-secondary transition-colors border-b border-border last:border-0 ${!n.isRead ? 'bg-secondary/50' : ''}`}
+                  onClick={() => setOpen(false)}
+                >
+                  <div className="flex items-start gap-2">
+                    {!n.isRead && (
+                      <span className="mt-1.5 size-2 shrink-0 rounded-full bg-accent" />
+                    )}
+                    <div className="flex-1">
+                      <p className="text-sm font-medium leading-tight">{content.title}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                        {content.message}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground/70 mt-1">
+                        {formatDate(n.createdAt, locale === 'ar' ? 'ar' : 'en')}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))
+                </Link>
+              );
+            })
           )}
         </div>
       </DropdownMenuContent>

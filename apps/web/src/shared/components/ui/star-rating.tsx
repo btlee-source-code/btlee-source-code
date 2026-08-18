@@ -136,8 +136,8 @@ export function StarRatingInput({
 
 /**
  * One 1–5 choice exposed through two synchronized controls: stars and numbered
- * buttons. Picking from either row submits the same value, while `disabled`
- * locks both controls together after a successful one-time rating.
+ * buttons. Picking from either row submits the same value; an existing choice
+ * stays selected and can be changed later.
  */
 export function RatingInput({
   value,

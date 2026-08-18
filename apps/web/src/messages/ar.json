@@ -374,8 +374,8 @@
     "rateThis": "قيّم هذا العقار",
     "yourRating": "تقييمك",
     "ratingChooseMethod": "أو قيّم باستخدام رقم",
-    "ratingSubmitted": "تم تسجيل تقييمك: {value} من 5",
-    "ratingThanks": "شكراً لتقييمك",
+    "ratingSubmitted": "تقييمك الحالي: {value} من 5 — يمكنك تغييره",
+    "ratingThanks": "تم حفظ تقييمك",
     "ratingsCount": "تقييم",
     "noRatings": "لا توجد تقييمات بعد"
   },
@@ -508,7 +508,20 @@
     "title": "الإشعارات",
     "empty": "لا توجد إشعارات",
     "markAllRead": "تأشير الكل كمقروء",
-    "viewAll": "عرض الكل"
+    "viewAll": "عرض الكل",
+    "listingApprovedTitle": "تم قبول إعلانك",
+    "listingApprovedMessage": "تم قبول إعلانك \"{listing}\" وأصبح متاحًا على المنصة.",
+    "listingApprovedMessageGeneric": "تم قبول إعلانك وأصبح متاحًا على المنصة.",
+    "listingRejectedTitle": "تم رفض إعلانك",
+    "listingRejectedMessage": "تم رفض إعلانك. راجعه ونفّذ التعديلات المطلوبة ثم أرسله مرة أخرى.",
+    "listingRejectedMessageWithReason": "تم رفض إعلانك. السبب: {reason}",
+    "listingExpiredTitle": "انتهت مدة إعلانك",
+    "listingExpiredMessage": "انتهت مدة إعلانك \"{listing}\". يمكنك تجديده من صفحة إعلاناتي.",
+    "listingExpiredMessageGeneric": "انتهت مدة إعلانك. يمكنك تجديده من صفحة إعلاناتي.",
+    "savedSearchMatchTitle": "إعلانات جديدة تطابق بحثك المحفوظ",
+    "savedSearchMatchMessage": "توجد نتائج جديدة لأحد أبحاثك المحفوظة.",
+    "listingReportedTitle": "تم الإبلاغ عن إعلانك",
+    "listingReportedMessage": "تم إرسال بلاغ عن إعلانك."
   },
   "deletedListing": {
     "eyebrow": "الإعلان غير متاح",

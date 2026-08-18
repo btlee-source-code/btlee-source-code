@@ -7,9 +7,9 @@ export interface RatingResult {
 }
 
 /**
- * Ratings API — one immutable rating per user per property, enforced
- * server-side. Repeated submissions return 409; owners and non-approved
- * listings are rejected too.
+ * Ratings API — one editable rating per user per property, enforced
+ * server-side. Repeated submissions update the existing value; owners and
+ * non-approved listings are still rejected.
  */
 export const ratingsApi = {
   rate: (propertyId: string, value: number) => post<RatingResult>(`/ratings/${propertyId}`, { value }),

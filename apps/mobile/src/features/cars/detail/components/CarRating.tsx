@@ -56,8 +56,6 @@ export function CarRating({ car }: { car: Car }) {
       ]);
       return;
     }
-    if (myRating > 0) return;
-
     submittingRef.current = true;
     const prev = myRating;
     setMyRating(value);
@@ -97,7 +95,7 @@ export function CarRating({ car }: { car: Car }) {
           <RatingInput
             value={displayedRating}
             onChange={onRate}
-            disabled={submitting || checkingExisting || displayedRating > 0}
+            disabled={submitting || checkingExisting}
             size={28}
           />
         </View>

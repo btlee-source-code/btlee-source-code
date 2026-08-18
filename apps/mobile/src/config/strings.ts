@@ -279,7 +279,7 @@ const ar = {
   rateThisCar: 'قيّم هذه العربية',
   yourRating: 'تقييمك',
   ratingChooseMethod: 'أو قيّم بالأرقام',
-  ratingSubmitted: (value: number) => `تم تسجيل تقييمك: ${value} من 5`,
+  ratingSubmitted: (value: number) => `تقييمك الحالي: ${value} من 5 — يمكنك تغييره`,
   loginToRate: 'سجّل دخولك أولاً لتقييم العقار',
   loginToRateCar: 'سجّل دخولك أولاً لتقييم العربية',
 
@@ -714,7 +714,7 @@ const en: Partial<Strings> = {
   rateThisCar: 'Rate this car',
   yourRating: 'Your rating',
   ratingChooseMethod: 'Or rate with a number',
-  ratingSubmitted: (value: number) => `Your rating is saved: ${value} of 5`,
+  ratingSubmitted: (value: number) => `Your current rating: ${value} of 5 — you can change it`,
   loginToRate: 'Sign in first to rate this property',
   loginToRateCar: 'Sign in first to rate this car',
 

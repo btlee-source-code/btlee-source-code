@@ -375,8 +375,8 @@
     "rateThis": "Rate this property",
     "yourRating": "Your rating",
     "ratingChooseMethod": "Or rate with a number",
-    "ratingSubmitted": "Your rating is saved: {value} of 5",
-    "ratingThanks": "Thanks for your rating",
+    "ratingSubmitted": "Your current rating: {value} of 5 — you can change it",
+    "ratingThanks": "Your rating has been saved",
     "ratingsCount": "ratings",
     "noRatings": "No ratings yet"
   },
@@ -509,7 +509,20 @@
     "title": "Notifications",
     "empty": "No notifications",
     "markAllRead": "Mark all as read",
-    "viewAll": "View all"
+    "viewAll": "View all",
+    "listingApprovedTitle": "Your listing was approved",
+    "listingApprovedMessage": "Your listing \"{listing}\" was approved and is now available on the platform.",
+    "listingApprovedMessageGeneric": "Your listing was approved and is now available on the platform.",
+    "listingRejectedTitle": "Your listing was rejected",
+    "listingRejectedMessage": "Your listing was rejected. Review it, make the required changes, and submit it again.",
+    "listingRejectedMessageWithReason": "Your listing was rejected. Reason: {reason}",
+    "listingExpiredTitle": "Your listing has expired",
+    "listingExpiredMessage": "Your listing \"{listing}\" has expired. You can renew it from My Listings.",
+    "listingExpiredMessageGeneric": "Your listing has expired. You can renew it from My Listings.",
+    "savedSearchMatchTitle": "New listings match your saved search",
+    "savedSearchMatchMessage": "New results are available for one of your saved searches.",
+    "listingReportedTitle": "Your listing received a report",
+    "listingReportedMessage": "A report was submitted for your listing."
   },
   "deletedListing": {
     "eyebrow": "Listing unavailable",

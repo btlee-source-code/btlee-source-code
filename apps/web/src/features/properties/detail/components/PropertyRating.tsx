@@ -68,8 +68,6 @@ export function PropertyRating({
       toast.error("سجل دخولك أولاً لتقييم العقار");
       return;
     }
-    if (myRating !== null) return;
-
     const prev = myRating;
     pendingRef.current = true;
     setMyRating(value); // optimistic
@@ -116,7 +114,7 @@ export function PropertyRating({
             <RatingInput
               value={displayedRating ?? 0}
               onRate={handleRate}
-              disabled={pending || checkingExisting || displayedRating !== null}
+              disabled={pending || checkingExisting}
               size={30}
               methodLabel={t("ratingChooseMethod")}
             />

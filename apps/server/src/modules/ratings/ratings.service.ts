@@ -1,8 +1,8 @@
 /**
  * Ratings Service
- * Users rate approved listings 1–5. Each user can submit exactly one immutable
- * rating per listing; denormalized ratingAvg/ratingCount values are recomputed
- * from the Rating collection after each new rating.
+ * Users rate approved listings 1–5. Each user owns one editable rating per
+ * listing; denormalized ratingAvg/ratingCount values are recomputed after every
+ * create or update.
  */
 import { Types } from 'mongoose';
 import { Rating } from './rating.model.js';
@@ -12,7 +12,6 @@ import {
   NotFoundError,
   ForbiddenError,
   BadRequestError,
-  ConflictError,
 } from '../../shared/errors/AppError.js';
 
 function isDuplicateKeyError(error: unknown): boolean {
@@ -50,21 +49,20 @@ export async function rateProperty(userId: string, propertyId: string, value: nu
 
   const propertyOid = new Types.ObjectId(propertyId);
   const userOid = new Types.ObjectId(userId);
-  const existing = await Rating.exists({ user: userOid, property: propertyOid });
-  if (existing) throw new ConflictError('لقد قيّمت هذا العقار من قبل');
-
+  const target = { user: userOid, property: propertyOid };
   try {
-    await Rating.create({
-      user: userOid,
-      targetType: 'property',
-      targetId: propertyOid,
-      property: propertyOid,
-      value,
-    });
+    await Rating.updateOne(
+      target,
+      { $set: { targetType: 'property', targetId: propertyOid, value } },
+      { upsert: true }
+    );
   } catch (error) {
-    // The unique index closes the race between the existence check and insert.
-    if (isDuplicateKeyError(error)) throw new ConflictError('لقد قيّمت هذا العقار من قبل');
-    throw error;
+    // Two first-time requests can race on the upsert. The unique index keeps a
+    // single row; retrying as an update makes the latest submitted value win.
+    if (!isDuplicateKeyError(error)) throw error;
+    await Rating.updateOne(target, {
+      $set: { targetType: 'property', targetId: propertyOid, value },
+    });
   }
 
   const stats = await recomputeAggregates(propertyId);
@@ -83,7 +81,7 @@ export async function getMyRating(userId: string, propertyId: string): Promise<n
 
 // ---------------------------------------------------------------------------
 // Cars — same collection, addressed via the domain-agnostic {targetType,targetId}
-// keys (no `property` field), so a user has exactly one rating per car.
+// keys (no `property` field), so a user has one editable rating per car.
 // ---------------------------------------------------------------------------
 
 /** Recompute + persist a car's rating aggregates from the Rating collection. */
@@ -115,15 +113,12 @@ export async function rateCar(userId: string, carId: string, value: number) {
   const carOid = new Types.ObjectId(carId);
   const userOid = new Types.ObjectId(userId);
   const target = { user: userOid, targetType: 'car' as const, targetId: carOid };
-  const existing = await Rating.exists(target);
-  if (existing) throw new ConflictError('لقد قيّمت هذه العربية من قبل');
-
   try {
     // `property` is intentionally omitted so the partial legacy index skips it.
-    await Rating.create({ ...target, value });
+    await Rating.updateOne(target, { $set: { value } }, { upsert: true });
   } catch (error) {
-    if (isDuplicateKeyError(error)) throw new ConflictError('لقد قيّمت هذه العربية من قبل');
-    throw error;
+    if (!isDuplicateKeyError(error)) throw error;
+    await Rating.updateOne(target, { $set: { value } });
   }
 
   const stats = await recomputeCarAggregates(carId);
