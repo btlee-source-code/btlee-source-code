@@ -78,6 +78,7 @@ export async function logout(req: Request, res: Response): Promise<void> {
   const refreshToken = readRefreshToken(req);
   const pushToken = (req.body as { pushToken?: unknown } | undefined)
     ?.pushToken;
+
   const validPushToken =
     typeof pushToken === "string" &&
     /^Expo(nent)?PushToken\[.+\]$/.test(pushToken)
@@ -87,6 +88,7 @@ export async function logout(req: Request, res: Response): Promise<void> {
   if (refreshToken) {
     await authService.logoutUser(refreshToken, validPushToken).catch(() => {});
   }
+
   clearAuthCookies(res, USER_COOKIES);
   res.json(ok({ message: "Logged out successfully" }));
 }
