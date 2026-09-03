@@ -68,7 +68,6 @@ export default async function HomePage({
       '@id': `${SITE_URL}/#organization`,
       name: site.name,
       url: localizedUrl,
-      logo: `${SITE_URL}/favicon.png`,
       description: site.description,
       inLanguage: site.locale,
       sameAs: SITE_SOCIALS,

@@ -60,9 +60,8 @@ export async function generateMetadata({
     // Favicon served from public/favicon.ico, referenced explicitly so it is the
     // single source (no competing app/icon.* file-convention icon).
     icons: {
-      icon: "/favicon.ico",
+      icon: [{ url: "/favicon.ico", type: "image/x-icon" }],
       shortcut: "/favicon.ico",
-      apple: "/favicon.png",
     },
     other: {
       // Tell the Dark Reader browser extension to leave the site alone — Btlee
