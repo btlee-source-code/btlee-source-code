@@ -53,7 +53,9 @@ export async function generateMetadata({
     robots: {
       index: true,
       follow: true,
-      googleBot: { index: true, follow: true, "max-image-preview": "large" },
+      // Keep search results text-focused. Google may still use the favicon,
+      // but must not render a large thumbnail beside the Btlee result.
+      googleBot: { index: true, follow: true, "max-image-preview": "none" },
     },
     // Favicon served from public/favicon.ico, referenced explicitly so it is the
     // single source (no competing app/icon.* file-convention icon).
