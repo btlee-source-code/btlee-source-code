@@ -26,7 +26,7 @@
         "foregroundImage": "./assets/images/btleeAppIcon1024.png"
       },
       "predictiveBackGestureEnabled": false,
-      "versionCode": 3
+      "versionCode": 4
     },
     "web": {
       "output": "static",
@@ -57,6 +57,18 @@
         "expo-notifications",
         {
           "color": "#1A3C34"
+        }
+      ],
+      [
+        "react-native-fbsdk-next",
+        {
+          "appID": "1530290685519732",
+          "clientToken": "def1f401023363e9955d4162d3c30474",
+          "displayName": "BT-Lee",
+          "scheme": "fb1530290685519732",
+          "advertiserIDCollectionEnabled": true,
+          "autoLogAppEventsEnabled": true,
+          "isAutoInitEnabled": true
         }
       ]
     ],
