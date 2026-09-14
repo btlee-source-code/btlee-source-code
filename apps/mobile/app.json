@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Bt Lee",
+    "name": "BtLee",
     "slug": "btlee",
     "version": "1.0.0",
     "orientation": "default",
@@ -26,7 +26,7 @@
         "foregroundImage": "./assets/images/btleeAppIcon1024.png"
       },
       "predictiveBackGestureEnabled": false,
-      "versionCode": 4
+      "versionCode": 6
     },
     "web": {
       "output": "static",
