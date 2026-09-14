@@ -126,12 +126,17 @@ function AppMockup({ locale }: { locale: "ar" | "en" }) {
         } as React.CSSProperties
       }
     >
-      <Image
+      {/* Plain <img>, not next/image: the webp is already sized and compressed
+          by scripts/make-download-assets.mjs, so routing it through Vercel's
+          image optimizer would only spend optimization quota. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         src={`/app-download/app-mockup-${locale}.webp`}
         alt=""
         width={width}
         height={height}
-        sizes="(min-width: 1280px) 18rem, (min-width: 1024px) 16rem, (min-width: 640px) 15rem, 13rem"
+        loading="lazy"
+        decoding="async"
         className="w-full h-auto"
       />
     </div>
