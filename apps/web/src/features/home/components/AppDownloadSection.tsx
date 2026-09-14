@@ -89,7 +89,9 @@ export function AppDownloadSection() {
               <GooglePlayGlyph className="size-7" />
             </span>
             <span className="flex flex-1 flex-col items-start leading-tight">
-              <span className="text-xs opacity-80">{t("appGooglePlayEyebrow")}</span>
+              <span className="text-xs opacity-80">
+                {t("appGooglePlayEyebrow")}
+              </span>
               <span dir="ltr" className="text-base font-bold">
                 Google Play
               </span>
@@ -143,8 +145,8 @@ function AppMockup({ locale }: { locale: "ar" | "en" }) {
   );
 }
 
-/** Below lg: share of the phone left visible above the crop — a little over half. */
-const MOBILE_VISIBLE_FRACTION = 0.58;
+/** Below lg: share of the phone left visible above the crop — about two thirds. */
+const MOBILE_VISIBLE_FRACTION = 1;
 
 /** Google Play mark — inlined so the button needs no remote asset. */
 function GooglePlayGlyph({ className }: { className?: string }) {
