@@ -26,7 +26,9 @@ export function AppDownloadSection() {
     // Deliberately no z-index: one here would out-paint the hero search
     // dropdown (z-50), which can expand down past the stats strip into this
     // section. `relative` alone keeps this below it.
-    <section className="relative overflow-hidden pt-14 lg:pt-20 pb-0 lg:pb-14">
+    // No overflow-hidden: the phone's drop shadow extends past the bottom
+    // padding and would be cut off in a hard line.
+    <section className="relative pt-14 lg:pt-20 pb-0 lg:pb-14">
       {/* px-30 is a desktop gutter; on a ~400px phone it would leave barely
           half the screen for content, so small screens keep the site's px-4. */}
       <div className="container mx-auto px-4 lg:px-30">
@@ -77,22 +79,25 @@ export function AppDownloadSection() {
           </div>
 
           {/* Below lg only — a phone cannot scan its own screen, so the QR
-              gives way to the store button. */}
+              gives way to the store badge. Drawn to match Google's official
+              "GET IT ON Google Play" badge, which stays English and LTR in
+              every locale. */}
           <a
             href={PLAY_STORE_URL}
             target="_blank"
             rel="noopener noreferrer"
             aria-label={t("appGooglePlay")}
-            className="lg:hidden -mt-2 flex w-full max-w-68 items-center gap-3 rounded-2xl border border-neutral-600 bg-black p-2 pe-5 text-white transition-transform active:scale-[0.98]"
+            dir="ltr"
+            // Same width as the phone above it at each breakpoint (w-52 / sm:w-60)
+            // so the badge and the mockup read as one column.
+            className="lg:hidden flex h-16 w-52 sm:w-60 items-center justify-center gap-3 rounded-xl border border-[#a6a6a6] bg-black px-4 text-white transition-transform active:scale-[0.97]"
           >
-            <span className="flex size-11 shrink-0 items-center justify-center">
-              <GooglePlayGlyph className="size-7" />
-            </span>
-            <span className="flex flex-1 flex-col items-start leading-tight">
-              <span className="text-xs opacity-80">
-                {t("appGooglePlayEyebrow")}
+            <GooglePlayGlyph className="size-8 shrink-0" />
+            <span className="flex flex-col items-start font-sans leading-none">
+              <span className="text-[0.68rem] font-medium tracking-wider">
+                GET IT ON
               </span>
-              <span dir="ltr" className="text-base font-bold">
+              <span className="mt-1 text-[1.45rem] font-medium tracking-[-0.01em]">
                 Google Play
               </span>
             </span>
@@ -117,10 +122,13 @@ function AppMockup({ locale }: { locale: "ar" | "en" }) {
   return (
     // Both aspect ratios come from each render's own size, so the mobile crop
     // lands at the same point on the phone in both locales. overflow-hidden
-    // does the cropping, and also stops the aspect-ratio box from growing to
-    // fit the taller image (its automatic minimum height).
+    // does the cropping (and stops the aspect-ratio box from growing to fit the
+    // taller image), so it is only applied while a crop is actually in effect —
+    // otherwise it would also clip the phone's drop shadow.
     <div
-      className="w-52 sm:w-60 lg:w-64 xl:w-72 overflow-hidden aspect-(--mockup-cropped) lg:aspect-(--mockup-full)"
+      className={`w-52 sm:w-60 lg:w-64 xl:w-72 aspect-(--mockup-cropped) lg:aspect-(--mockup-full) lg:overflow-visible ${
+        MOBILE_VISIBLE_FRACTION < 1 ? "overflow-hidden" : ""
+      }`}
       style={
         {
           "--mockup-cropped": `${width} / ${height * MOBILE_VISIBLE_FRACTION}`,
@@ -139,13 +147,15 @@ function AppMockup({ locale }: { locale: "ar" | "en" }) {
         height={height}
         loading="lazy"
         decoding="async"
-        className="w-full h-auto"
+        // drop-shadow (not box-shadow) follows the render's alpha, so the
+        // shadow takes the tilted phone's outline rather than the image box.
+        className="w-full h-auto filter-[drop-shadow(0_22px_28px_rgba(15,23,42,0.22))_drop-shadow(0_6px_10px_rgba(15,23,42,0.12))]"
       />
     </div>
   );
 }
 
-/** Below lg: share of the phone left visible above the crop — about two thirds. */
+/** Below lg: share of the phone left visible above the crop (1 = whole phone). */
 const MOBILE_VISIBLE_FRACTION = 1;
 
 /** Google Play mark — inlined so the button needs no remote asset. */
