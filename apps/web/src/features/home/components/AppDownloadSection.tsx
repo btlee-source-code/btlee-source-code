@@ -31,8 +31,8 @@ export function AppDownloadSection() {
     <section className="relative pt-14 lg:pt-20 pb-0 lg:pb-14">
       {/* px-30 is a desktop gutter; on a ~400px phone it would leave barely
           half the screen for content, so small screens keep the site's px-4. */}
-      <div className="container mx-auto px-4 lg:px-30">
-        <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-8">
+      <div className="container mx-auto px-4 lg:px-4">
+        <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-3">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
