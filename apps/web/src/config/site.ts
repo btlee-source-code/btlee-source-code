@@ -42,6 +42,15 @@ export function localizedSiteInfo(locale: string) {
  * serves it at a hashed /_next/static path, resolved absolute via metadataBase. */
 export const OG_IMAGE = ogLogo.src;
 
+/** Store listings for the Btlee mobile app. The home download section and its
+ * pre-rendered QR code (scripts/make-download-assets.mjs) both read from here —
+ * re-run that script after changing the URL so the QR keeps pointing at it.
+ * APP_STORE_URL stays null until the iOS build is published; the UI hides the
+ * App Store affordances while it is. */
+export const PLAY_STORE_URL =
+  'https://play.google.com/store/apps/details?id=com.btlee.app';
+export const APP_STORE_URL: string | null = null;
+
 /** Optional social links used in Organization structured data. */
 export const SITE_SOCIALS = ['https://www.facebook.com/share/1CuGDB45iY/'];
 

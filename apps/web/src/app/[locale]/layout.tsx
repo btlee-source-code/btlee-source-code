@@ -113,8 +113,14 @@ export default async function LocaleLayout({
       className={isDark ? "dark" : undefined}
       suppressHydrationWarning
     >
-      <head>
-        <Script id="meta-pixel" strategy="beforeInteractive">
+      <body className="font-cairo min-h-screen bg-background text-foreground antialiased">
+        {/* afterInteractive, not beforeInteractive: this layout sits under the
+            [locale] segment, so switching language re-renders it on the client.
+            beforeInteractive is emitted as a literal <script> element, which
+            React 19 flags ("Encountered a script tag while rendering React
+            component") on that client render. afterInteractive goes through
+            Next's script loader instead, runs once, and survives navigations. */}
+        <Script id="meta-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
             {if(f.fbq)return;n=f.fbq=function(){
@@ -137,9 +143,7 @@ export default async function LocaleLayout({
             fbq('track', 'PageView');
           `}
         </Script>
-      </head>
 
-      <body className="font-cairo min-h-screen bg-background text-foreground antialiased">
         <noscript>
           <img
             height="1"

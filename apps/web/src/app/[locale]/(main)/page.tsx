@@ -4,6 +4,7 @@
 import type { Metadata } from 'next';
 import { HeroSection } from '@/features/home/components/HeroSection';
 import { StatsSection } from '@/features/home/components/StatsSection';
+import { AppDownloadSection } from '@/features/home/components/AppDownloadSection';
 import { CategoriesSection } from '@/features/home/components/CategoriesSection';
 import { FeaturedProperties } from '@/features/home/components/FeaturedProperties';
 import { LatestProperties } from '@/features/home/components/LatestProperties';
@@ -103,6 +104,7 @@ export default async function HomePage({
       <JsonLd data={structuredData} />
       <HeroSection />
       <StatsSection />
+      <AppDownloadSection />
       <FeaturedProperties />
       <CategoriesSection />
       <LatestProperties />
