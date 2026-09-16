@@ -133,11 +133,11 @@ export async function expireListingsTick(): Promise<void> {
   const now = new Date();
   const [propertyResult, carResult] = await Promise.all([
     Property.updateMany(
-      { status: 'approved', expiresAt: { $lte: now } },
+      { status: 'approved', neverExpires: { $ne: true }, expiresAt: { $lte: now } },
       { $set: { status: 'expired', expiryNotificationPending: true } }
     ),
     Car.updateMany(
-      { status: 'approved', expiresAt: { $lte: now } },
+      { status: 'approved', neverExpires: { $ne: true }, expiresAt: { $lte: now } },
       { $set: { status: 'expired', expiryNotificationPending: true } }
     ),
   ]);

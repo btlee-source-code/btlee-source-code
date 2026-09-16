@@ -60,9 +60,14 @@ export const baseListingFields = {
   // Contact
   whatsappNumber: { type: String, required: true, trim: true },
 
-  // Listing duration (days the owner requested) + expiry timestamp
+  // Listing duration (days the owner requested) + expiry timestamp.
+  // `expiresAt` only starts counting once an admin approves the listing —
+  // time spent awaiting review must not eat into the owner's paid duration.
   durationDays: { type: Number, required: true, min: 30, max: 365 },
   expiresAt: { type: Date, required: true, index: true },
+  // Admin-only override (admin panel): the listing never expires. The expiry
+  // job skips these, so `expiresAt` is left untouched and meaningless here.
+  neverExpires: { type: Boolean, default: false, index: true },
   // Set only after the expiry notification has been durably created. Keeping
   // this separate from status lets the job safely retry after a server restart.
   expiryNotificationSentAt: {

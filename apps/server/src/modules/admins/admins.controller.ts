@@ -43,6 +43,11 @@ export async function bulkDeleteProperties(req: Request, res: Response): Promise
   res.json(ok({ deletedCount: result.deletedCount }));
 }
 
+export async function extendProperties(req: Request, res: Response): Promise<void> {
+  const result = await propertiesService.adminExtendProperties(req.body);
+  res.json(ok({ modifiedCount: result.modifiedCount }));
+}
+
 // ── Cars management (mirrors the property handlers, delegating to carsService) ──
 
 export async function listCars(req: Request, res: Response): Promise<void> {
@@ -72,6 +77,11 @@ export async function deleteCar(req: Request, res: Response): Promise<void> {
 export async function bulkDeleteCars(req: Request, res: Response): Promise<void> {
   const result = await carsService.adminBulkDeleteCars(req.body.ids);
   res.json(ok({ deletedCount: result.deletedCount }));
+}
+
+export async function extendCars(req: Request, res: Response): Promise<void> {
+  const result = await carsService.adminExtendCars(req.body);
+  res.json(ok({ modifiedCount: result.modifiedCount }));
 }
 
 export async function listUsers(req: Request, res: Response): Promise<void> {

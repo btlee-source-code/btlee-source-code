@@ -18,6 +18,10 @@ import {
   carIdParamsSchema,
   reviewCarSchema,
 } from '../cars/cars.validators.js';
+import {
+  MIN_LISTING_DURATION_DAYS,
+  MAX_LISTING_DURATION_DAYS,
+} from '../../config/constants.js';
 
 const userIdParams = z.object({
   userId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid user id'),
@@ -33,6 +37,26 @@ const bulkDeleteSchema = z.object({
     .max(100, 'Cannot delete more than 100 at once'),
 });
 const reportUpdateSchema = z.object({ status: z.enum(['reviewed', 'dismissed']) });
+
+// Renew expired listings: either a fresh duration, or open-ended (admin-only).
+const extendListingsSchema = z
+  .object({
+    ids: z
+      .array(z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid id'))
+      .min(1, 'Select at least one listing')
+      .max(100, 'Cannot renew more than 100 at once'),
+    neverExpires: z.boolean().optional(),
+    durationDays: z.coerce
+      .number()
+      .int()
+      .min(MIN_LISTING_DURATION_DAYS)
+      .max(MAX_LISTING_DURATION_DAYS)
+      .optional(),
+  })
+  .refine((body) => body.neverExpires === true || body.durationDays !== undefined, {
+    message: 'Provide durationDays, or set neverExpires',
+    path: ['durationDays'],
+  });
 
 export const adminsRouter = Router();
 
@@ -62,6 +86,12 @@ adminsRouter.post(
   adminProtect,
   validate({ body: bulkDeleteSchema }),
   asyncHandler(controller.bulkDeleteProperties)
+);
+adminsRouter.post(
+  '/properties/extend',
+  adminProtect,
+  validate({ body: extendListingsSchema }),
+  asyncHandler(controller.extendProperties)
 );
 adminsRouter.delete(
   '/properties/:id',
@@ -94,6 +124,12 @@ adminsRouter.post(
   adminProtect,
   validate({ body: bulkDeleteSchema }),
   asyncHandler(controller.bulkDeleteCars)
+);
+adminsRouter.post(
+  '/cars/extend',
+  adminProtect,
+  validate({ body: extendListingsSchema }),
+  asyncHandler(controller.extendCars)
 );
 adminsRouter.delete(
   '/cars/:id',

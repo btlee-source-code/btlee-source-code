@@ -13,6 +13,12 @@ import { sendEmail } from '../../shared/utils/email.js';
 import { createNotification } from '../notifications/notifications.service.js';
 import { buildPaginationMeta } from '../../shared/utils/pagination.js';
 import {
+  addDays,
+  buildExtendUpdate,
+  RENEWABLE_STATUSES,
+  type ExtendListingsInput,
+} from '../../shared/utils/listingExpiry.js';
+import {
   NotFoundError,
   ForbiddenError,
   BadRequestError,
@@ -317,8 +323,8 @@ export async function getPropertiesByOwner(ownerId: string, limit = 12) {
 }
 
 /**
- * Creates a new listing. Status is always 'pending' — admin must approve.
- * Computes expiresAt from durationDays.
+ * Creates a new listing. Status is always 'pending' — admin must approve, and
+ * the expiry clock only starts then (see reviewProperty).
  */
 function assertPropertyCategoryMatchesType(type: string, category: string): void {
   const fixedCategory =
@@ -345,7 +351,8 @@ function assertPropertyCategoryMatchesType(type: string, category: string): void
 export async function createProperty(ownerId: string, input: CreatePropertyInput) {
   assertPropertyCategoryMatchesType(input.type, input.category);
 
-  const expiresAt = new Date(Date.now() + input.durationDays * 24 * 60 * 60 * 1000);
+  // Provisional — recomputed when an admin approves (see reviewProperty).
+  const expiresAt = addDays(input.durationDays);
   const seq = await getNextSequence('property');
 
   const property = await Property.create({
@@ -456,7 +463,7 @@ export async function updateProperty(
 
   if (input.durationDays) {
     property.durationDays = input.durationDays;
-    property.expiresAt = new Date(Date.now() + input.durationDays * 24 * 60 * 60 * 1000);
+    property.expiresAt = addDays(input.durationDays);
   }
 
   // Resubmit for review if previously rejected
@@ -536,6 +543,21 @@ export async function adminBulkDeleteProperties(ids: string[]): Promise<{ delete
 }
 
 /**
+ * Admin renews expired (or soon-to-expire) listings — one or many at once.
+ * This is the only way out of `expired`, and the only way to set a listing
+ * open-ended.
+ */
+export async function adminExtendProperties(
+  input: ExtendListingsInput
+): Promise<{ modifiedCount: number }> {
+  const result = await Property.updateMany(
+    { _id: { $in: input.ids }, status: { $in: RENEWABLE_STATUSES } },
+    { $set: buildExtendUpdate(input) }
+  );
+  return { modifiedCount: result.modifiedCount ?? 0 };
+}
+
+/**
  * Owner marks their listing as sold or rented — it disappears from search.
  */
 export async function markAsSoldOrRented(
@@ -591,6 +613,11 @@ export async function reviewProperty(
 
   property.status = decision;
   property.rejectionReason = decision === 'rejected' ? (rejectionReason ?? null) : null;
+  // The duration clock starts now, not at submission — otherwise time spent
+  // waiting in the review queue is silently deducted from the owner's listing.
+  if (decision === 'approved') {
+    property.expiresAt = addDays(property.durationDays);
+  }
   await property.save();
 
   const owner = property.owner as unknown as { _id: unknown; email: string; name: string };

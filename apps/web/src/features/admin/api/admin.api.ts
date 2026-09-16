@@ -73,6 +73,9 @@ async function unwrap<T>(p: Promise<{ data: Envelope<T> }>): Promise<T> {
   return r.data.data;
 }
 
+/** Renewing an expired listing: a fresh duration, or open-ended (admin-only). */
+export type ExtendRenewal = { durationDays: number } | { neverExpires: true };
+
 export const adminApi = {
   login: async (email: string, password: string) => {
     // withCredentials so the browser accepts the admin httpOnly cookies.
@@ -115,6 +118,11 @@ export const adminApi = {
       adminAxios.post('/admin/properties/bulk-delete', { ids })
     ),
 
+  extendProperties: (ids: string[], renewal: ExtendRenewal) =>
+    unwrap<{ modifiedCount: number }>(
+      adminAxios.post('/admin/properties/extend', { ids, ...renewal })
+    ),
+
   // ── Cars management (mirrors the property methods against /admin/cars) ──
   listCarsPaged: async (params: Record<string, string | number | undefined>) => {
     const res = await adminAxios.get<Envelope<unknown[]>>('/admin/cars', { params });
@@ -132,6 +140,9 @@ export const adminApi = {
 
   bulkDeleteCars: (ids: string[]) =>
     unwrap<{ deletedCount: number }>(adminAxios.post('/admin/cars/bulk-delete', { ids })),
+
+  extendCars: (ids: string[], renewal: ExtendRenewal) =>
+    unwrap<{ modifiedCount: number }>(adminAxios.post('/admin/cars/extend', { ids, ...renewal })),
 
   listUsers: () => unwrap<UserAdmin[]>(adminAxios.get('/admin/users')),
 

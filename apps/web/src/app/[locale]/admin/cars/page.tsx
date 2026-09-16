@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { MapPin, Check, X, Star, Trash2, Loader2, Car as CarIcon } from 'lucide-react';
+import { MapPin, Check, X, Star, Trash2, Loader2, CalendarClock, Car as CarIcon } from 'lucide-react';
 import { Card } from '@/shared/components/ui/card';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
@@ -16,6 +16,8 @@ import {
 } from '@/shared/components/ui/dialog';
 import { Textarea } from '@/shared/components/ui/textarea';
 import { CarDetailsDialog } from '@/features/admin/components/CarDetailsDialog';
+import { ExpiryLine } from '@/features/admin/components/ExpiryLine';
+import { ExtendListingDialog } from '@/features/admin/components/ExtendListingDialog';
 import { adminApi } from '@/features/admin/api/admin.api';
 import { useAdminAuth } from '@/features/admin/hooks/useAdminAuth';
 import { CAR_TRANSMISSION_LABELS } from '@/features/admin/lib/carLabels';
@@ -118,6 +120,8 @@ export default function AdminCarsPage() {
   }
 
   const allSelected = cars.length > 0 && selectedIds.size === cars.length;
+  // Renewal only makes sense for listings that are live or have lapsed.
+  const canRenew = status === 'expired' || status === 'approved';
 
   function toggleAll() {
     setSelectedIds(allSelected ? new Set() : new Set(cars.map((c) => c._id)));
@@ -152,6 +156,7 @@ export default function AdminCarsPage() {
               <TabsTrigger value="rejected">مرفوضة</TabsTrigger>
               <TabsTrigger value="sold">مباعة</TabsTrigger>
               <TabsTrigger value="rented">مؤجرة</TabsTrigger>
+              <TabsTrigger value="expired">منتهية الصلاحية</TabsTrigger>
             </TabsList>
           </div>
 
@@ -181,6 +186,23 @@ export default function AdminCarsPage() {
                   </label>
 
                   {selectedIds.size > 0 && (
+                    <div className="flex items-center gap-2">
+                    {canRenew && (
+                      <ExtendListingDialog
+                        domain="cars"
+                        ids={[...selectedIds]}
+                        onDone={() => {
+                          setSelectedIds(new Set());
+                          refetch();
+                        }}
+                        trigger={
+                          <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                            <CalendarClock className="size-4" />
+                            تجديد المحدد ({selectedIds.size})
+                          </Button>
+                        }
+                      />
+                    )}
                     <Dialog>
                       <DialogTrigger asChild>
                         <Button variant="destructive" size="sm">
@@ -209,6 +231,7 @@ export default function AdminCarsPage() {
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
+                    </div>
                   )}
                 </div>
 
@@ -338,6 +361,11 @@ function AdminCarRow({
                 {car.mileage != null ? ` · ${formatPrice(car.mileage)} كم` : ''}
                 {` · ${CAR_TRANSMISSION_LABELS[car.transmission]}`}
               </p>
+              <ExpiryLine
+                status={car.status}
+                expiresAt={car.expiresAt}
+                neverExpires={car.neverExpires}
+              />
             </div>
             <Badge variant={statusVariant[car.status]} className="shrink-0">
               {tProp(`status.${car.status}`)}
@@ -402,6 +430,24 @@ function AdminCarRow({
                   </DialogContent>
                 </Dialog>
               </>
+            )}
+
+            {(car.status === 'expired' || car.status === 'approved') && (
+              <ExtendListingDialog
+                domain="cars"
+                ids={[car._id]}
+                onDone={onAction}
+                trigger={
+                  <Button
+                    size="sm"
+                    variant={car.status === 'expired' ? 'default' : 'outline'}
+                    className={car.status === 'expired' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : ''}
+                  >
+                    <CalendarClock className="size-4" />
+                    تجديد المدة
+                  </Button>
+                }
+              />
             )}
 
             {car.status === 'approved' && (

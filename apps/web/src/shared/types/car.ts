@@ -46,6 +46,8 @@ export interface Car {
   rejectionReason: string | null;
   durationDays: number;
   expiresAt: string;
+  /** Admin-only override: the listing never expires. */
+  neverExpires?: boolean;
   isFeatured: boolean;
   viewCount: number;
   ratingAvg: number;

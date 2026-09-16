@@ -56,6 +56,8 @@ export interface Property {
   rejectionReason: string | null;
   durationDays: number;
   expiresAt: string;
+  /** Admin-only override: the listing never expires. */
+  neverExpires?: boolean;
   isFeatured: boolean;
   viewCount: number;
   // Denormalized rating aggregates. ratingAvg is 0 until the listing has ratings.

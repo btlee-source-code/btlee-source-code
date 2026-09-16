@@ -3,7 +3,15 @@ import { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { MapPin, Check, X, Star, Trash2, Loader2 } from "lucide-react";
+import {
+  MapPin,
+  Check,
+  X,
+  Star,
+  Trash2,
+  Loader2,
+  CalendarClock,
+} from "lucide-react";
 import { Card } from "@/shared/components/ui/card";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
@@ -24,6 +32,8 @@ import {
 } from "@/shared/components/ui/dialog";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { PropertyDetailsDialog } from "@/features/admin/components/PropertyDetailsDialog";
+import { ExpiryLine } from "@/features/admin/components/ExpiryLine";
+import { ExtendListingDialog } from "@/features/admin/components/ExtendListingDialog";
 import { adminApi } from "@/features/admin/api/admin.api";
 import { useAdminAuth } from "@/features/admin/hooks/useAdminAuth";
 import { formatPrice } from "@/shared/lib/utils";
@@ -142,6 +152,8 @@ export default function AdminPropertiesPage() {
 
   const allSelected =
     properties.length > 0 && selectedIds.size === properties.length;
+  // Renewal only makes sense for listings that are live or have lapsed.
+  const canRenew = status === "expired" || status === "approved";
 
   function toggleAll() {
     setSelectedIds(
@@ -186,6 +198,7 @@ export default function AdminPropertiesPage() {
               <TabsTrigger value="rejected">مرفوضة</TabsTrigger>
               <TabsTrigger value="sold">مباعة</TabsTrigger>
               <TabsTrigger value="rented">مؤجرة</TabsTrigger>
+              <TabsTrigger value="expired">منتهية الصلاحية</TabsTrigger>
             </TabsList>
           </div>
 
@@ -227,6 +240,26 @@ export default function AdminPropertiesPage() {
                   </label>
 
                   {selectedIds.size > 0 && (
+                    <div className="flex items-center gap-2">
+                    {canRenew && (
+                      <ExtendListingDialog
+                        domain="properties"
+                        ids={[...selectedIds]}
+                        onDone={() => {
+                          setSelectedIds(new Set());
+                          refetch();
+                        }}
+                        trigger={
+                          <Button
+                            size="sm"
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                          >
+                            <CalendarClock className="size-4" />
+                            تجديد المحدد ({selectedIds.size})
+                          </Button>
+                        }
+                      />
+                    )}
                     <Dialog>
                       <DialogTrigger asChild>
                         <Button variant="destructive" size="sm">
@@ -258,6 +291,7 @@ export default function AdminPropertiesPage() {
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
+                    </div>
                   )}
                 </div>
 
@@ -391,6 +425,11 @@ function AdminPropertyRow({
               <p className="text-xs text-muted-foreground mt-1 truncate">
                 المعلن: {property.owner?.name ?? "—"}
               </p>
+              <ExpiryLine
+                status={property.status}
+                expiresAt={property.expiresAt}
+                neverExpires={property.neverExpires}
+              />
             </div>
             <Badge
               variant={statusVariant[property.status]}
@@ -470,6 +509,31 @@ function AdminPropertyRow({
                   </DialogContent>
                 </Dialog>
               </>
+            )}
+
+            {(property.status === "expired" ||
+              property.status === "approved") && (
+              <ExtendListingDialog
+                domain="properties"
+                ids={[property._id]}
+                onDone={onAction}
+                trigger={
+                  <Button
+                    size="sm"
+                    variant={
+                      property.status === "expired" ? "default" : "outline"
+                    }
+                    className={
+                      property.status === "expired"
+                        ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                        : ""
+                    }
+                  >
+                    <CalendarClock className="size-4" />
+                    تجديد المدة
+                  </Button>
+                }
+              />
             )}
 
             {property.status === "approved" && (
