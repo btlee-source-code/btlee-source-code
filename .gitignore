@@ -2,6 +2,14 @@
 node_modules/
 **/node_modules/
 
+# Root lockfile — intentionally NOT committed. It pins native optional
+# binaries (e.g. @swc/core-*, @next/swc-*) to whatever platform generated it;
+# a Windows-generated lock breaks `npm install` in the Linux deploy container
+# (missing @swc/core-linux-x64-gnu etc). Let each environment (local dev,
+# Railpack/Docker build) resolve its own. apps/server/package-lock.json is
+# unaffected (that workspace has no native optional deps) and stays committed.
+/package-lock.json
+
 # Env / secrets
 .env
 .env.local
