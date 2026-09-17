@@ -11,7 +11,9 @@
     "web": "npm run dev --workspace apps/web",
     "server": "npm run dev --workspace apps/server",
     "mobile": "npm run start --workspace apps/mobile",
-    "type-check": "npm run type-check --workspaces --if-present"
+    "type-check": "npm run type-check --workspaces --if-present",
+    "build:web": "npm run build --workspace apps/web",
+    "start:web": "npm run start --workspace apps/web"
   },
   "engines": {
     "node": ">=20"
