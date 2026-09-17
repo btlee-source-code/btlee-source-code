@@ -51,8 +51,8 @@ const envSchema = z.object({
   // Auth cookies. 'lax' is safe when the frontend and API share a site
   // (same registrable domain — incl. localhost:3000 ↔ localhost:5000, or
   // app.example.com ↔ api.example.com). Use 'none' only if they are truly
-  // cross-site (e.g. Vercel frontend + Railway API), in which case Secure is
-  // forced on and HTTPS is required.
+  // cross-site (different registrable domains), in which case Secure is forced
+  // on and HTTPS is required.
   COOKIE_SAMESITE: z.enum(['lax', 'strict', 'none']).default('lax'),
   COOKIE_DOMAIN: z.string().optional(),
 
@@ -77,8 +77,8 @@ const envSchema = z.object({
   SMTP_PASS: optionalConfig(z.string().min(1)),
   EMAIL_FROM: z.string().min(1),
 
-  // Resend HTTP API key. Set this on hosts that block SMTP (e.g. Railway) — when
-  // present, email is sent via Resend over HTTPS instead of SMTP.
+  // Resend HTTP API key. Set this on hosts that block outbound SMTP ports —
+  // when present, email is sent via Resend over HTTPS instead of SMTP.
   RESEND_API_KEY: optionalConfig(z.string().min(1)),
 
   // Seed admin. Password must be reasonably strong since it owns the platform.
@@ -108,13 +108,13 @@ if (env.JWT_ACCESS_SECRET === env.JWT_REFRESH_SECRET) {
   process.exit(1);
 }
 
-// Cross-site safety check: in production a Vercel-style frontend talking to a
-// separate API host needs SameSite=None, otherwise the browser drops the auth
-// cookies and every login silently fails. Warn loudly if that looks misconfigured.
+// Cross-site safety check: in production a frontend talking to an API on a
+// different registrable domain needs SameSite=None, otherwise the browser drops
+// the auth cookies and every login silently fails. Warn if that looks wrong.
 if (env.NODE_ENV === 'production' && env.COOKIE_SAMESITE === 'lax') {
   console.warn(
     '⚠️  COOKIE_SAMESITE=lax in production. If the frontend and API are on ' +
-    'different sites (e.g. *.vercel.app + *.railway.app), set COOKIE_SAMESITE=none ' +
-    'or auth cookies will NOT be sent and login will fail.'
+    'different registrable domains, set COOKIE_SAMESITE=none or auth cookies ' +
+    'will NOT be sent and login will fail.'
   );
 }

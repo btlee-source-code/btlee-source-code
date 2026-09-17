@@ -23,7 +23,7 @@ if (!process.env.NEXT_PUBLIC_API_URL && process.env.NODE_ENV === 'production') {
   // eslint-disable-next-line no-console
   console.error(
     '[btlee] NEXT_PUBLIC_API_URL is not set — set it to your API origin ' +
-      '(e.g. https://your-api.up.railway.app/api) before deploying.'
+      '(e.g. https://api.your-domain.com/api) before deploying.'
   );
 }
 

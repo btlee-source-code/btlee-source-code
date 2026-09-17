@@ -32,12 +32,14 @@ const allowedOrigins = [
 export function createApp(): Express {
   const app = express();
 
-  // Trust the first proxy (required behind Nginx/Railway/Render/Cloudflare so
-  // req.ip + req.secure + rate-limit keying reflect the real client).
+  // Trust the first proxy (required behind Nginx/Cloudflare so req.ip +
+  // req.secure + rate-limit keying reflect the real client). Raise the count
+  // only if you add another proxy hop in front of Nginx.
   app.set('trust proxy', 1);
 
-  // Force HTTPS in production. The platform terminates TLS and forwards over
-  // http with `x-forwarded-proto: https`; redirect anything that isn't https.
+  // Force HTTPS in production. Nginx terminates TLS and forwards over http, so
+  // it MUST set `X-Forwarded-Proto: https` — without that header this redirect
+  // loops forever.
   if (isProd) {
     app.use((req: Request, res: Response, next: NextFunction) => {
       if (req.secure || req.headers['x-forwarded-proto'] === 'https') return next();
@@ -80,7 +82,7 @@ export function createApp(): Express {
   app.use(compression());
 
   // Request logging — concise 'dev' locally, Apache 'combined' in production
-  // (written to stdout, which Railway/Render capture as structured logs).
+  // (written to stdout, captured by the process manager's logs).
   app.use(morgan(isProd ? 'combined' : 'dev'));
 
   // Global rate limit — 300 req / 15 min per IP

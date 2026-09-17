@@ -13,9 +13,10 @@ import mongoose from 'mongoose';
 import { env } from './env.js';
 
 // DNS override is only needed for local dev behind ISPs that block SRV
-// lookups. In production (Railway/Render/etc.) the platform's own resolver
-// works fine and forcing public DNS can slow down or break connections, so
-// only apply it outside production.
+// lookups. In production the host's own resolver works fine and forcing public
+// DNS can slow down or break connections, so only apply it outside production.
+// (If the server's own SRV lookups ever fail, fix the host's /etc/resolv.conf
+// rather than overriding here.)
 if (env.NODE_ENV !== 'production') {
   dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4', '1.0.0.1']);
 }

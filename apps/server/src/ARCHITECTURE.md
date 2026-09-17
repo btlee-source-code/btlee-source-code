@@ -77,6 +77,6 @@ These are documented so the next contributor doesn't assume they're complete:
   real second domain.
 - **Wire `@btlee/shared` into web + server at runtime.** Today only `apps/mobile`
   consumes the shared package (Metro resolves its TS source). Web (Vercel) and
-  server (Railway) keep local enum copies as canonical mirrors; wiring them to
+  server (VPS) keep local enum copies as canonical mirrors; wiring them to
   import the package needs their workspace-install/build config confirmed first
   (a bare `import '@btlee/shared'` must resolve at their build + runtime).

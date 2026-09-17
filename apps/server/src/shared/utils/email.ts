@@ -4,7 +4,8 @@
  *
  * Two delivery paths, picked automatically:
  *   - If RESEND_API_KEY is set → send via Resend's HTTP API (port 443). Use this
- *     on hosts that block outbound SMTP ports (e.g. Railway blocks 25/465/587).
+ *     on hosts that block outbound SMTP ports (25/465/587) — many VPS providers
+ *     block 25 by default.
  *   - Otherwise → send via SMTP (nodemailer). Works fine locally.
  */
 import nodemailer from 'nodemailer';

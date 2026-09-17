@@ -5,11 +5,11 @@ const withNextIntl = createNextIntlPlugin('./src/config/i18n.ts');
 
 // Same-origin API proxy. When API_PROXY_TARGET is set (production on Vercel),
 // the browser calls our own origin at /api/* and Vercel rewrites those to the
-// Railway API. That makes the auth cookie FIRST-PARTY (same site as the app),
-// so it is sent on every request even on iOS Safari / mobile browsers that
-// block third-party cookies — without merging the two deployments or buying a
-// shared domain. The i18n middleware (src/proxy.ts) already excludes /api.
-//   Vercel env:  API_PROXY_TARGET=https://<your-app>.up.railway.app
+// backend. That makes the auth cookie FIRST-PARTY (same site as the app), so it
+// is sent on every request even on iOS Safari / mobile browsers that block
+// third-party cookies — without merging the two deployments or buying a shared
+// domain. The i18n middleware (src/proxy.ts) already excludes /api.
+//   Vercel env:  API_PROXY_TARGET=https://api.<your-domain>
 //                NEXT_PUBLIC_API_URL=/api
 const proxyTarget = process.env.API_PROXY_TARGET?.replace(/\/$/, '');
 

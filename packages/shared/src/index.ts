@@ -3,7 +3,7 @@
  *
  * Consumed today by apps/mobile (Expo/Metro). apps/web + apps/server keep local
  * mirrors for now and treat this package as canonical; wiring them to import it
- * directly is deferred until the Vercel/Railway workspace-install config is
+ * directly is deferred until their workspace-install config is
  * confirmed (a bare `import` here must resolve at their build/runtime too).
  *
  * Relative imports are EXTENSIONLESS on purpose: Metro's resolver does not remap
