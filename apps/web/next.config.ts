@@ -15,6 +15,10 @@ const proxyTarget = process.env.API_PROXY_TARGET?.replace(/\/$/, '');
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Emit a self-contained server bundle (only the runtime deps it actually
+  // needs, no dev/mobile/server workspace packages) — the Docker image copies
+  // this instead of full node_modules, and `node server.js` replaces `next start`.
+  output: 'standalone',
   // Brand logo artwork is the single source of truth in the shared package
   // (@btlee/shared/logos), shared with the mobile app. Transpiling it lets Next
   // resolve the PNG imports from that workspace package.
