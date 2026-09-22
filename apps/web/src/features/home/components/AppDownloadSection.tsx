@@ -16,6 +16,8 @@
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { motion } from "framer-motion";
+import { ArrowLeft } from "lucide-react";
+import { Link } from "@/config/navigation";
 import { PLAY_STORE_URL } from "@/config/site";
 
 export function AppDownloadSection() {
@@ -46,6 +48,14 @@ export function AppDownloadSection() {
             <p className="text-sm sm:text-base lg:text-lg text-muted-foreground">
               {t("appSubtitle")}
             </p>
+
+            <Link
+              href="/download"
+              className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline lg:text-base"
+            >
+              {t("appLearnMore")}
+              <ArrowLeft className="size-4 rtl:rotate-180" />
+            </Link>
           </motion.div>
 
           <div className="flex items-center gap-10">

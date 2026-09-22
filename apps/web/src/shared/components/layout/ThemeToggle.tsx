@@ -13,10 +13,7 @@ import { useEffect, useState } from 'react';
 import { Sun, Moon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/shared/components/ui/button';
-
-export const THEME_COOKIE = 'btlee-theme';
-// One year — the choice should stick across sessions.
-const THEME_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
+import { THEME_COOKIE, THEME_COOKIE_MAX_AGE } from '@/config/theme';
 
 function applyTheme(dark: boolean) {
   document.documentElement.classList.toggle('dark', dark);

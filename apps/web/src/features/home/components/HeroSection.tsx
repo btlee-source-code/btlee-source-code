@@ -149,7 +149,9 @@ export function HeroSection() {
                     }`}
                     strokeWidth={2}
                   />
-                  <span className="min-w-0 truncate">{tabLabelMap[tab.key]}</span>
+                  <span className="min-w-0 truncate">
+                    {tabLabelMap[tab.key]}
+                  </span>
                 </button>
               ))}
             </div>

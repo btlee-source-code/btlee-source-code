@@ -39,7 +39,8 @@
     "properties": "Properties",
     "editProperty": "Edit Listing",
     "darkMode": "Dark mode",
-    "lightMode": "Light mode"
+    "lightMode": "Light mode",
+    "app": "App"
   },
   "home": {
     "heroBadge": "A real estate platform with no middleman",
@@ -97,6 +98,7 @@
     "appSubtitle": "Install the Btlee app and start searching smarter.",
     "appQrHint": "Scan to download the app",
     "appGooglePlay": "Get it on Google Play",
+    "appLearnMore": "Learn more about the app",
     "propertiesAvailable": "properties available",
     "searchSuggestionsHeader": "Suggestions",
     "searchPropertiesHeader": "Suggested properties",
@@ -567,5 +569,137 @@
     "oauthFailed": "Couldn't sign in with Google. Please try again",
     "oauthUnavailable": "Google sign-in is currently unavailable",
     "accountBlocked": "This account has been blocked. Please contact support"
+  },
+  "download": {
+    "meta": {
+      "title": "Download the Android app",
+      "description": "Get the Btlee app on Android: browse properties and cars, save favourites and searches, and message the owner directly on WhatsApp — no middleman, no commission."
+    },
+    "hero": {
+      "title": "Everything you're looking for",
+      "titleAccent": "in one app",
+      "subtitle": "Browse properties and cars, save what you like, and message the owner directly on WhatsApp — no middleman, no commission.",
+      "googlePlay": "Get it on Google Play",
+      "qrHint": "Scan with your phone camera",
+      "availability": "Free on Android",
+      "cards": {
+        "alertTitle": "A new listing matches your search",
+        "alertBody": "Apartment for sale · Maadi",
+        "alertTime": "now",
+        "whatsapp": "Contact on WhatsApp",
+        "noCommission": "No commission"
+      }
+    },
+    "marquee": [
+      "No commission",
+      "Apartments",
+      "Direct contact with owners",
+      "Villas",
+      "Cars",
+      "Free listings",
+      "Chalets",
+      "Reviewed listings",
+      "Shops",
+      "Land"
+    ],
+    "showcase": {
+      "title": "See the app in action",
+      "subtitle": "Keep scrolling — each step shows you another part of the app.",
+      "steps": [
+        {
+          "tag": "Search",
+          "title": "Search with ease",
+          "desc": "Start on the home screen, type an area or property type and apply filters — apartments, villas, chalets, land, shops and factories in one place."
+        },
+        {
+          "tag": "Details",
+          "title": "Every detail up front",
+          "desc": "Full-size photos, the price, bedrooms and bathrooms — and a pinned WhatsApp button so you can reach the owner in a second."
+        },
+        {
+          "tag": "Cars",
+          "title": "Cars too",
+          "desc": "Switch between properties and cars in one tap and browse by body type: sedan, hatchback, SUV, minivan and more."
+        },
+        {
+          "tag": "Account",
+          "title": "Sign in in seconds",
+          "desc": "With Google, or your email or phone number — then start saving favourites and searches and following your alerts."
+        },
+        {
+          "tag": "Publish",
+          "title": "Post your own listing",
+          "desc": "Upload up to 15 photos, pick the deal and property type, and publish for free — with no commission."
+        }
+      ]
+    },
+    "features": {
+      "title": "Why get the app?",
+      "subtitle": "Built for your phone from day one: faster, simpler, and quick to tell you what’s new.",
+      "items": [
+        {
+          "title": "Alerts the moment it lands",
+          "desc": "Save a search once and get a push notification as soon as a matching listing is published."
+        },
+        {
+          "title": "WhatsApp in one tap",
+          "desc": "The contact button is pinned on every listing — reach the owner directly, no middleman."
+        },
+        {
+          "title": "Precise filters",
+          "desc": "Type, price, area and bedrooms, plus search by name, like “apartment in Maadi”."
+        },
+        {
+          "title": "Favourites & saved searches",
+          "desc": "Come back to any listing you liked without starting your search over."
+        },
+        {
+          "title": "List for free",
+          "desc": "Up to 15 photos per listing, and no commission on the deal."
+        },
+        {
+          "title": "Your language, your look",
+          "desc": "Arabic or English, light or dark — switch anytime from the app menu."
+        }
+      ]
+    },
+    "gallery": {
+      "title": "Snapshots from the app",
+      "subtitle": "Swipe through every screen of the app.",
+      "prev": "Previous screen",
+      "next": "Next screen",
+      "captions": [
+        "Home",
+        "Listing details",
+        "Cars",
+        "Choose a make",
+        "Add a property",
+        "Add a car",
+        "Sign in"
+      ]
+    },
+    "steps": {
+      "title": "Get started in 3 steps",
+      "subtitle": "From install to your first chat with an owner, in minutes.",
+      "items": [
+        {
+          "title": "Install the app",
+          "desc": "From Google Play in one tap."
+        },
+        {
+          "title": "Sign in",
+          "desc": "With Google, or your email or phone number, in seconds."
+        },
+        {
+          "title": "Talk to the owner",
+          "desc": "Message on WhatsApp with no middleman and settle every detail."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Btlee, in your pocket.",
+      "subtitle": "Search, save and talk to the owner directly — anywhere, anytime.",
+      "availability": "Free on Android"
+    }
   }
 }

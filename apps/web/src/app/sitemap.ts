@@ -9,6 +9,7 @@ const LOCALES = ['ar', 'en'] as const;
 const STATIC_PATHS = [
   '',
   '/properties',
+  '/download',
   '/login',
   '/register',
   '/privacy',

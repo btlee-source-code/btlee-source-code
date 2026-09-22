@@ -11,7 +11,7 @@ import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import { routing } from "@/config/routing";
 import { SITE_URL, OG_IMAGE, localizedSiteInfo } from "@/config/site";
-import { THEME_COOKIE } from "@/shared/components/layout/ThemeToggle";
+import { THEME_COOKIE } from "@/config/theme";
 import { AuthHydrator } from "@/features/auth/components/AuthHydrator";
 import { LocalePreferenceSync } from "@/features/i18n/components/LocalePreferenceSync";
 import { ZodI18nSetup } from "@/shared/components/providers/ZodI18nSetup";
@@ -134,7 +134,6 @@ export default async function LocaleLayout({
             fbq('track', 'PageView');
           `}
         </Script>
-
         <noscript>
           <img
             height="1"

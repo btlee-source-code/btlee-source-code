@@ -27,6 +27,7 @@ export function Navbar() {
     { href: '/properties?listingType=sale', label: t('buy'), match: 'sale' },
     { href: '/properties?listingType=rent', label: t('rent'), match: 'rent' },
     { href: '/properties?category=commercial', label: t('commercial'), match: 'commercial' },
+    { href: '/download', label: t('app'), match: 'download' },
   ];
 
   return (
@@ -35,7 +36,7 @@ export function Navbar() {
         {/* Left: Logo + Nav */}
         <div className="flex items-center gap-8">
           <Logo />
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -55,7 +56,7 @@ export function Navbar() {
 
         {/* Right: Actions */}
         <div className="flex items-center gap-1 min-[380px]:gap-1.5 md:gap-2">
-          <Button asChild variant="accent" size="sm" className="hidden md:inline-flex font-semibold">
+          <Button asChild variant="accent" size="sm" className="hidden lg:inline-flex font-semibold">
             <Link href="/add-property">
               <Plus className="size-4" />
               {t('addProperty')}
@@ -76,10 +77,10 @@ export function Navbar() {
 
           {!isAuthenticated && (
             <>
-              <Button asChild variant="secondary" size="sm" className="hidden md:inline-flex border border-border">
+              <Button asChild variant="secondary" size="sm" className="hidden lg:inline-flex border border-border">
                 <Link href="/login">{t('login')}</Link>
               </Button>
-              <Button asChild variant="default" size="sm" className="hidden md:inline-flex">
+              <Button asChild variant="default" size="sm" className="hidden lg:inline-flex">
                 <Link href="/register">{t('register')}</Link>
               </Button>
             </>
@@ -89,14 +90,14 @@ export function Navbar() {
               (not tucked inside the mobile menu). */}
           <ThemeToggle />
 
-          <div className="hidden md:block">
+          <div className="hidden lg:block">
             <LanguageSwitcher />
           </div>
 
           <Button
             variant="ghost"
             size="icon"
-            className="size-9 min-[380px]:size-10 md:hidden"
+            className="size-9 min-[380px]:size-10 lg:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Menu"
           >
@@ -111,7 +112,7 @@ export function Navbar() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-border bg-background">
+        <div className="lg:hidden border-t border-border bg-background">
           <nav className="container mx-auto flex flex-col gap-2.5 px-4 py-4">
             {navLinks.map((link) => (
               <Link

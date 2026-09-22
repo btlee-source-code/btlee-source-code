@@ -49,6 +49,11 @@ export function Footer() {
                   {t('nav.addProperty')}
                 </Link>
               </li>
+              <li>
+                <Link href="/download" className="text-muted-foreground hover:text-primary transition-colors">
+                  {t('nav.app')}
+                </Link>
+              </li>
             </ul>
           </div>
 
