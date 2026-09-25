@@ -1,8 +1,8 @@
 import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
-import { useEffect } from 'react';
 import { Image as NativeImage, Pressable, Text } from 'react-native';
 import Animated, {
+  cancelAnimation,
   Easing,
   useAnimatedStyle,
   useSharedValue,
@@ -16,6 +16,7 @@ import Animated, {
 import type { ReactElement } from 'react';
 
 import type { Icon3D } from '@/assets/icons3d/registry';
+import { useWhileActive } from '@/shared/hooks/useWhileActive';
 import { shadows } from '@/shared/lib/shadows';
 
 type Props = {
@@ -49,7 +50,9 @@ export function CategoryChip({ label, icon, Svg, accent, index = 0, onPress }: P
   // Press pop — a quick squish then springy overshoot back to rest.
   const scale = useSharedValue(1);
 
-  useEffect(() => {
+  // Foreground only — these loops never end on their own, and leaving them
+  // running while the app is backgrounded is what trips Android's ANR watchdog.
+  useWhileActive(() => {
     float.value = withDelay(
       index * 160,
       withRepeat(withTiming(1, { duration: 1500, easing: Easing.inOut(Easing.sin) }), -1, true)
@@ -58,6 +61,13 @@ export function CategoryChip({ label, icon, Svg, accent, index = 0, onPress }: P
       index * 160,
       withRepeat(withTiming(1, { duration: 2100, easing: Easing.inOut(Easing.sin) }), -1, true)
     );
+
+    return () => {
+      cancelAnimation(float);
+      cancelAnimation(sway);
+      float.value = 0;
+      sway.value = 0;
+    };
   }, [float, sway, index]);
 
   const iconStyle = useAnimatedStyle(() => ({

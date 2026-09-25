@@ -1,7 +1,8 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, {
+  cancelAnimation,
   Easing,
   interpolate,
   useAnimatedStyle,
@@ -11,6 +12,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useTheme } from '@/features/theme/hooks/useTheme';
+import { useWhileActive } from '@/shared/hooks/useWhileActive';
 
 /**
  * A placeholder block with a shimmer sweep — a soft light band glides across
@@ -22,10 +24,14 @@ export function Skeleton({ className, style }: { className?: string; style?: Sty
   const [w, setW] = useState(0);
   const progress = useSharedValue(0);
 
-  useEffect(() => {
+  // Foreground only — an endless shimmer that keeps updating props while the
+  // app is backgrounded is an ANR waiting to happen (see useWhileActive).
+  useWhileActive(() => {
     if (w === 0) return;
     progress.value = 0;
     progress.value = withRepeat(withTiming(1, { duration: 1300, easing: Easing.inOut(Easing.ease) }), -1, false);
+
+    return () => cancelAnimation(progress);
   }, [w, progress]);
 
   const sweep = useAnimatedStyle(() => ({

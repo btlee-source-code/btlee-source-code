@@ -116,7 +116,6 @@ export default async function LocaleLayout({
       <body className="font-cairo min-h-screen bg-background text-foreground antialiased">
         <MetaPixel />
 
-
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ReduxProvider>
             <ZodI18nSetup />

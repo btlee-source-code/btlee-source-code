@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Image, Text, View } from 'react-native';
 import Animated, {
   cancelAnimation,
@@ -19,6 +19,7 @@ import { useSection } from '@/features/section/hooks/useSection';
 import { useThemeColors } from '@/features/theme/hooks/useTheme';
 import { PressableScale } from '@/shared/components/ui/PressableScale';
 import { useResponsiveLayout } from '@/shared/hooks/useResponsiveLayout';
+import { useWhileActive } from '@/shared/hooks/useWhileActive';
 import { shadows } from '@/shared/lib/shadows';
 
 const OPTIONS: { key: Section; label: () => string }[] = [
@@ -107,7 +108,8 @@ function Pill({
   const idlePulse = useSharedValue(0);
   const interacting = useSharedValue(0);
 
-  useEffect(() => {
+  // Foreground only — see useWhileActive.
+  useWhileActive(() => {
     idlePulse.value = withDelay(
       index * 450,
       withRepeat(
@@ -121,7 +123,10 @@ function Pill({
       )
     );
 
-    return () => cancelAnimation(idlePulse);
+    return () => {
+      cancelAnimation(idlePulse);
+      idlePulse.value = 0;
+    };
   }, [idlePulse, index]);
 
   const iconStyle = useAnimatedStyle(() => ({

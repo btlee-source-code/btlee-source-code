@@ -1,6 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Text } from 'react-native';
-import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, {
+  cancelAnimation,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+
+import { useWhileActive } from '@/shared/hooks/useWhileActive';
 
 /**
  * A single-line hint that cycles through example searches, each rolling up and
@@ -21,7 +29,9 @@ export function AnimatedSearchHint({
   const opacity = useSharedValue(1);
   const translateY = useSharedValue(0);
 
-  useEffect(() => {
+  // Foreground only: a background tick would animate props nobody can see, and
+  // JS timers keep firing after the app is backgrounded (see useWhileActive).
+  useWhileActive(() => {
     if (examples.length < 2) return;
     const bump = () => setI((p) => (p + 1) % examples.length);
     const id = setInterval(() => {
@@ -35,7 +45,13 @@ export function AnimatedSearchHint({
         opacity.value = withTiming(1, { duration: 260 });
       });
     }, intervalMs);
-    return () => clearInterval(id);
+    return () => {
+      clearInterval(id);
+      cancelAnimation(opacity);
+      cancelAnimation(translateY);
+      opacity.value = 1;
+      translateY.value = 0;
+    };
   }, [examples.length, intervalMs, opacity, translateY]);
 
   const style = useAnimatedStyle(() => ({
