@@ -1,4 +1,4 @@
-'use client';
+"use client";
 /**
  * "Continue with Google" button.
  *
@@ -7,9 +7,9 @@
  * httpOnly cookies on the callback and redirects to /oauth/callback, so there's
  * no token handling in the client.
  */
-import { useTranslations } from 'next-intl';
-import { Button } from '@/shared/components/ui/button';
-import { API_URL } from '@/shared/api/httpClient';
+import { useTranslations } from "next-intl";
+import { Button } from "@/shared/components/ui/button";
+import { API_URL } from "@/shared/api/httpClient";
 
 function GoogleIcon() {
   return (
@@ -40,7 +40,7 @@ interface GoogleButtonProps {
 }
 
 export function GoogleButton({ label }: GoogleButtonProps) {
-  const t = useTranslations('auth');
+  const t = useTranslations("auth");
 
   function start() {
     window.location.href = `${API_URL}/auth/google`;
@@ -54,7 +54,7 @@ export function GoogleButton({ label }: GoogleButtonProps) {
       onClick={start}
     >
       <GoogleIcon />
-      {label ?? t('continueWithGoogle')}
+      {label ?? t("continueWithGoogle")}
     </Button>
   );
 }

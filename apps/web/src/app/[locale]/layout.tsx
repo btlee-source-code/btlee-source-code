@@ -4,7 +4,6 @@
  * wraps the app with all providers.
  */
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -12,6 +11,7 @@ import { cookies } from "next/headers";
 import { routing } from "@/config/routing";
 import { SITE_URL, OG_IMAGE, localizedSiteInfo } from "@/config/site";
 import { THEME_COOKIE } from "@/config/theme";
+import { MetaPixel } from "@/features/analytics/components/MetaPixel";
 import { AuthHydrator } from "@/features/auth/components/AuthHydrator";
 import { LocalePreferenceSync } from "@/features/i18n/components/LocalePreferenceSync";
 import { ZodI18nSetup } from "@/shared/components/providers/ZodI18nSetup";
@@ -114,35 +114,8 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <body className="font-cairo min-h-screen bg-background text-foreground antialiased">
-        {/* afterInteractive, not beforeInteractive: this layout sits under the
-            [locale] segment, so switching language re-renders it on the client.
-            beforeInteractive is emitted as a literal <script> element, which
-            React 19 flags ("Encountered a script tag while rendering React
-            component") on that client render. afterInteractive goes through
-            Next's script loader instead, runs once, and survives navigations. */}
-        <Script id="meta-pixel" strategy="afterInteractive">
-          {`
-            !function(f,b,e,v,n,t,s)
-            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-            n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t,s)}(window, document,'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '2612465362522284');
-            fbq('track', 'PageView');
-          `}
-        </Script>
-        <noscript>
-          <img
-            height="1"
-            width="1"
-            style={{ display: "none" }}
-            src="https://www.facebook.com/tr?id=2612465362522284&ev=PageView&noscript=1"
-            alt=""
-          />
-        </noscript>
+        <MetaPixel />
+
 
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ReduxProvider>
