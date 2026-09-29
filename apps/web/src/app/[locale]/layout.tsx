@@ -17,6 +17,8 @@ import { LocalePreferenceSync } from "@/features/i18n/components/LocalePreferenc
 import { ZodI18nSetup } from "@/shared/components/providers/ZodI18nSetup";
 import { ReduxProvider } from "@/shared/components/providers/ReduxProvider";
 import { Toaster } from "@/shared/components/ui/toaster";
+import Script from "next/script";
+
 import "../globals.css";
 
 export async function generateMetadata({
@@ -102,8 +104,8 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   // Read the saved theme from its cookie and render the `dark` class on <html>
-  // server-side. This avoids both a flash of the wrong theme AND any client-side
-  // <script>. The navbar toggle keeps this cookie in sync.
+  // server-side. This avoids both a flash of the wrong theme AND a client-side
+  // script. The navbar toggle keeps this cookie in sync.
   const isDark = (await cookies()).get(THEME_COOKIE)?.value === "dark";
 
   return (
@@ -114,6 +116,21 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <body className="font-cairo min-h-screen bg-background text-foreground antialiased">
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-204HRNB1ZN"
+          strategy="afterInteractive"
+        />
+
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-204HRNB1ZN');
+          `}
+        </Script>
+
         <MetaPixel />
 
         <NextIntlClientProvider locale={locale} messages={messages}>
