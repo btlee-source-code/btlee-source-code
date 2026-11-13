@@ -131,7 +131,7 @@ export default async function LocaleLayout({
           `}
         </Script>
 
-        <MetaPixel />
+        {/* <MetaPixel /> */}
 
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ReduxProvider>
